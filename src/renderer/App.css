@@ -1,32 +1,42 @@
-:root {
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: 100%;
-  background-color: #242424;
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-
-h1 {
-  font-size: 1.5em;
-  line-height: 0;
-}
-
-h2 {
-  font-size: 2.2em;
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
   text-align: center;
 }
 
-a {
-  text-decoration: none;
-  color: white;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
-code {
-  font-size: large;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-span {
-  text-decoration: underline;
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
 }

@@ -4,7 +4,7 @@ import electronLogo from '@Assets/electron.png';
 import reactLogo from '@Assets/react.svg';
 import viteLogo from '@Assets/vite.svg';
 import './Home.scss';
-import './Api';
+// import './Api';
 
 function Home() {
   const [state, setState] = useState(0);
@@ -50,11 +50,6 @@ function Home() {
           </a>
         </div>
       </section>
-      <footer className="footer">
-        <a href="https://ajaykanniyappan.com" target="_blank" rel="noopener noreferrer">
-          Powered by&nbsp;<span>Ajay Kanniyappan</span>
-        </a>
-      </footer>
     </div>
   );
 }

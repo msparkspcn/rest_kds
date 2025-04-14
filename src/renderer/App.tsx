@@ -1,12 +1,12 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from '@Components/Home';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Main from '@Components/pages/main/Main';
+import './index.css';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Main />} />
       </Routes>
     </Router>
   );

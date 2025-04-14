@@ -15,7 +15,7 @@ console.log(`${chalk.whiteBright.bold(' ✨ Start')} ${chalk.green.bold('Hacking
 export default defineConfig({
   base: './',
   clearScreen: false,
-  publicDir: resolve('./src/renderer/public'),
+  publicDir: resolve('../src/renderer'),
   root: resolve('./src/renderer'),
   server: {
     port,

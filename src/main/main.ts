@@ -3,7 +3,6 @@ import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import { isDebug, getAssetsPath, getHtmlPath, getPreloadPath, installExtensions } from './utils';
-import menu from './menu';
 import './updater';
 
 function createWindow() {
@@ -14,15 +13,12 @@ function createWindow() {
     webPreferences: {
       devTools: isDebug,
       preload: getPreloadPath('preload.js'), // 👈 Don't USE PRELOAD.JS IF YOUR USING NODE IN RENDERER PROCESS
-      // nodeIntegration: true, // 👈 NODE.JS WILL AVAILABLE IN RENDERER
-      // contextIsolation: false, // 👈 ENABLE THIS FOR NODE INTEGRATION IN RENDERER
+      nodeIntegration: true, // 렌더러 프로세스에서 Node.js 모듈을 사용할 수 있도록 함
+      contextIsolation: false, // 👈 ENABLE THIS FOR NODE INTEGRATION IN RENDERER
     },
   });
 
   mainWindow.loadURL(getHtmlPath('index.html'));
-
-  /* MENU BUILDER */
-  Menu.setApplicationMenu(menu);
 
   /* AUTO UPDATER INVOKE */
   autoUpdater.checkForUpdatesAndNotify();
