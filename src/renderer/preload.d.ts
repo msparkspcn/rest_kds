@@ -7,6 +7,7 @@ declare global {
       /* ELECTRON IPC TYPES */
       set: (key: string, val: unknown) => void;
       get: (key: string) => unknown;
+      quitApp: () => void;
     };
   }
 }

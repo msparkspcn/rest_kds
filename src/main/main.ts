@@ -14,7 +14,7 @@ function createWindow() {
       devTools: isDebug,
       preload: getPreloadPath('preload.js'), // 👈 Don't USE PRELOAD.JS IF YOUR USING NODE IN RENDERER PROCESS
       nodeIntegration: true, // 렌더러 프로세스에서 Node.js 모듈을 사용할 수 있도록 함
-      contextIsolation: false, // 👈 ENABLE THIS FOR NODE INTEGRATION IN RENDERER
+      contextIsolation: true, // 👈 ENABLE THIS FOR NODE INTEGRATION IN RENDERER
     },
   });
 
@@ -56,6 +56,8 @@ ipcMain.on('get', (event, val) => {
   // eslint-disable-next-line no-param-reassign
   event.returnValue = store.get(val);
 });
+
+ipcMain.on('app:quit', () => app.quit());
 
 app.whenReady().then(() => {
   createWindow();

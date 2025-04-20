@@ -18,4 +18,8 @@ contextBridge.exposeInMainWorld('ipc', {
   get(key: string) {
     return ipcRenderer.sendSync('get', key);
   },
+
+  quitApp: () => {
+    ipcRenderer.send('app:quit')
+  }
 });

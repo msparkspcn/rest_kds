@@ -69,7 +69,10 @@ function Footer(): JSX.Element {
         <li><div className="footer__menu-item">전체완료</div></li>
         <li><div className="footer__menu-item">직전복원</div></li>
         <li><div className="footer__menu-item">조회복원</div></li>
-        <li><div className="footer__menu-item">프로그램 종료 X</div></li>
+        <li><div className="footer__menu-item" onClick={() => {
+          console.log('종료 버튼 클릭');
+          window.ipc.quitApp()
+        }}>프로그램 종료 X</div></li>
       </ul>
     </footer>
 

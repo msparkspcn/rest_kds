@@ -101,14 +101,14 @@ const Login: React.FC = () => {
                 id="check-2"
               />
               <span className="checkbox-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" className="check-svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" clipRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414
-                0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0
-                011.414 0z"
-              />
-            </svg>
-          </span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="check-svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" clipRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414
+                  0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0
+                  011.414 0z"
+                  />
+                </svg>
+              </span>
             </label>
             <label htmlFor="check-2" className="checkbox-text">자동 로그인</label>
           </div>
