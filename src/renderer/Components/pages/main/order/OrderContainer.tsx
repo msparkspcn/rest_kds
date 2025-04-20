@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import './OrderContainer.scss';
 
 interface OrderItem {
   productNm: string;
@@ -41,9 +42,9 @@ function OrderContainer({ item }: OrderContainerProps): JSX.Element {
   });
 
   return (
-    <div className={`w-full h-full ${backColor}`}>
+    <div className={`order-container ${backColor}`}>
       <OrderHeader orderNo={item.orderNo} instTime={displayInstTime} diff={diff} />
-      <div className="overflow-y-auto max-h-[170px]">
+      <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
           <RenderItem key={index} item={orderItem} index={index} />
         ))}
@@ -60,16 +61,10 @@ interface OrderHeaderProps {
 /* hd 가져오고 orderNo, updTime, 경과시간 처리.(경과시간 무엇을 기준으로 하는지 확인 필요) */
 function OrderHeader({ orderNo, instTime, diff }: OrderHeaderProps): JSX.Element {
   return (
-    <div className="flex w-full h-10">
-      <div className="flex-3 border border-gray-400 bg-gray-500 p-1 text-white text-2xl flex justify-start items-end">
-        {orderNo}
-      </div>
-      <div className="flex-4 border border-gray-400 bg-gray-500 p-1 text-white text-xl flex justify-center items-end">
-        {instTime}
-      </div>
-      <div className="flex-3 border border-gray-400 bg-gray-500 p-1 text-white text-xl flex justify-center items-end">
-        {diff * -1}&apos;
-      </div>
+    <div className="order-header">
+      <div className="header-cell order-no">{orderNo}</div>
+      <div className="header-cell inst-time">{instTime}</div>
+      <div className="header-cell diff">{diff * -1}&apos;</div>
     </div>
   );
 }
@@ -81,13 +76,11 @@ interface RenderItemProps {
 
 function RenderItem({ item, index }: RenderItemProps): JSX.Element {
   return (
-    <button type="button" className="w-full h-9 text-black" onClick={() => {}}>
-      <div className="flex w-full">
-        <div className="flex-1 border border-gray-400 bg-white p-1">{index + 1}</div>
-        <div className="flex-8 border border-gray-400 bg-white p-1 flex justify-start items-end">
-          {item.productNm}
-        </div>
-        <div className="flex-1 border border-gray-400 bg-white p-1">{item.saleQty}</div>
+    <button type="button" className="order-item" onClick={() => {}}>
+      <div className="order-row">
+        <div className="order-cell index">{index + 1}</div>
+        <div className="order-cell name">{item.productNm}</div>
+        <div className="order-cell qty">{item.saleQty}</div>
       </div>
     </button>
   );

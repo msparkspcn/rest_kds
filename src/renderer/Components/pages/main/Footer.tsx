@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import './Footer.scss';
 const getFormattedDate = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
@@ -44,79 +44,35 @@ function Footer(): JSX.Element {
     return () => clearInterval(interval);
   }, [date]);
   return (
-    <footer className="flex w-full flex-row flex-wrap items-center justify-center gap-y-6 border-t bg-black border-blue-gray-50 py-1 text-center md:justify-between">
-      <button
-        type="button"
-        className="bg-gray-500 ml-2 hover:bg-blue-700 gap-x-5 text-white py-2 px-4 rounded"
-      >
-        Light
-      </button>
-      <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white text-left">
+    <footer className="footer">
+      <button type="button" className="footer__button">Light</button>
+
+      <div className="footer__date">
         {getFormattedDate(date)}
       </div>
-      <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white text-left text-2xl">
+
+      <div className="footer__time">
         {getFormattedTime(date)}
       </div>
-      <div className="flex items-center justify-center">
-        <svg
-          className="w-15 h-6 text-white dark:text-white"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 8 14"
-        >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"
-          />
+
+      <div className="footer__pagination">
+        <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
+          <path d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white text-left text-3xl">
-          {/* "현재 페이지 / 전체 페이지" 형식으로 표시 */}
-          {/* {currentPage}/{totalPages} */}
-          1/1
-        </div>
-        <svg
-          className="w-15 h-6 text-white dark:text-white"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 8 14"
-        >
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
-          />
+        <div className="footer__page">1/1</div>
+        <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
+          <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
-      <ul className="flex flex-wrap items-center gap-y-2 gap-x-8 px-7">
-        <li>
-          <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white">
-            전체완료
-          </div>
-        </li>
-        <li>
-          <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white">
-            직전복원
-          </div>
-        </li>
-        <li>
-          <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white">
-            조회복원
-          </div>
-        </li>
-        <li>
-          <div className="font-normal transition-colors hover:text-blue-500 focus:text-blue-500 text-white">
-            프로그램 종료 X
-          </div>
-        </li>
+
+      <ul className="footer__menu">
+        <li><div className="footer__menu-item">전체완료</div></li>
+        <li><div className="footer__menu-item">직전복원</div></li>
+        <li><div className="footer__menu-item">조회복원</div></li>
+        <li><div className="footer__menu-item">프로그램 종료 X</div></li>
       </ul>
     </footer>
+
   );
 }
 

@@ -1,0 +1,179 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 3rem 1.5rem;
+  overflow-y: auto;
+
+  @media (min-width: 1024px) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.project-name {
+  margin-top: 2.5rem;
+  text-align: center;
+  font-size: 3rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.member-login {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.form-wrapper {
+  margin-top: 1.25rem;
+  max-width: 24rem;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-box,
+.login-button-wrapper {
+  width: 100%;
+}
+
+.input,
+.login-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box; /* padding 포함하여 정확한 너비 맞춤 */
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+
+.input {
+  background-color: white;
+  color: #111827;
+  outline: 1px solid #d1d5db;
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+  }
+}
+
+.checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  appearance: none;
+  border-radius: 0.25rem;
+  border: 1px solid #cbd5e1;
+  background-color: white;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &:checked {
+    background-color: #1e293b;
+    border-color: #1e293b;
+  }
+
+  &:checked + .checkbox-icon {
+    opacity: 1;
+  }
+}
+
+.checkbox-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  opacity: 0;
+}
+
+.check-svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.checkbox-text {
+  margin-left: 0.5rem;
+  color: #475569;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.login-button {
+  justify-content: center;
+  padding: 1rem 0.75rem;
+  color: white;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+
+  &.active {
+    background-color: #3b82f6;
+  }
+
+  &.inactive {
+    background-color: #d1d5db;
+  }
+}
+
+.dialog-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-box {
+  background-color: white;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+
+.dialog-title {
+  font-size: 1.5rem;
+}
+
+.dialog-message {
+  font-size: 1.125rem;
+  margin-top: 1.25rem;
+}
+
+.dialog-confirm {
+  width: 100%;
+  height: 3rem;
+  margin-top: 1.25rem;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 0.5rem;
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import OrderContainer from './order/OrderContainer';
-
+import './Contents.scss';
 interface ContentsProps {
   orderList: string | any[];
   onRefresh: () => void;
@@ -18,8 +18,8 @@ function Contents({ orderList, onRefresh, className }: ContentsProps): JSX.Eleme
   );
 
   return (
-    <div className={'flex flex-col flex-1'}>
-      <div className="flex-1 grid grid-cols-3 grid-rows-[repeat(3,minmax(0,1fr))] gap-4 w-full h-full p-4">
+    <div className="page-container">
+      <div className="order-grid">
         {paginatedOrders?.map((orderItem: any, index: number) => (
           <OrderContainer key={orderItem.orderNo || index} item={orderItem} />
         ))}
@@ -27,9 +27,5 @@ function Contents({ orderList, onRefresh, className }: ContentsProps): JSX.Eleme
     </div>
   );
 }
-
-Contents.defaultProps = {
-  className: 'flex flex-col flex-1',
-};
 
 export default Contents;

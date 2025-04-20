@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Loading from '../../common/Loading';
-import * as api from '../../../api/api';
+import * as api from '../../api/api';
 import { useNavigate } from 'react-router-dom';
 import { STRINGS } from '../../../constants/strings';
-import { useUserStore } from '/src/api/user';
-import { setAuthToken } from '../../../api/api';
+import { useUserStore } from '../../store/user';
+import { setAuthToken } from '../../api/api';
+import './Login.scss';
 const Login: React.FC = () => {
   // const [userId, setUserId] = useState<string>("");
   const [userId, setUserId] = useState<string>('5000511001');
@@ -61,79 +62,60 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      {loading ? <Loading /> : null}
+    <div className="login-container">
+      {loading && <Loading />}
 
-      <h1 className="mt-10 text-center text-5xl/9 font-bold tracking-tight text-gray-900">
-        {STRINGS.project_name}
-      </h1>
-      <h2 className="mt-3 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-        {STRINGS.member_login}
-      </h2>
+      <h1 className="project-name">{STRINGS.project_name}</h1>
+      <h2 className="member-login">{STRINGS.member_login}</h2>
 
-      <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault(); // 기본 동작(새로고침) 방지
-            handleLoginClick(); // 로그인 로직 실행
-          }}
-          className="space-y-2"
-        >
-          <div className="mt-2">
+      <div className="form-wrapper">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleLoginClick();
+        }} className="login-form">
+          <div className="input-box">
             <input
               type="text"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               placeholder={STRINGS.id}
-              className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-500 sm:text-sm/6"
+              className="input"
             />
           </div>
-          <div className="mt-1">
+          <div className="input-box">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={STRINGS.password}
-              className="block w-full rounded-md bg-white px-3 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-500 sm:text-sm/6"
+              className="input"
             />
           </div>
-          <div className="mt-2 inline-flex items-center">
-            <label className="flex items-center cursor-pointer relative" htmlFor="check-2">
+          <div className="checkbox-wrapper">
+            <label className="checkbox-label" htmlFor="check-2">
               <input
                 type="checkbox"
                 checked={isChecked}
                 onChange={handleCheckboxChange}
-                className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-slate-800 checked:border-slate-800"
+                className="checkbox"
                 id="check-2"
               />
-              <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-3.5 w-3.5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
+              <span className="checkbox-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" className="check-svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" clipRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414
+                0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0
+                011.414 0z"
+              />
+            </svg>
+          </span>
             </label>
-            <label className="cursor-pointer ml-2 text-slate-600 text-sm" htmlFor="check-2">
-              자동 로그인
-            </label>
+            <label htmlFor="check-2" className="checkbox-text">자동 로그인</label>
           </div>
-
-          <div className="mt-2">
+          <div className="login-button-wrapper">
             <button
               type="submit"
-              className={`flex w-full justify-center rounded-md px-3 py-4 text-xl font-semibold
-                            text-white shadow-xs hover: focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
-                            ${userId && password ? 'bg-blue-500' : 'bg-gray-300'}`}
+              className={`login-button ${userId && password ? 'active' : 'inactive'}`}
               disabled={!userId || !password}
             >
               {STRINGS.login}
@@ -143,12 +125,12 @@ const Login: React.FC = () => {
       </div>
 
       {dialogMessage && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-5 rounded-lg text-center">
-            <h3 className="text-2xl">{STRINGS.notification}</h3>
-            <p className="text-lg mt-5">{dialogMessage}</p>
+        <div className="dialog-overlay">
+          <div className="dialog-box">
+            <h3 className="dialog-title">{STRINGS.notification}</h3>
+            <p className="dialog-message">{dialogMessage}</p>
             <button
-              className="w-full h-12 mt-5 bg-blue-500 text-white rounded-lg"
+              className="dialog-confirm"
               onClick={() => setDialogMessage(null)}
             >
               {STRINGS.confirm}

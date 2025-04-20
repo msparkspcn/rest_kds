@@ -1,23 +1,24 @@
-.container {
+.layout-root {
   display: flex;
-  min-height: 100vh;
   flex-direction: column;
+  min-height: 100vh;
   align-items: center;
-  background-color: #e0e0e0; // bg-gray-300에 해당하는 색상
+  background-color: #d1d5db;
+}
 
-  .content-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    flex: 1;
-    height: 100%;
+.layout-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  height: 100%;
+}
 
-    .content {
-      display: flex;
-      flex-direction: row;
-      gap: 16px; // gap-4에 해당하는 값
-      justify-content: space-between;
-      flex: 1;
-    }
-  }
+.contents {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: space-between;
+  flex: 1;
 }

@@ -1,0 +1,125 @@
+/* 전체 화면을 커버하는 컨테이너 */
+.container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 0 16px;
+  align-items: center;
+  background-color: black;
+}
+
+/* 상단 버튼 영역 */
+.button-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  .empty-space {
+    width: 10%;
+  }
+
+  button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background-color: #f56565; /* red-500 */
+
+    span {
+      color: white;
+    }
+
+    &:disabled {
+      background-color: #d1d5db; /* gray-300 */
+    }
+  }
+}
+
+/* 정보 영역 */
+.info-section {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  flex-grow: 1;
+
+  .info-left, .info-right {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    span.title {
+      padding: 8px;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      color: white;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .field {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+
+      span {
+        font-size: 1rem;
+        color: white;
+      }
+    }
+  }
+
+  /* DropdownMenu 스타일 */
+  .dropdown-container {
+    display: flex;
+    justify-content: space-between;
+
+    .dropdown {
+      width: 60%;
+    }
+  }
+}
+
+/* 시스템 구분 설정 */
+.segmented-control-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .segmented-control {
+    background-color: #333333;
+    color: #ff5f00;
+
+    .selected-item {
+      font-size: 1.25rem;
+      color: white;
+      margin-top: 8px;
+    }
+  }
+}
+
+/* 버튼 영역 */
+.action-buttons {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 16px;
+
+  button {
+    width: 33.33%;
+    padding: 16px;
+    font-size: 1.25rem;
+    border-radius: 8px;
+    border: 2px solid #2d3748; /* zinc-700 */
+    color: white;
+
+    &.cancel {
+      background-color: #2d3748; /* zinc-700 */
+    }
+
+    &.save {
+      background-color: #3182ce; /* blue-500 */
+    }
+  }
+}

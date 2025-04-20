@@ -3,6 +3,7 @@ import Contents from '@Components/pages/main/Contents';
 import OrderActionBar from '@Components/pages/main/order/OrderActionBar';
 import Footer from '@Components/pages/main/Footer';
 import * as api from "@Components/api/api";
+import './Main.scss';
 
 
 function Main(): JSX.Element {
@@ -149,10 +150,10 @@ function Main(): JSX.Element {
   }, [orderList, sectionItemList, systemType]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-300">
-      <div className="flex flex-col w-full flex-1 h-full">
+    <div className="layout-root">
+      <div className="layout-content">
         <Contents
-          className="w-full flex flex-row gap-4 justify-between flex-1"
+          className="contents"
           orderList={filterList}
           onRefresh={onRefresh}
         />
