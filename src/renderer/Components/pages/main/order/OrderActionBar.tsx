@@ -4,12 +4,13 @@ import './OrderActionBar.scss';
 
 interface OrderActionBarProps {
     orderCnt: number;
+    selectedOrderNo: string | null;
 }
 
-const OrderActionBar: React.FC<OrderActionBarProps> = ({ orderCnt }) => {
+const OrderActionBar: React.FC<OrderActionBarProps> = ({ orderCnt, selectedOrderNo }) => {
 
     return (
-        <footer className="footer">
+        <div className="order-action-bar-root">
           <button type="button" className="btn btn-blue">
             임의호출
           </button>
@@ -18,7 +19,7 @@ const OrderActionBar: React.FC<OrderActionBarProps> = ({ orderCnt }) => {
           </button>
           <div className="count-wrap">
             <div className="label">{STRINGS.selected_order_no}</div>
-            <button type="button" className="count-btn">1</button>
+            <button type="button" className="count-btn">{selectedOrderNo || ''}</button>
           </div>
 
           <button type="button" className="btn btn-blue">
@@ -32,7 +33,7 @@ const OrderActionBar: React.FC<OrderActionBarProps> = ({ orderCnt }) => {
             <div className="label">{STRINGS.total_order_cnt}</div>
             <button type="button" className="count-btn">{orderCnt}</button>
           </div>
-        </footer>
+        </div>
         )
 }
 

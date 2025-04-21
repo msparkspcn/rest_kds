@@ -4,6 +4,8 @@ import OrderActionBar from '@Components/pages/main/order/OrderActionBar';
 import Footer from '@Components/pages/main/Footer';
 import * as api from "@Components/api/api";
 import './Main.scss';
+import InputPassword from '@Components/common/InputPassword';
+import { useNavigate } from 'react-router-dom';
 
 
 function Main(): JSX.Element {
@@ -13,10 +15,48 @@ function Main(): JSX.Element {
   const [orderList, setOrderList] = useState([]);
   const [systemType, setSystemType] = useState('1');
   const [filterList, setFilterList] = useState([]);
-
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const navigate = useNavigate();
+  const ITEMS_PER_PAGE = 9;
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>("");
   useEffect(() => {
     getKdsMstSectionItemList('10000');
   }, []);
+
+  useEffect(() => {
+    console.log('### 6. 주문정보 갱신 ###');
+    console.log('### 시스템 구분 :: ', systemType);
+    if (systemType === '0') {
+      // EXPO
+      setFilterList(orderList);
+    } else if (systemType === '1') {
+      // Section
+      // 섹션별 아이템코드 추출
+      const sectionItemCdList = sectionItemList.map((item) => item.productCd);
+
+      // 주문내역 필터링
+      const filterOrderArray = orderList
+        .map((order) => ({
+          ...order,
+          orderDtList: order.orderDtList.filter((product) =>
+            sectionItemCdList.includes(product.productCd),
+          ),
+        }))
+        .filter((item) => item.orderDtList.some((order) => order.kdsState !== '9'));
+      console.log('### filter :: ', filterOrderArray);
+
+      setFilterList(filterOrderArray);
+    }
+  }, [orderList, sectionItemList, systemType]);
+
+  useEffect(() => {
+    console.log("페이지 변경:"+currentPage);
+    const startIndex = currentPage * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    setFilterList(orderList.slice(startIndex, endIndex));
+  }, [orderList, currentPage]);
 
   const arraysEqual = (arr1: string | any[], arr2: string | any[]) => {
     if (arr1.length === 0 && arr2.length > 0) return false;
@@ -50,7 +90,14 @@ function Main(): JSX.Element {
             console.log('### 5-1 주문내역 변경점이 있으므로 갱신');
             // playSound();
           }
+          console.log("페이징:"+responseBody.length);
+          // ITEMS_PER_PAGE)
           setOrderCount(responseBody.length);
+          console.log("orderCnt:"+responseBody.length+", ITEMS_PER_PAGE:"+ITEMS_PER_PAGE);
+          if((responseBody.length / ITEMS_PER_PAGE) > 0) {
+            console.log("1이상 ="+Math.ceil(responseBody.length / ITEMS_PER_PAGE));
+            setTotalPages(Math.ceil(responseBody.length / ITEMS_PER_PAGE));
+          }
         } else {
           // Alert.alert("!", responseMessage);
         }
@@ -123,43 +170,61 @@ function Main(): JSX.Element {
       });
   };
 
-  useEffect(() => {
-    console.log('### 6. 주문정보 갱신 ###');
-    console.log('### 시스템 구분 :: ', systemType);
-    if (systemType === '0') {
-      // EXPO
-      setFilterList(orderList);
-    } else if (systemType === '1') {
-      // Section
-      // 섹션별 아이템코드 추출
-      const sectionItemCdList = sectionItemList.map((item) => item.productCd);
+  const onSetting = () => {
+    console.info("### 설정화면 진입 시도 ###")
+    setPasswordOpen(true);
+  }
 
-      // 주문내역 필터링
-      const filterOrderArray = orderList
-        .map((order) => ({
-          ...order,
-          orderDtList: order.orderDtList.filter((product) =>
-            sectionItemCdList.includes(product.productCd),
-          ),
-        }))
-        .filter((item) => item.orderDtList.some((order) => order.kdsState !== '9'));
-      console.log('### filter :: ', filterOrderArray);
+  const goSettingPage = () => {
+    console.log("비밀번호 인증 성공! 설정 페이지로 이동");
+    setPasswordOpen(false);
+    navigate("/setting", { replace: true });
+  };
 
-      setFilterList(filterOrderArray);
+  const onNextPage = () => {
+
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
     }
-  }, [orderList, sectionItemList, systemType]);
+    console.log("현재 페이지:"+currentPage)
+  };
 
+  const onPrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+    console.log("현재 페이지:"+currentPage)
+  };
+
+  const onSelectOrderHd = (orderNo: string) => {
+    setSelectedOrderNo(orderNo); // 선택된 주문 번호 업데이트
+  };
   return (
     <div className="layout-root">
       <div className="layout-content">
         <Contents
-          className="contents"
           orderList={filterList}
           onRefresh={onRefresh}
+          onSelectOrderHd = {onSelectOrderHd}
         />
       </div>
-      <OrderActionBar orderCnt={orderCount} />
-      <Footer />
+      <div className="order-action-bar">
+        <OrderActionBar orderCnt={orderCount} selectedOrderNo={selectedOrderNo}/>
+      </div>
+      <div className="footer-area">
+        <Footer
+          onSetting={onSetting}
+          currentPage = {currentPage}
+          totalPages = {totalPages}
+          onNextPage={onNextPage}
+          onPrevPage={onPrevPage} />
+      </div>
+      {passwordOpen && (
+        <InputPassword
+          onClose={() => setPasswordOpen(false)}
+          onCorrect={goSettingPage}
+        />
+      )}
     </div>
   );
 }

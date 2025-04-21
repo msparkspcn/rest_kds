@@ -8,5 +8,5 @@ export const STRINGS = {
   notification: "알림",
   confirm: "확인",
   selected_order_no: "선택\n주문번호",
-  total_order_cnt: "총주문\n건수"
+  total_order_cnt: "총 주문\n건수"
 }

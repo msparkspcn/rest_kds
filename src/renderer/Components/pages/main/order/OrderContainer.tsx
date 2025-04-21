@@ -15,13 +15,14 @@ interface OrderData {
 
 interface OrderContainerProps {
   item: OrderData;
+  onSelectOrder: (orderNo: string) => void;
 }
 
-function OrderContainer({ item }: OrderContainerProps): JSX.Element {
+function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Element {
   const [backColor, setBackColor] = useState('bg-green-600');
   const [diff, setDiff] = useState(0);
 
-  console.log(`item:${JSON.stringify(item)}`);
+  // console.log(`item:${JSON.stringify(item)}`);
 
   const displayInstTime = dayjs(item.instTime, 'YYYYMMDDHHmmss').format('HH:mm:ss');
   const timeDiff = dayjs(item.instTime, 'YYYY-MM-DDTHH:mm:ss', true).diff(dayjs(), 'minute');
@@ -43,7 +44,11 @@ function OrderContainer({ item }: OrderContainerProps): JSX.Element {
 
   return (
     <div className={`order-container ${backColor}`}>
-      <OrderHeader orderNo={item.orderNo} instTime={displayInstTime} diff={diff} />
+      <OrderHeader
+        orderNo={item.orderNo}
+        onClick={() => onSelectOrder(item.orderNo)}
+        instTime={displayInstTime}
+        diff={diff} />
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
           <RenderItem key={index} item={orderItem} index={index} />
@@ -57,11 +62,12 @@ interface OrderHeaderProps {
   orderNo: string;
   instTime: string;
   diff: number;
+  onClick: () => void;
 }
 /* hd 가져오고 orderNo, updTime, 경과시간 처리.(경과시간 무엇을 기준으로 하는지 확인 필요) */
-function OrderHeader({ orderNo, instTime, diff }: OrderHeaderProps): JSX.Element {
+function OrderHeader({ orderNo, instTime, diff, onClick }: OrderHeaderProps): JSX.Element {
   return (
-    <div className="order-header">
+    <div className="order-header" onClick={onClick}>
       <div className="header-cell order-no">{orderNo}</div>
       <div className="header-cell inst-time">{instTime}</div>
       <div className="header-cell diff">{diff * -1}&apos;</div>
@@ -76,13 +82,11 @@ interface RenderItemProps {
 
 function RenderItem({ item, index }: RenderItemProps): JSX.Element {
   return (
-    <button type="button" className="order-item" onClick={() => {}}>
-      <div className="order-row">
-        <div className="order-cell index">{index + 1}</div>
-        <div className="order-cell name">{item.productNm}</div>
-        <div className="order-cell qty">{item.saleQty}</div>
-      </div>
-    </button>
+    <div className="order-row">
+      <div className="order-cell index">{index + 1}</div>
+      <div className="order-cell name">{item.productNm}</div>
+      <div className="order-cell qty">{item.saleQty}</div>
+    </div>
   );
 }
 

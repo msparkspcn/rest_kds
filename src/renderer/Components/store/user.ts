@@ -23,13 +23,19 @@ interface UserData {
 
 interface UserStore {
     user: UserData | null;
+    password: string | null;
     setUser: (user: UserData) => void;
     getUser: () => UserData | null;
+  setPassword: (password: string) => void;
+  getPassword: () => string | null;
 }
 
 export const useUserStore = create<UserStore>(
-    (set, get) => ({
+  (set, get) => ({
     user: null,
+    password: null,
     setUser: (user) => set({ user }),
     getUser: () => get().user,
+    setPassword: (password) => set({ password }),
+    getPassword: () => get().password,
 }));

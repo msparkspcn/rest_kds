@@ -26,12 +26,21 @@ const getFormattedTime = (date: Date) => {
   // 원하는 형식: "11:11"
   return `${hours} : ${minutes}`;
 };
+interface FooterProps {
+  onSetting: () => void;
+  currentPage:number;
+  totalPages:number;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+}
 
-function Footer(): JSX.Element {
+const Footer: React.FC<FooterProps> = ({ onSetting, currentPage, totalPages, onNextPage, onPrevPage }) => {
   // console.log(getFormattedDate())
   // const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
   // const totalPages = 5;
   const [date, setDate] = useState(new Date());
+  let clickCnt = 0;
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -43,9 +52,17 @@ function Footer(): JSX.Element {
 
     return () => clearInterval(interval);
   }, [date]);
+
+  const onHeaderClick = () => {
+    clickCnt++;
+    if (clickCnt >= 10) {
+      onSetting();
+      clickCnt = 0;
+    }
+  }
   return (
     <footer className="footer">
-      <button type="button" className="footer__button">Light</button>
+      <button type="button" className="footer__button" onClick={onHeaderClick}>EXPO</button>
 
       <div className="footer__date">
         {getFormattedDate(date)}
@@ -56,13 +73,17 @@ function Footer(): JSX.Element {
       </div>
 
       <div className="footer__pagination">
-        <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
-          <path d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <div className="footer__page">1/1</div>
-        <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
-          <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <button type="button" className="footer__arrow" onClick={onPrevPage}>
+          <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
+            <path d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <div className="footer__page">{currentPage+1}/{totalPages}</div>
+        <button type="button" className="footer__arrow" onClick={onNextPage}>
+          <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
+            <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
 
       <ul className="footer__menu">

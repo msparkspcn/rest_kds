@@ -5,9 +5,20 @@ interface ContentsProps {
   orderList: string | any[];
   onRefresh: () => void;
   className?: string;
+  onSelectOrderHd: (orderNo: string) => void;
+}
+interface OrderItem {
+  productNm: string;
+  saleQty: number;
 }
 
-function Contents({ orderList, onRefresh, className }: ContentsProps): JSX.Element {
+interface OrderData {
+  orderNo: string;
+  instTime: string;
+  orderDtList: OrderItem[];
+}
+
+function Contents({ orderList, onRefresh, className, onSelectOrderHd }: ContentsProps): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const orderArray = Array.isArray(orderList) ? orderList : [];
@@ -21,7 +32,7 @@ function Contents({ orderList, onRefresh, className }: ContentsProps): JSX.Eleme
     <div className="page-container">
       <div className="order-grid">
         {paginatedOrders?.map((orderItem: any, index: number) => (
-          <OrderContainer key={orderItem.orderNo || index} item={orderItem} />
+          <OrderContainer key={orderItem.orderNo || index} item={orderItem} onSelectOrder={onSelectOrderHd}/>
         ))}
       </div>
     </div>

@@ -20,6 +20,7 @@ const Login: React.FC = () => {
   // const user = useUserStore((state) =>7 7 state.user);
   const setUser = useUserStore((state) => state.setUser);
   const getUser = useUserStore((state) => state.getUser);
+  const setStorePassword = useUserStore((state) => state.setPassword);
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
@@ -41,6 +42,7 @@ const Login: React.FC = () => {
         const { responseCode, responseMessage, responseBody } = result.data;
         if (responseCode === '200') {
           console.log('성공 responseBody:' + JSON.stringify(responseBody));
+          setStorePassword(password);
           setUser(responseBody);
           const user = getUser();
           if (user && 'apiKey' in user) {
