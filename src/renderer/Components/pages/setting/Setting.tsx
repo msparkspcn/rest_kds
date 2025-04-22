@@ -3,9 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 // import { AppContext } from "../../../App";
 import * as api from "@Components/api/api";
 import {useUserStore} from "@Components/store/user";
-// import DropdownMenu from "../../../../components/DropdownMenu";
 import { useNavigate } from "react-router-dom";
-// import SegmentedControl from "../../../../components/SegmentedControl";
 import './Setting.scss';
 import DropdownMenu from '@Components/common/DropdownMenu';
 import SegmentedControl from '@Components/common/SegmentedControl';
@@ -43,6 +41,10 @@ const Setting: React.FC = () => {
     //     cmpNm: string;
     // }
     const [cmpNmList, setCmpNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
+    const [selectedCmpCd, setSelectedCmpCd] = useState<string>("");
+    const [selectedSalesOrgCd, setSelectedSalesOrgCd] = useState<string>("");
+    const [selectedStorCd, setSelectedStorCd] = useState<string>("");
+    const [selectedCornerCd, setSelectedCornerCd] = useState<string>("");
     const [salesOrgNmList, setSalesOrgNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [storNmList, setStorNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [cornerNmList, setCornerNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
@@ -63,10 +65,11 @@ const Setting: React.FC = () => {
         // setAppVersion(Constants.expoConfig.version);
         console.log("Setting user:"+JSON.stringify(user))
         if(user!=null) {
-            if ("cmpCd" in user) {
-                console.log("cmpCd:"+user.cmpCd)
-                getCmpList(user.cmpCd)
-            }
+          if ("cmpCd" in user) {
+            console.log("cmpCd:"+user.cmpCd)
+            getCmpList(user.cmpCd)
+            setSelectedCmpCd(user.cmpCd)
+          }
         }
 
 
@@ -96,13 +99,15 @@ const Setting: React.FC = () => {
             const {responseCode, responseMessage, responseBody} = result.data;
             if (responseCode === "200") {
                 console.log("회사 조회 성공 responseBody:"+JSON.stringify(responseBody))
+              if (responseBody != null) {
                 setCmpNmList(
-                    responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
-                        infoCd: cmpCd,
-                        infoNm: cmpNm,
-                    }))
+                  responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
+                    infoCd: cmpCd,
+                    infoNm: cmpNm,
+                  }))
                 );
                 getSalesOrgList(cmpCd)
+              }
             }
             else {
                 window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
@@ -126,18 +131,21 @@ const Setting: React.FC = () => {
             const {responseCode, responseMessage, responseBody} = result.data;
             if (responseCode === "200") {
                 console.log("영업 조직 조회 성공 responseBody:"+JSON.stringify(responseBody))
+              if(responseBody != null) {
                 setSalesOrgNmList(
-                    responseBody.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
-                        infoCd: salesOrgCd,
-                        infoNm: salesOrgNm,
-                    }))
+                  responseBody.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
+                    infoCd: salesOrgCd,
+                    infoNm: salesOrgNm,
+                  }))
                 );
                 if(!(user) || user.salesOrgCd == "") {
-                    getStorList(cmpCd, responseBody[0].salesOrgCd)
+                  getStorList(cmpCd, responseBody[0].salesOrgCd)
+                  setSelectedSalesOrgCd(responseBody[0].salesOrgCd)
+                } else {
+                  getStorList(cmpCd, user.salesOrgCd)
+                  setSelectedSalesOrgCd(user.salesOrgCd)
                 }
-                else {
-                    getStorList(cmpCd, user.salesOrgCd)
-                }
+              }
             }
             else {
                 window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
@@ -162,21 +170,24 @@ const Setting: React.FC = () => {
             const {responseCode, responseMessage, responseBody} = result.data;
             if (responseCode === "200") {
                 console.log("점포 조회 성공 responseBody:"+JSON.stringify(responseBody))
+              if(responseBody != null) {
                 setStorNmList(
-                    responseBody.map(({ storCd, storNm }: { storCd: string; storNm: string }) => ({
-                        infoCd: storCd,
-                        infoNm: storNm,
-                    }))
+                  responseBody.map(({ storCd, storNm }: { storCd: string; storNm: string }) => ({
+                    infoCd: storCd,
+                    infoNm: storNm,
+                  }))
                 );
-                if(!(user) || user.storCd == "") {
-                    getCornerList(cmpCd,salesOrgCd,responseBody[0].storCd)
-                }
-                else {
-                    if(user.storCd) {
-                        getCornerList(cmpCd,salesOrgCd,user.storCd)
-                    }
+                if (!(user) || user.storCd == "") {
+                  getCornerList(cmpCd, salesOrgCd, responseBody[0].storCd)
+                  setSelectedStorCd(responseBody[0].storCd)
+                } else {
+                  if (user.storCd) {
+                    getCornerList(cmpCd, salesOrgCd, user.storCd)
+                    setSelectedStorCd(user.storCd)
+                  }
 
                 }
+              }
                 // getSalesOrgList(cmpCd)
             }
             else {
@@ -203,13 +214,15 @@ const Setting: React.FC = () => {
             const {responseCode, responseMessage, responseBody} = result.data;
             if (responseCode === "200") {
                 console.log("코너 조회 성공 responseBody:"+JSON.stringify(responseBody))
+              if(responseBody!=null) {
                 setCornerNmList(
-                    responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
-                        infoCd: cornerCd,
-                        infoNm: cornerNm,
-                    }))
+                  responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
+                    infoCd: cornerCd,
+                    infoNm: cornerNm,
+                  }))
                 );
-                // getSalesOrgList(cmpCd)
+                setSelectedStorCd(responseBody[0].cornerCd)
+              }
             }
             else {
                 window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
@@ -299,6 +312,20 @@ const Setting: React.FC = () => {
         navigate("/main")
         // AppFuncRestart();
     };
+
+    const onSelectInfo = () => {
+
+    }
+
+    const changeSelectedCmpCd = (item: { infoCd: string; infoNm: string })  => {
+      setSelectedCmpCd(item.infoCd);
+      // 추가적인 로직이 필요하면 여기에 작성
+    };
+
+    const changeSelectedSalesOrgCd = (item: { infoCd: string; infoNm: string })  => {
+      console.log("326 item:"+JSON.stringify(item));
+      setSelectedSalesOrgCd(item.infoCd);
+    }
     if(loading) {
         return <></>
     }
@@ -329,22 +356,22 @@ const Setting: React.FC = () => {
 
             <div className="field">
               <span>회사</span>
-              <DropdownMenu infoList={cmpNmList} />
+              <DropdownMenu infoList={cmpNmList} onSelectInfo={changeSelectedCmpCd}/>
             </div>
 
             <div className="field">
               <span>영업조직</span>
-              <DropdownMenu infoList={salesOrgNmList} />
+              <DropdownMenu infoList={salesOrgNmList} onSelectInfo={changeSelectedSalesOrgCd} />
             </div>
 
             <div className="field">
               <span>점포</span>
-              <DropdownMenu infoList={storNmList} />
+              <DropdownMenu infoList={storNmList} onSelectInfo={changeSelectedCmpCd} />
             </div>
 
             <div className="field">
               <span>코너</span>
-              <DropdownMenu infoList={cornerNmList} />
+              <DropdownMenu infoList={cornerNmList} onSelectInfo={changeSelectedCmpCd} />
             </div>
           </div>
 
@@ -363,8 +390,7 @@ const Setting: React.FC = () => {
                 (seg) => seg.value === mode
               )}
             />
-
-            <p className="selected-item">Selected: {mode}</p>
+            {/*<p className="selected-item">Selected: {mode}</p>*/}
 
             <div className="field">
               <span className="label">시스템구분</span>

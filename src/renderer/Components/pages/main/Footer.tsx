@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Footer.scss';
+import History from '@Components/pages/main/order/History';
 const getFormattedDate = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
@@ -32,14 +33,20 @@ interface FooterProps {
   totalPages:number;
   onNextPage: () => void;
   onPrevPage: () => void;
+  onRestore: () => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onSetting, currentPage, totalPages, onNextPage, onPrevPage }) => {
-  // console.log(getFormattedDate())
-  // const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
-  // const totalPages = 5;
+const Footer: React.FC<FooterProps> = (
+  { onSetting,
+    currentPage,
+    totalPages,
+    onNextPage,
+    onPrevPage,
+    onRestore,
+  }) => {
   const [date, setDate] = useState(new Date());
   let clickCnt = 0;
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -60,6 +67,7 @@ const Footer: React.FC<FooterProps> = ({ onSetting, currentPage, totalPages, onN
       clickCnt = 0;
     }
   }
+
   return (
     <footer className="footer">
       <button type="button" className="footer__button" onClick={onHeaderClick}>EXPO</button>
@@ -89,7 +97,7 @@ const Footer: React.FC<FooterProps> = ({ onSetting, currentPage, totalPages, onN
       <ul className="footer__menu">
         <li><div className="footer__menu-item">전체완료</div></li>
         <li><div className="footer__menu-item">직전복원</div></li>
-        <li><div className="footer__menu-item">조회복원</div></li>
+        <li><div className="footer__menu-item" onClick={onRestore}>조회복원</div></li>
         <li><div className="footer__menu-item" onClick={() => {
           console.log('종료 버튼 클릭');
           window.ipc.quitApp()

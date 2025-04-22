@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Contents from '@Components/pages/main/Contents';
 import OrderActionBar from '@Components/pages/main/order/OrderActionBar';
 import Footer from '@Components/pages/main/Footer';
@@ -6,6 +6,7 @@ import * as api from "@Components/api/api";
 import './Main.scss';
 import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
+import History from '@Components/pages/main/order/History';
 
 
 function Main(): JSX.Element {
@@ -19,7 +20,7 @@ function Main(): JSX.Element {
   const navigate = useNavigate();
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>("");
   useEffect(() => {
     getKdsMstSectionItemList('10000');
@@ -180,6 +181,10 @@ function Main(): JSX.Element {
     setPasswordOpen(false);
     navigate("/setting", { replace: true });
   };
+  const [isModalOpen, setModalOpen] = useState(false);
+  const onRestore = () => {
+    setModalOpen(true)
+  }
 
   const onNextPage = () => {
 
@@ -195,6 +200,16 @@ function Main(): JSX.Element {
     }
     console.log("현재 페이지:"+currentPage)
   };
+  const data = [{
+    no: 1,
+    pos: "91",
+    orderNo: "111",
+    orderDateTime: "20250422",
+    completionDateTime: "20250422",
+    seq: 1,
+    menuName: "돈모밀국수",
+    quantity: 1
+  }]
 
   const onSelectOrderHd = (orderNo: string) => {
     setSelectedOrderNo(orderNo); // 선택된 주문 번호 업데이트
@@ -217,7 +232,9 @@ function Main(): JSX.Element {
           currentPage = {currentPage}
           totalPages = {totalPages}
           onNextPage={onNextPage}
-          onPrevPage={onPrevPage} />
+          onPrevPage={onPrevPage}
+          onRestore={onRestore}
+        />
       </div>
       {passwordOpen && (
         <InputPassword
@@ -225,6 +242,7 @@ function Main(): JSX.Element {
           onCorrect={goSettingPage}
         />
       )}
+      <History isOpen={isModalOpen} onClose={() => setModalOpen(false)} data={data}/>
     </div>
   );
 }

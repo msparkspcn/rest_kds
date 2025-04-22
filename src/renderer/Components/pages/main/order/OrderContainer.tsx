@@ -25,13 +25,14 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
   // console.log(`item:${JSON.stringify(item)}`);
 
   const displayInstTime = dayjs(item.instTime, 'YYYYMMDDHHmmss').format('HH:mm:ss');
-  const timeDiff = dayjs(item.instTime, 'YYYY-MM-DDTHH:mm:ss', true).diff(dayjs(), 'minute');
+
   useEffect(() => {
     const interval = setInterval(() => {
+      const timeDiff = dayjs(item.instTime, 'YYYY-MM-DDTHH:mm:ss', true).diff(dayjs(), 'minute');
       if (timeDiff > -5) {
         setBackColor('bg-green-600');
       }
-      if (timeDiff <= -5 && timeDiff > -10) {
+      else if (timeDiff <= -5 && timeDiff > -10) {
         setBackColor('bg-yellow-600');
       } else if (timeDiff <= -10) {
         setBackColor('bg-red-600');
