@@ -1,6 +1,6 @@
 .restore-query-modal {
   position: fixed;
-  inset:0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -12,7 +12,7 @@
     padding: 20px;
     border-radius: 8px;
     width: 80%;
-    height:80%;
+    height: 80%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
     .modal-header {
@@ -22,7 +22,7 @@
       margin-bottom: 20px;
 
       h2 {
-        margin: 0 0 30px;
+        margin: 0;
       }
 
       .close-button {
@@ -32,15 +32,40 @@
         cursor: pointer;
       }
     }
-
+    .table-wrapper {
+      height: 80%;
+      overflow-y: auto;
+    }
     .data-table {
       width: 100%;
+      height: auto;
       border-collapse: collapse;
+      overflow-y: auto;
+      table-layout: fixed;
+
+      thead {
+        display: table-header-group;
+        width: 100%;
+      }
+
+      tbody {
+        display: table-row-group;
+        width: 100%;
+      }
+
+      tr {
+        display: table-row;
+      }
 
       th, td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
+        width: auto;
+        min-height: 20px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       th {
@@ -51,7 +76,6 @@
         background-color: #f1f1f1;
       }
     }
-
 
     .modal-footer {
       display: flex;

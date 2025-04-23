@@ -28,34 +28,36 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
           <h2>조회 복원</h2>
           <button className="close-button" onClick={onClose}>X</button>
         </div>
-        <table className="data-table">
-          <thead>
-          <tr>
-            <th>No</th>
-            <th>POS</th>
-            <th>주문번호</th>
-            <th>주문일시</th>
-            <th>완료일시</th>
-            <th>seq</th>
-            <th>매뉴명</th>
-            <th>수량</th>
-          </tr>
-          </thead>
-          <tbody>
-          {data.map((item) => (
-            <tr key={item.orderNo}>
-              <td>{item.no}</td>
-              <td>{item.pos}</td>
-              <td>{item.orderNo}</td>
-              <td>{item.orderDateTime}</td>
-              <td>{item.completionDateTime}</td>
-              <td>{item.seq}</td>
-              <td>{item.menuName}</td>
-              <td>{item.quantity}</td>
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+            <tr>
+              <th>No</th>
+              <th>POS</th>
+              <th>주문번호</th>
+              <th>주문일시</th>
+              <th>완료일시</th>
+              <th>seq</th>
+              <th>매뉴명</th>
+              <th>수량</th>
             </tr>
-          ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+            {data.map((item) => (
+              <tr key={item.orderNo}>
+                <td>{item.no}</td>
+                <td>{item.pos}</td>
+                <td>{item.orderNo}</td>
+                <td>{item.orderDateTime}</td>
+                <td>{item.completionDateTime}</td>
+                <td>{item.seq}</td>
+                <td>{item.menuName}</td>
+                <td>{item.quantity}</td>
+              </tr>
+            ))}
+            </tbody>
+          </table>
+        </div>
         <div className="modal-footer">
           <button className="restore-button" onClick={onRestore}>복원</button>
           <div className="pagination">

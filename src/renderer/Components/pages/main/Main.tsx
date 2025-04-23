@@ -209,7 +209,19 @@ function Main(): JSX.Element {
     seq: 1,
     menuName: "돈모밀국수",
     quantity: 1
-  }]
+  },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "112",
+      orderDateTime: "20250422",
+      completionDateTime: "20250422",
+      seq: 2,
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+  ]
+
 
   const onSelectOrderHd = (orderNo: string) => {
     setSelectedOrderNo(orderNo); // 선택된 주문 번호 업데이트
