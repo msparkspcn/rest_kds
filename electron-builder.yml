@@ -1,5 +1,5 @@
-productName: 'Electron Vite React'
-appId: 'org.StackOutput.ElectronVite'
+productName: 'S9 Rest KDS'
+appId: 'kr.co.secta9ine.S9RestKDS'
 copyright: 'Copyright © 2022 StackOutput'
 artifactName: '${productName}-${version}.${ext}'
 
@@ -32,7 +32,7 @@ nsis:
   allowToChangeInstallationDirectory: false
   installerIcon: './assets/icon.ico'
   uninstallerIcon: './assets/icon.ico'
-  uninstallDisplayName: 'Electron Vite React'
+  uninstallDisplayName: 'S9 Rest KDS'
   license: './LICENSE'
   # perMachine: true # Per Machine Configuration
 
@@ -82,11 +82,6 @@ linux:
     - 'AppImage'
     - 'deb'
     - 'snap'
-  maintainer: 'AJAY'
+  maintainer: 'minsupark'
   packageCategory: 'Utility'
   category: Utility
-
-publish:
-  provider: 'github'
-  owner: 'stackoutput-com'
-  repo: 'vite-electron-react-boilerplate'

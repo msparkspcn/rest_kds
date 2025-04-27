@@ -6,7 +6,7 @@ const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
 
 createRoot(rootElement).render(
-  // <StrictMode> //개발시에는 제거
+  <StrictMode>
     <App />
-  // </StrictMode>,
+  </StrictMode>,
 );

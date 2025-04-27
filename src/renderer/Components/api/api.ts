@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 // export const host = process.env.REACT_APP_API_URL;
-export const host = "https://s9rest.ngrok.io";
-// export const host = 'https://o2api.spc.co.kr';
+// export const host = "https://s9rest.ngrok.io";
+export const host = 'https://o2api.spc.co.kr';
 const api = axios.create({ baseURL: host });
 
 let authToken: string | null = null;
@@ -90,10 +90,14 @@ export function getCornerList(params: any) {
 //     return post(request, params);
 // }
 //
-// export function getSaleOpen(params) {      //개점 조회(가칭)
+// export function getSaleOpen(params: any) {      //개점 조회(가칭)
 //     const request = host + "/saleOpen/getSaleOpen";
 //     return post(request, params);
 // }
+export function getStoreSaleOpen(params:any) {
+  const request = host + '/api/v1/store/getStoreSaleOpen?' + new URLSearchParams(params).toString();
+  return post(request,params);
+}
 //
 // export function getKdsMstSection(params) {      //kds 섹션 마스터 목록 조회
 //     const request = host + "/kds/mst/list";

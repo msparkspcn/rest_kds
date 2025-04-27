@@ -7,6 +7,7 @@ import './Main.scss';
 import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
 import History from '@Components/pages/main/order/History';
+import { getStoreSaleOpen } from '@Components/api/api';
 
 
 function Main(): JSX.Element {
@@ -22,6 +23,7 @@ function Main(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>("");
+  const [saleDt, setSaleDt] = useState('');
   useEffect(() => {
     getKdsMstSectionItemList('10000');
   }, []);
@@ -69,13 +71,34 @@ function Main(): JSX.Element {
     return true;
   };
 
-  const getOrderData = () => {
+  const getStoreSaleOpen = () => {
+    const params = {
+      cmpCd: '90000001',
+      brandCd: '9999',
+      storeCd: '000281'
+    };
+    api.getStoreSaleOpen(params)
+      .then((result) => {
+        const { responseBody, responseCode, responseMessage } = result.data;
+        if (responseCode === '200') {
+          console.log(`### 개점정보 res:${responseBody.saleDt}`);
+          setSaleDt(responseBody.saleDt);
+          getOrderData(responseBody.saleDt);
+        }
+        else {
+          console.log('### 개점정보 수신 실패');
+        }
+      })
+  }
+
+  const getOrderData = (saleDt:string) => {
     // const {cmpCd, brandCd, storeCd} = store;
+    console.log("개점일:"+saleDt);
     const params = {
       cmpCd: '90000001',
       brandCd: '9999',
       storeCd: '000281',
-      saleDt: '20250327',
+      saleDt: saleDt,
       state: '0',
     };
 
@@ -157,7 +180,7 @@ function Main(): JSX.Element {
           console.log('### 5-2 Section Item 마스터 수신 완료 ###');
           setSectionItemList(responseBody);
           // 기본 구성이 끝나고 주문 정보를 가져온다
-          getOrderData();
+          getStoreSaleOpen();
         } else {
           // Alert.alert("!", responseMessage);
         }
