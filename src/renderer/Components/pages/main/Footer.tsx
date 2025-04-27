@@ -89,7 +89,12 @@ const Footer: React.FC<FooterProps> = (
         <div className="footer__page">{currentPage+1}/{totalPages}</div>
         <button type="button" className="footer__arrow" onClick={onNextPage}>
           <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
-            <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+            />
           </svg>
         </button>
       </div>

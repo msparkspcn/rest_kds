@@ -81,7 +81,7 @@
       cursor: pointer;
       transition: color 0.2s;
 
-      &:hover,
+      &:active,
       &:focus {
         color: #3b82f6;
       }

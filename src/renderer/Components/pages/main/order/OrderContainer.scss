@@ -81,7 +81,7 @@
     justify-content: center;
     box-sizing: border-box;
     background-color: transparent;
-
+    color: #222;
     &.index {
       flex: 1;
     }
@@ -91,6 +91,9 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     &.qty {

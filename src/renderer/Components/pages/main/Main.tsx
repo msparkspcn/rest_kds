@@ -8,6 +8,7 @@ import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
 import History from '@Components/pages/main/order/History';
 import { getStoreSaleOpen } from '@Components/api/api';
+import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 
 
 function Main(): JSX.Element {
@@ -24,6 +25,7 @@ function Main(): JSX.Element {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>("");
   const [saleDt, setSaleDt] = useState('');
+  const [callOrderOpen, setCallOrderOpen] = useState(false);
   useEffect(() => {
     getKdsMstSectionItemList('10000');
   }, []);
@@ -244,6 +246,13 @@ function Main(): JSX.Element {
       quantity: 1
     },
   ]
+  const openCallOrder = () => {
+    setCallOrderOpen(true)
+  }
+
+  const onCallOrder = (orderNo:string) => {
+
+  }
 
 
   const onSelectOrderHd = (orderNo: string) => {
@@ -277,7 +286,17 @@ function Main(): JSX.Element {
           onCorrect={goSettingPage}
         />
       )}
-      <History isOpen={isModalOpen} onClose={() => setModalOpen(false)} data={data}/>
+      {callOrderOpen && (
+        <CallOrderDialog
+          title="임의호출"
+          errorMsg="주문번호를 다시 입력해주세요."
+          onClose={() => setCallOrderOpen(false)}
+          onCorrect={} />
+      )}
+      <History
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        data={data}/>
     </div>
   );
 }
