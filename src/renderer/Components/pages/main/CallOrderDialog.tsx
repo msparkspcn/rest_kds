@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./InputPassword.scss";
+// import "./InputPassword.scss";
 import { useUserStore } from '@Components/store/user';
 
 interface CallOrderProps {
@@ -9,7 +9,8 @@ interface CallOrderProps {
   onCorrect: () => void;
 }
 
-const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, onCorrect }) => {
+const CallOrderDialog: React.FC<CallOrderProps> =
+  ({ title, errorMsg, onClose, onCorrect }) => {
   const [inputValue, setInputValue] = useState("");
   const [isCorrect, setIsCorrect] = useState(true);
   const getPassword = useUserStore((state) => state.getPassword);
@@ -25,7 +26,7 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
       setInputValue("");
       setIsCorrect(true);
     } else {
-      if (inputValue.length === 4) return;
+      if (inputValue.length === 7) return; //주문번호 길이에 맞춰 수정
       setInputValue((prev) => prev + value);
     }
   };
@@ -42,6 +43,12 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
     }
   };
 
+  const onCallOrder = (value: string) => {
+    //params:{cmpCd, salesOrgCd, storCd, cornerCd, saleDt, orderNo}
+    //kdsState 대기,호출,완료
+    //onCallOrder -> 호출
+  }
+
   return (
     <div className="password-overlay">
       <div className="password-container">
@@ -55,11 +62,7 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
           <div className="error-message">{errorMsg}</div>
         )}
 
-        <div className="password-dots">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="dot-box">{inputValue.length > i ? "•" : ""}</div>
-          ))}
-        </div>
+        <div className="order-no-box">{inputValue}</div>
 
         <div className="keypad">
           {keyArray.map((item, idx) => (

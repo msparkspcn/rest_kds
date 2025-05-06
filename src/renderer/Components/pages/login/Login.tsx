@@ -52,7 +52,7 @@ const Login: React.FC = () => {
           // setDialogMessage("로그인 성공 userId:"+userId+", password:"+password);
           navigate('/setting');
         } else {
-          window.alert('ErrorCode :: ' + responseCode + '\n' + responseMessage);
+          window.alert(responseMessage);
         }
       })
       .catch((ex) => {

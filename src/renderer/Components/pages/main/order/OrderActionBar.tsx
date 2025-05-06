@@ -7,11 +7,17 @@ interface OrderActionBarProps {
     selectedOrderNo: string | null;
 }
 
-const OrderActionBar: React.FC<OrderActionBarProps> = ({ orderCnt, selectedOrderNo }) => {
+const OrderActionBar: React.FC<OrderActionBarProps> =
+  ({ orderCnt,
+     selectedOrderNo,
+    onOpenCallOrder,
+     onCallOrder,
+     onCompleteOrder,
+  }) => {
 
     return (
         <div className="order-action-bar-root">
-          <button type="button" className="btn btn-blue">
+          <button type="button" className="btn btn-blue" onClick={onOpenCallOrder}>
             임의호출
           </button>
           <button type="button" className="btn btn-orange">
@@ -22,10 +28,10 @@ const OrderActionBar: React.FC<OrderActionBarProps> = ({ orderCnt, selectedOrder
             <button type="button" className="count-btn">{selectedOrderNo || ''}</button>
           </div>
 
-          <button type="button" className="btn btn-blue">
+          <button type="button" className="btn btn-blue" onClick={onCallOrder}>
             Call(호출)
           </button>
-          <button type="button" className="btn btn-orange">
+          <button type="button" className="btn btn-orange" onClick={onCompleteOrder}>
             완료
           </button>
 

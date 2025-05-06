@@ -1,0 +1,67 @@
+.dialog-layout {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+
+  .dialog-content {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    width: 30%;
+    height: 30%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .dialog-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    .h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+    }
+    .close-button {
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.25rem;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .spacer {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .dialog-message {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+
+    .confirm-button {
+      background-color: #3182ce; /* blue-500 */
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
+}
+

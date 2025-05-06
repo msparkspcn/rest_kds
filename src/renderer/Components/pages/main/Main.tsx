@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import History from '@Components/pages/main/order/History';
 import { getStoreSaleOpen } from '@Components/api/api';
 import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
-
+import ConfirmDialog from '@Components/pages/main/ConfirmDialog';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -26,6 +26,12 @@ function Main(): JSX.Element {
   const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>("");
   const [saleDt, setSaleDt] = useState('');
   const [callOrderOpen, setCallOrderOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmProps, setConfirmProps] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
   useEffect(() => {
     getKdsMstSectionItemList('10000');
   }, []);
@@ -246,13 +252,35 @@ function Main(): JSX.Element {
       quantity: 1
     },
   ]
-  const openCallOrder = () => {
+  const onOpenCallOrder = () => {
     setCallOrderOpen(true)
   }
 
-  const onCallOrder = (orderNo:string) => {
+  const openDialog = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmProps({ title, message, onConfirm });
+    setConfirmOpen(true);
+  };
+  const handleCallOrder = () => {
+    openDialog(
+      '주문 호출',
+      '주문을 호출하시겠습니까?',
+      () => {
+        console.log('주문 호출 실행');
+        // 호출 로직
+      }
+    );
+  };
 
-  }
+  const handleCompleteOrder = () => {
+    openDialog(
+      '주문 완료',
+      '주문을 완료하시겠습니까?',
+      () => {
+        console.log('주문 완료 실행');
+        // 완료 로직
+      }
+    );
+  };
 
 
   const onSelectOrderHd = (orderNo: string) => {
@@ -268,7 +296,13 @@ function Main(): JSX.Element {
         />
       </div>
       <div className="order-action-bar">
-        <OrderActionBar orderCnt={orderCount} selectedOrderNo={selectedOrderNo}/>
+        <OrderActionBar
+          orderCnt={orderCount}
+          selectedOrderNo={selectedOrderNo}
+          onOpenCallOrder={onOpenCallOrder}
+          onCallOrder={handleCallOrder}
+          onCompleteOrder={handleCompleteOrder}
+        />
       </div>
       <div className="footer-area">
         <Footer
@@ -291,7 +325,14 @@ function Main(): JSX.Element {
           title="임의호출"
           errorMsg="주문번호를 다시 입력해주세요."
           onClose={() => setCallOrderOpen(false)}
-          onCorrect={} />
+          onCorrect={() => setCallOrderOpen(false)} />
+      )}
+      {confirmOpen && (
+        <ConfirmDialog
+          confirmOpen={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          {...confirmProps}
+        />
       )}
       <History
         isOpen={isModalOpen}
