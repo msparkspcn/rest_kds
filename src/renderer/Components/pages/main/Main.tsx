@@ -337,7 +337,8 @@ function Main(): JSX.Element {
       <History
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        data={data}/>
+        data={data}
+      />
     </div>
   );
 }

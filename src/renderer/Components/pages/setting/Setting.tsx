@@ -100,6 +100,7 @@ const Setting: React.FC = () => {
             if (responseCode === "200") {
                 console.log("회사 조회 성공 responseBody:"+JSON.stringify(responseBody))
               if (responseBody != null) {
+                // window.electronAPI.
                 setCmpNmList(
                   responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
                     infoCd: cmpCd,
