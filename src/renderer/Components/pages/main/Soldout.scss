@@ -19,10 +19,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
 
-      h2 {
-        margin: 0;
+      .modal-title {
+        flex: 1;
+        font-weight: bold;
       }
 
       .close-button {
@@ -31,53 +32,51 @@
         font-size: 1.5rem;
         cursor: pointer;
       }
+
+      .btn {
+        flex: 0 0 15%; // 버튼 너비를 전체의 20%로 설정
+        max-width: 140px; // 화면이 너무 클 때 제한
+        min-width: 70px;  // 화면이 너무 작을 때 제한
+        padding: 0.25rem 0.75rem;
+        text-align: center;
+      }
     }
     .table-wrapper {
+      display: flex;
+      gap: 1rem;
       height: 80%;
+      background-color: white;
       overflow-y: auto;
+
     }
     .data-table {
       width: 100%;
       table-layout: fixed;
       border-collapse: collapse;
       border: 1px solid #e5e7eb;
+      thead {
+        background-color: #f0f0f0;
+      }
 
-      thead, tbody {
-        width: 100%;
+      tbody {
+        display: block;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      tr {
+        display: table-row;
       }
 
       th, td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
+        width: auto;
+        min-height: 20px;
         overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
-      }
-
-      th:nth-child(1), td:nth-child(1) {
-        width: 10%;  /* 예시: 첫 번째 열 너비 */
-      }
-      th:nth-child(2), td:nth-child(2) {
-        width: 10%;  /* 예시: 두 번째 열 너비 */
-      }
-      th:nth-child(3), td:nth-child(3) {
-        width: 15%;  /* 예시: 세 번째 열 너비 */
-      }
-      th:nth-child(4), td:nth-child(4) {
-        width: 20%;  /* 예시: 네 번째 열 너비 */
-      }
-      th:nth-child(5), td:nth-child(5) {
-        width: 20%;  /* 예시: 다섯 번째 열 너비 */
-      }
-      th:nth-child(6), td:nth-child(6) {
-        width: 10%;  /* 예시: 여섯 번째 열 너비 */
-      }
-      th:nth-child(7), td:nth-child(7) {
-        width: 10%;  /* 예시: 일곱 번째 열 너비 */
-      }
-      th:nth-child(8), td:nth-child(8) {
-        width: 15%;  /* 예시: 여덟 번째 열 너비 */
+        text-overflow: ellipsis;
       }
 
       th {

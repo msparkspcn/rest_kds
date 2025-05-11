@@ -31,16 +31,16 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
         <div className="table-wrapper">
           <table className="data-table">
             <thead>
-            <tr>
-              <th>No</th>
-              <th>POS</th>
-              <th>주문번호</th>
-              <th>주문일시</th>
-              <th>완료일시</th>
-              <th>seq</th>
-              <th>매뉴명</th>
-              <th>수량</th>
-            </tr>
+              <tr>
+                <th>No</th>
+                <th>POS</th>
+                <th>주문번호</th>
+                <th>주문일시</th>
+                <th>완료일시</th>
+                <th>seq</th>
+                <th>매뉴명</th>
+                <th>수량</th>
+              </tr>
             </thead>
             <tbody>
             {data.map((item) => (

@@ -13,6 +13,7 @@ const OrderActionBar: React.FC<OrderActionBarProps> =
     onOpenCallOrder,
      onCallOrder,
      onCompleteOrder,
+    onSoldout,
   }) => {
 
     return (
@@ -20,7 +21,7 @@ const OrderActionBar: React.FC<OrderActionBarProps> =
           <button type="button" className="btn btn-blue" onClick={onOpenCallOrder}>
             임의호출
           </button>
-          <button type="button" className="btn btn-orange">
+          <button type="button" className="btn btn-orange" onClick={onSoldout}>
             품절
           </button>
           <div className="count-wrap">

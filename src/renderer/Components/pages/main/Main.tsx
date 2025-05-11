@@ -10,6 +10,7 @@ import History from '@Components/pages/main/order/History';
 import { getStoreSaleOpen } from '@Components/api/api';
 import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/pages/main/ConfirmDialog';
+import Soldout from '@Components/pages/main/Soldout';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -32,6 +33,7 @@ function Main(): JSX.Element {
     message: '',
     onConfirm: () => {},
   });
+  const [isSoldoutOpen, setSoldoutOpen] = useState(false);
   useEffect(() => {
     getKdsMstSectionItemList('10000');
   }, []);
@@ -216,6 +218,9 @@ function Main(): JSX.Element {
   const onRestore = () => {
     setModalOpen(true)
   }
+  const onSoldout = () => {
+    setSoldoutOpen(true)
+  }
 
   const onNextPage = () => {
 
@@ -302,6 +307,7 @@ function Main(): JSX.Element {
           onOpenCallOrder={onOpenCallOrder}
           onCallOrder={handleCallOrder}
           onCompleteOrder={handleCompleteOrder}
+          onSoldout={onSoldout}
         />
       </div>
       <div className="footer-area">
@@ -338,6 +344,10 @@ function Main(): JSX.Element {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         data={data}
+      />
+      <Soldout
+        isOpen={isSoldoutOpen}
+        onClose={() => setSoldoutOpen(false)}
       />
     </div>
   );
