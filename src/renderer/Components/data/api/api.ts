@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 // export const host = process.env.REACT_APP_API_URL;
-// export const host = "https://s9rest.ngrok.io";
-export const host = 'https://o2api.spc.co.kr';
+export const host = "https://s9rest.ngrok.io";
+// export const host = 'https://o2api.spc.co.kr';
 const api = axios.create({ baseURL: host });
 
 let authToken: string | null = null;

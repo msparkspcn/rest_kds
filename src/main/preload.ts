@@ -21,5 +21,14 @@ contextBridge.exposeInMainWorld('ipc', {
 
   quitApp: () => {
     ipcRenderer.send('app:quit')
-  }
+  },
+
+  cmp: {
+    getList: () => ipcRenderer.invoke('db:getCmpList'),
+    add: (cmp_cd: string, cmp_nm: string) =>
+      ipcRenderer.invoke('db:addCmp', cmp_cd, cmp_nm),
+    update: (cmp_cd: string, cmp_nm: string) =>
+      ipcRenderer.invoke('db:updateCmp', cmp_nm, cmp_cd),
+    delete: (cmp_cd: string) => ipcRenderer.invoke('db:deleteCmp', cmp_cd),
+  },
 });

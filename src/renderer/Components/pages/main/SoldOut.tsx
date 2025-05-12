@@ -1,16 +1,16 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import * as api from "@Components/api/api";
-import './Soldout.scss';
+import * as api from "@Components/data/api/api";
+import './SoldOut.scss';
 
-interface SoldoutProps {
+interface SoldOutProps {
   isOpen: boolean;
   onClose: () => void;
 
 }
 //좌측 코너별 판매, 품절 상품
 //우측 코너별 상품 목록
-const Soldout: React.FC<SoldoutProps> = ({isOpen, onClose}) => {
+const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
   if (!isOpen) return null;
   useEffect(() => {
 
@@ -41,14 +41,14 @@ const Soldout: React.FC<SoldoutProps> = ({isOpen, onClose}) => {
       });
   }
   return (
-    <div className="restore-query-modal">
+    <div className="soldout-modal">
       <div className="modal-content">
         <div className="modal-header">
           <div className="modal-title">품절</div>
           <button className="close-button" onClick={onClose}>X</button>
         </div>
         <div className="modal-header">
-          <div className="modal-title">주문에 대한 품절 관리 화면</div>
+          <div className="modal-desc">주문에 대한 품절 관리 화면</div>
           <button type="button" className="btn btn-orange" onClick={onClose}>저장</button>
         </div>
         <div className="table-wrapper">
@@ -108,4 +108,4 @@ const Soldout: React.FC<SoldoutProps> = ({isOpen, onClose}) => {
   )
 }
 
-export default Soldout;
+export default SoldOut;

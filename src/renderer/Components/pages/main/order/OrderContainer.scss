@@ -84,6 +84,7 @@
     color: #222;
     &.index {
       flex: 1;
+      text-align: center;
     }
 
     &.name {
@@ -98,6 +99,7 @@
 
     &.qty {
       flex: 1;
+      text-align: right;
     }
   }
 }

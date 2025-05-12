@@ -29,13 +29,15 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
   useEffect(() => {
     const interval = setInterval(() => {
       const timeDiff = dayjs(item.instTime, 'YYYY-MM-DDTHH:mm:ss', true).diff(dayjs(), 'minute');
+      console.log("timeDiff:"+timeDiff)
       if (timeDiff > -5) {
-        setBackColor('bg-green-600');
+        setBackColor('bg-green');
       }
       else if (timeDiff <= -5 && timeDiff > -10) {
-        setBackColor('bg-yellow-600');
+        setBackColor('bg-yellow');
       } else if (timeDiff <= -10) {
-        setBackColor('bg-red-600');
+        console.log("here")
+        setBackColor('bg-red');
       }
       setDiff(timeDiff);
     }, 1000);
@@ -44,10 +46,12 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
   });
 
   return (
-    <div className={`order-container ${backColor}`}>
+    <div
+      className={`order-container ${backColor}`}
+      onClick={() => onSelectOrder(item.orderNo)}
+    >
       <OrderHeader
         orderNo={item.orderNo}
-        onClick={() => onSelectOrder(item.orderNo)}
         instTime={displayInstTime}
         diff={diff} />
       <div className="order-items">
@@ -63,12 +67,11 @@ interface OrderHeaderProps {
   orderNo: string;
   instTime: string;
   diff: number;
-  onClick: () => void;
 }
 /* hd 가져오고 orderNo, updTime, 경과시간 처리.(경과시간 무엇을 기준으로 하는지 확인 필요) */
-function OrderHeader({ orderNo, instTime, diff, onClick }: OrderHeaderProps): JSX.Element {
+function OrderHeader({ orderNo, instTime, diff}: OrderHeaderProps): JSX.Element {
   return (
-    <div className="order-header" onClick={onClick}>
+    <div className="order-header">
       <div className="header-cell order-no">{orderNo}</div>
       <div className="header-cell inst-time">{instTime}</div>
       <div className="header-cell diff">{diff * -1}&apos;</div>

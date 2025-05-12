@@ -8,7 +8,7 @@ import EnvironmentPlugin from 'vite-plugin-environment';
 import React from '@vitejs/plugin-react';
 import TsConfigPaths from 'vite-tsconfig-paths';
 import { port } from '../DevConfig.json';
-
+import commonjs from '@rollup/plugin-commonjs';
 // eslint-disable-next-line no-console
 console.log(`${chalk.whiteBright.bold(' ✨ Start')} ${chalk.green.bold('Hacking...👨‍💻')}`);
 
@@ -37,7 +37,24 @@ export default defineConfig({
         build: {
           assetsDir: '',
           outDir: resolve('./app/dist/main'),
-          rollupOptions: { external: ['electron', ...builtinModules] },
+          rollupOptions: {
+            external: [
+              'electron',
+              'better-sqlite3',
+              ...builtinModules],
+            //better-sqlite3 사용 관련 추가
+            output: {
+              manualChunks: undefined,
+            },
+            plugins: [
+              commonjs({
+                dynamicRequireTargets: [
+                  resolve(__dirname, '../node_modules/better-sqlite3/build/Release/better_sqlite3.node'),
+                  resolve(__dirname, '../node_modules/better-sqlite3/lib/*.js'),
+                ],
+              }),
+            ],
+          },
         },
         plugins: [
           EnvironmentPlugin('all', { prefix: '' }),

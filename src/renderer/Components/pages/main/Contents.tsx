@@ -18,7 +18,7 @@ interface OrderData {
   orderDtList: OrderItem[];
 }
 
-function Contents({ orderList, onRefresh, className, onSelectOrderHd }: ContentsProps): JSX.Element {
+function Contents({ orderList, onRefresh, onSelectOrderHd }: ContentsProps): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const orderArray = Array.isArray(orderList) ? orderList : [];
@@ -32,7 +32,11 @@ function Contents({ orderList, onRefresh, className, onSelectOrderHd }: Contents
     <div className="page-container">
       <div className="order-grid">
         {paginatedOrders?.map((orderItem: any, index: number) => (
-          <OrderContainer key={orderItem.orderNo || index} item={orderItem} onSelectOrder={onSelectOrderHd}/>
+          <OrderContainer
+            key={orderItem.orderNo || index}
+            item={orderItem}
+            onSelectOrder={onSelectOrderHd}
+          />
         ))}
       </div>
     </div>

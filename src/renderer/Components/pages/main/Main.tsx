@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Contents from '@Components/pages/main/Contents';
 import OrderActionBar from '@Components/pages/main/order/OrderActionBar';
 import Footer from '@Components/pages/main/Footer';
-import * as api from "@Components/api/api";
+import * as api from "@Components/data/api/api";
 import './Main.scss';
 import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
 import History from '@Components/pages/main/order/History';
-import { getStoreSaleOpen } from '@Components/api/api';
+import { getStoreSaleOpen } from '@Components/data/api/api';
 import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/pages/main/ConfirmDialog';
-import Soldout from '@Components/pages/main/Soldout';
+import SoldOut from '@Components/pages/main/SoldOut';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -33,7 +33,7 @@ function Main(): JSX.Element {
     message: '',
     onConfirm: () => {},
   });
-  const [isSoldoutOpen, setSoldoutOpen] = useState(false);
+  const [isSoldOutOpen, setSoldOutOpen] = useState(false);
   useEffect(() => {
     getKdsMstSectionItemList('10000');
   }, []);
@@ -218,8 +218,8 @@ function Main(): JSX.Element {
   const onRestore = () => {
     setModalOpen(true)
   }
-  const onSoldout = () => {
-    setSoldoutOpen(true)
+  const onSoldOut = () => {
+    setSoldOutOpen(true)
   }
 
   const onNextPage = () => {
@@ -239,21 +239,21 @@ function Main(): JSX.Element {
   const data = [{
     no: 1,
     pos: "91",
-    orderNo: "111",
-    orderDateTime: "20250422",
-    completionDateTime: "20250422",
-    seq: 1,
+    orderNo: "9100012",
+    orderDateTime: "11:58:17",
+    completionDateTime: "12:01:58",
+    seq: '01',
     menuName: "돈모밀국수",
     quantity: 1
   },
     {
       no: 2,
       pos: "91",
-      orderNo: "112",
-      orderDateTime: "20250422",
-      completionDateTime: "20250422",
-      seq: 2,
-      menuName: "돈모밀국수",
+      orderNo: "9100011",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '01',
+      menuName: "옛날돈까스",
       quantity: 1
     },
   ]
@@ -266,30 +266,39 @@ function Main(): JSX.Element {
     setConfirmOpen(true);
   };
   const handleCallOrder = () => {
-    openDialog(
-      '주문 호출',
-      '주문을 호출하시겠습니까?',
-      () => {
-        console.log('주문 호출 실행');
-        // 호출 로직
-      }
-    );
+    if(selectedOrderNo!='') {
+      openDialog(
+        '주문 호출',
+        selectedOrderNo+'번 주문을\n호출하시겠습니까?',
+        () => {
+          console.log('주문 호출 실행');
+          // 호출 로직
+        }
+      );
+    }
   };
 
   const handleCompleteOrder = () => {
-    openDialog(
-      '주문 완료',
-      '주문을 완료하시겠습니까?',
-      () => {
-        console.log('주문 완료 실행');
-        // 완료 로직
-      }
-    );
+    if(selectedOrderNo!='') {
+      openDialog(
+        '주문 완료',
+        selectedOrderNo+'번 주문을\n완료하시겠습니까?',
+        () => {
+          console.log('주문 완료 실행');
+          // 완료 로직
+        }
+      );
+    }
   };
 
 
   const onSelectOrderHd = (orderNo: string) => {
-    setSelectedOrderNo(orderNo); // 선택된 주문 번호 업데이트
+    if(orderNo==selectedOrderNo) {
+      setSelectedOrderNo("")
+    }
+    else {
+      setSelectedOrderNo(orderNo); // 선택된 주문 번호 업데이트
+    }
   };
   return (
     <div className="layout-root">
@@ -307,7 +316,7 @@ function Main(): JSX.Element {
           onOpenCallOrder={onOpenCallOrder}
           onCallOrder={handleCallOrder}
           onCompleteOrder={handleCompleteOrder}
-          onSoldout={onSoldout}
+          onSoldOut={onSoldOut}
         />
       </div>
       <div className="footer-area">
@@ -345,9 +354,9 @@ function Main(): JSX.Element {
         onClose={() => setModalOpen(false)}
         data={data}
       />
-      <Soldout
-        isOpen={isSoldoutOpen}
-        onClose={() => setSoldoutOpen(false)}
+      <SoldOut
+        isOpen={isSoldOutOpen}
+        onClose={() => setSoldOutOpen(false)}
       />
     </div>
   );

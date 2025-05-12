@@ -1,4 +1,4 @@
-.restore-query-modal {
+.soldout-modal {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
@@ -19,11 +19,17 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      //margin-bottom: 10px;
 
       .modal-title {
         flex: 1;
         font-weight: bold;
+        font-size: 1.75rem;
+      }
+      .modal-desc {
+        flex: 1;
+        font-weight: bold;
+        font-size: 1.2rem;
       }
 
       .close-button {
@@ -34,7 +40,7 @@
       }
 
       .btn {
-        flex: 0 0 15%; // 버튼 너비를 전체의 20%로 설정
+        flex: 0 0 15%;
         max-width: 140px; // 화면이 너무 클 때 제한
         min-width: 70px;  // 화면이 너무 작을 때 제한
         padding: 0.25rem 0.75rem;

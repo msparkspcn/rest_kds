@@ -20,7 +20,14 @@ const ConfirmDialog: React.FC<DialogProps> = (
           <button className="close-button" onClick={onClose}>✕</button>
         </div>
         <div className="dialog-message">
-          {message}
+          {typeof message === 'string'
+            ? message.split('\n').map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                {idx !== message.split('\n').length - 1 && <br />}
+              </React.Fragment>
+            ))
+            : message}
         </div>
         <div className="dialog-footer">
           <button className="confirm-button" onClick={onConfirm}>확인</button>

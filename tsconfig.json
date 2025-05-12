@@ -20,5 +20,6 @@
       "@Components/*": ["src/renderer/Components/*"]
     }
   },
+  "include": ["src", "src/renderer/types"],
   "extends": "./tsconfig.node.json"
 }

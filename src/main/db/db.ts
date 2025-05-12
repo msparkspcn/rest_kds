@@ -10,12 +10,12 @@ const db = new Database(dbPath);
 
 // 테이블 생성 함수
 function createTables() {
+  console.log('Starting to create tables...');
+
   const tables = [
     `CREATE TABLE IF NOT EXISTS cmp (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cmp_cd TEXT NOT NULL,
-      cmp_nm TEXT,
-      useYn TEXT
+      cmp_cd TEXT PRIMARY KEY,
+      cmp_nm TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS salesorg (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,31 +63,32 @@ function createTables() {
       product_nm TEXT,
       qty INTEGER,
       price REAL,
-      soldout_yn TEXT
+      soldout_yn TEXT,
       useYn TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS order_hd (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY AUTOINCREMENT
 
     );`,
     `CREATE TABLE IF NOT EXISTS order_dt (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY AUTOINCREMENT
 
     );`,
     `CREATE TABLE IF NOT EXISTS sale_open (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY AUTOINCREMENT
     );`
   ];
 
-  db.transaction(() => {
-    for (const query of tables) {
-      db.prepare(query).run();
-    }
-  })();
+  for (const query of tables) {
+    db.prepare(query).run();
+    console.log('Table created or already exists.');
+  }
+
 
   console.log('✅ All tables created.');
+  console.log('Database will be created at:', dbPath);
 }
 
 createTables();
 
-export default db;
+export {db, createTables};

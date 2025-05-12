@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 // import { Alert } from "react-alert"; // You can use any web-compatible alert library or native JS alert
 // import { AppContext } from "../../../App";
-import * as api from "@Components/api/api";
+import * as api from "@Components/data/api/api";
 import {useUserStore} from "@Components/store/user";
 import { useNavigate } from "react-router-dom";
 import './Setting.scss';
@@ -88,38 +88,42 @@ const Setting: React.FC = () => {
     }, []);
 
     const init = () => {
-        localStorage.clear();
+      localStorage.clear();
+      deleteCmp('SLKR')
     };
 
-    const getCmpList = (cmpCd: String) => {
+    const getCmpList = async (cmpCd: String) => {
         const request = {
             "cmpValue" : cmpCd
         }
-        api.getCmpList(request).then((result) => {
-            const {responseCode, responseMessage, responseBody} = result.data;
-            if (responseCode === "200") {
-                console.log("회사 조회 성공 responseBody:"+JSON.stringify(responseBody))
-              if (responseBody != null) {
-                // window.electronAPI.
-                setCmpNmList(
-                  responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
-                    infoCd: cmpCd,
-                    infoNm: cmpNm,
-                  }))
-                );
-                getSalesOrgList(cmpCd)
+        try {
+          const result = await api.getCmpList(request);
+          const {responseCode, responseMessage, responseBody} = result.data;
+
+          if (responseCode === "200") {
+            console.log("회사 조회 성공 responseBody:"+JSON.stringify(responseBody))
+            if (responseBody != null) {
+              for (const cmp of responseBody) {
+                const { cmpCd, cmpNm} = cmp;
+                console.log("cmpCd:"+cmpCd+", cmpNm:"+cmpNm)
+                await window.ipc.cmp.add(cmpCd, cmpNm);
               }
+              setCmpNmList(
+                responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
+                  infoCd: cmpCd,
+                  infoNm: cmpNm,
+                }))
+              );
+              getSalesOrgList(cmpCd)
             }
-            else {
-                window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-            }
-        })
-            .catch(ex => {
-                window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
-            })
-            .finally(() => {
-                // setLoading(false)
-            })
+          }
+          else {
+            window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+          }
+        }
+        catch(error) {
+          window.alert("서버에1 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+        }
     };
 
     const getSalesOrgList = (cmpCd: String) => {
@@ -320,6 +324,7 @@ const Setting: React.FC = () => {
 
     const changeSelectedCmpCd = (item: { infoCd: string; infoNm: string })  => {
       setSelectedCmpCd(item.infoCd);
+      updateCmp(item.infoCd, "안녕")
       // 추가적인 로직이 필요하면 여기에 작성
     };
 
@@ -327,7 +332,34 @@ const Setting: React.FC = () => {
       console.log("326 item:"+JSON.stringify(item));
       setSelectedSalesOrgCd(item.infoCd);
     }
-    if(loading) {
+  const loadCmpList = async () => {
+    try {
+      const cmpList = await window.ipc.cmp.getList();
+      console.log('회사 목록:', cmpList); // 👈 여기서 로그
+    } catch (err) {
+      console.error('에러 발생:', err);
+    }
+  };
+
+    const deleteCmp = async (cmpCd:string) => {
+      try {
+        const result = await window.ipc.cmp.delete(cmpCd);
+        console.log('삭제 결과:'+result)
+      } catch(err) {
+        console.error('에러 발생:', err);
+      }
+    }
+
+    const updateCmp = async (cmpCd:string, cmpNm:string) => {
+      try {
+        const result = await window.ipc.cmp.update(cmpNm, cmpCd);
+        console.log('업데이트 결과:'+result)
+      } catch(err) {
+        console.error('에러 발생:', err);
+      }
+    }
+
+  if(loading) {
         return <></>
     }
     return (
@@ -339,7 +371,7 @@ const Setting: React.FC = () => {
           <button onClick={init}>
             <span>초기화</span>
           </button>
-          <button>
+          <button onClick={loadCmpList}>
             <span>마스터수신</span>
           </button>
         </div>

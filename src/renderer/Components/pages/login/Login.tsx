@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import Loading from '../../common/Loading';
-import * as api from '../../api/api';
+import * as api from '../../data/api/api';
 import { useNavigate } from 'react-router-dom';
 import { STRINGS } from '../../../constants/strings';
 import { useUserStore } from '../../store/user';
-import { setAuthToken } from '../../api/api';
+import { setAuthToken } from '../../data/api/api';
 import './Login.scss';
 const Login: React.FC = () => {
   // const [userId, setUserId] = useState<string>("");

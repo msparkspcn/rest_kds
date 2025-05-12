@@ -10,7 +10,7 @@ interface HistoryProps {
     orderNo: string;
     orderDateTime: string;
     completionDateTime: string;
-    seq: number;
+    seq: string;
     menuName: string;
     quantity: number;
   }[]; // 전달받는 데이터
@@ -25,7 +25,7 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
     <div className="restore-query-modal">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>조회 복원</h2>
+          <div className="modal-title">조회 복원</div>
           <button className="close-button" onClick={onClose}>X</button>
         </div>
         <div className="table-wrapper">
@@ -37,7 +37,7 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
                 <th>주문번호</th>
                 <th>주문일시</th>
                 <th>완료일시</th>
-                <th>seq</th>
+                <th>SEQ</th>
                 <th>매뉴명</th>
                 <th>수량</th>
               </tr>
