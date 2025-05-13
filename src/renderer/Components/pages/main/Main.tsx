@@ -7,7 +7,6 @@ import './Main.scss';
 import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
 import History from '@Components/pages/main/order/History';
-import { getStoreSaleOpen } from '@Components/data/api/api';
 import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/pages/main/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';

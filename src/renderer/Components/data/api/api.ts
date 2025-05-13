@@ -15,7 +15,8 @@ api.interceptors.request.use((config) => {
 });
 
 export function getOrderDataList(params: any) {
-  const request = `${host}/api/v1/order/getOrderDataList`;
+  // const request = `${host}/api/v1/order/getOrderDataList`;
+  const request = `https://o2api.spc.co.kr/api/v1/order/getOrderDataList`;
   return post(request, params);
 }
 
@@ -25,7 +26,7 @@ export function getKdsMstSection(params: any) {
 }
 
 export function getKdsMstSectionItemList(params: any) {
-  const request = `${host}/api/v1/kds/section/items`;
+  const request = `https://o2api.spc.co.kr/api/v1/kds/section/items`;
   return post(request, params);
 }
 
@@ -100,7 +101,7 @@ export function updateOrderCallState(params: any) {
 //     return post(request, params);
 // }
 export function getStoreSaleOpen(params:any) {
-  const request = host + '/api/v1/store/getStoreSaleOpen?' + new URLSearchParams(params).toString();
+  const request = 'https://o2api.spc.co.kr/api/v1/store/getStoreSaleOpen?' + new URLSearchParams(params).toString();
   return post(request,params);
 }
 //

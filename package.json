@@ -10,9 +10,9 @@
     "build:debug": "npm run clean:build && npm run debug && electron-builder build",
     "build": "npm run clean:dist && cross-env NODE_ENV=production ELECTRON_ENV=production vite build --config configs/vite.config.ts",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "clean:build": "ts-node configs/clean.ts --build",
-    "clean:dist": "ts-node configs/clean.ts --dist",
-    "clean": "ts-node configs/clean.ts --clean",
+    "clean:build": "npx ts-node configs/clean.ts --build",
+    "clean:dist": "npx ts-node configs/clean.ts --dist",
+    "clean": "npx ts-node configs/clean.ts --clean",
     "debug": "npm run clean:dist && cross-env NODE_ENV=production ELECTRON_ENV=debug vite build --config configs/vite.config.ts",
     "dev": "cross-env NODE_ENV=development ELECTRON_ENV=debug vite --config configs/vite.config.ts",
     "lint": "eslint --fix .",
@@ -73,7 +73,7 @@
     "ts-node": "^10.9.1",
     "tw-animate-css": "^1.2.5",
     "typescript": "^4.6.4",
-    "vite": "^5.4.17",
+    "vite": "^5.4.19",
     "vite-plugin-electron": "^0.10.4",
     "vite-plugin-environment": "^1.1.3",
     "vite-tsconfig-paths": "^3.5.2"
@@ -81,7 +81,10 @@
   "build": {
     "asar": false,
     "files": [
-      "app/**/*",
+      {
+        "from": "app/dist",
+        "to": "app/dist"
+      },
       "node_modules/better-sqlite3/**/*"
     ],
     "extraResources": [
