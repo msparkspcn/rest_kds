@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       .then((result) => {
         const { responseCode, responseMessage, responseBody } = result.data;
         if (responseCode === '200') {
-          console.log('성공 responseBody:' + JSON.stringify(responseBody));
+          console.log('11성공 responseBody:' + JSON.stringify(responseBody));
           setStorePassword(password);
           setUser(responseBody);
           const user = getUser();

@@ -11,17 +11,17 @@ type SegmentedControlProps = {
     name: string;
     segments: Segment[];
     callback: (value: string, index: number) => void;
+  controlRef: RefObject<HTMLDivElement>;
     defaultIndex?: number;
-    controlRef: RefObject<HTMLDivElement>;
 };
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({
-                                                               name,
-                                                               segments,
-                                                               callback,
-                                                               defaultIndex = 0,
-                                                               controlRef
-                                                           }) => {
+     name,
+     segments,
+     callback,
+   controlRef,
+     defaultIndex = 0,
+ }) => {
     const [activeIndex, setActiveIndex] = useState<number>(() => defaultIndex ?? 0);
     const componentReady = useRef<boolean>(false);
 
@@ -67,13 +67,13 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               <input
                 type="radio"
                 value={item.value}
-                id={item.label}
+                id={`${name}-${item.value}`}
                 name={name}
                 onChange={() => onInputChange(item.value, i)}
                 checked={i === activeIndex}
                 className="segment-radio"
               />
-              <label htmlFor={item.label} className="segment-label">
+              <label htmlFor={`${name}-${item.value}`} className="segment-label">
                 {item.label}
               </label>
             </div>
@@ -84,4 +84,4 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     );
 };
 
-export default SegmentedControl;
+export default React.memo(SegmentedControl);

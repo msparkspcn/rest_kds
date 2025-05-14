@@ -1,12 +1,12 @@
 .segment-wrapper {
-  width: 90%;
+  width: 100%;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
 
 .segment-container {
   position: relative;
-  display: inline-flex;
+  display: flex;
   justify-content: flex-start;
   width: 100%;
   background-color: white;
@@ -32,7 +32,7 @@
 
   .segment-item {
     position: relative;
-    width: 50%;
+    flex: 1 1 0;
     text-align: center;
     z-index: 10;
     color: black;

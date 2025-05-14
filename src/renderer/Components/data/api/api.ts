@@ -21,7 +21,7 @@ export function getOrderDataList(params: any) {
 }
 
 export function getKdsMstSection(params: any) {
-  const request = `${host}/api/v1/kds/mst/list`;
+  const request = `https://o2api.spc.co.kr/api/v1/kds/mst/list`;
   return post(request, params);
 }
 

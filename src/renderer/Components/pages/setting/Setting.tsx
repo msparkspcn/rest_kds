@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 // import { Alert } from "react-alert"; // You can use any web-compatible alert library or native JS alert
 // import { AppContext } from "../../../App";
 import * as api from "@Components/data/api/api";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import './Setting.scss';
 import DropdownMenu from '@Components/common/DropdownMenu';
 import SegmentedControl from '@Components/common/SegmentedControl';
+import {getPlatform} from '@Components/utils/platform';
 // interface SettingPageProps {
 //     route: {
 //         params: {
@@ -48,6 +49,9 @@ const Setting: React.FC = () => {
     const [salesOrgNmList, setSalesOrgNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [storNmList, setStorNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [cornerNmList, setCornerNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
+    const [sectionList, setSectionList] = useState([
+      {sectionCd: "", sectionNm: ""}
+    ]);
     const navigate = useNavigate();
 
     const [mode, setMode] = useState("EXPO");
@@ -58,7 +62,7 @@ const Setting: React.FC = () => {
     ];
     const controlRef = useRef<HTMLDivElement | null>(null);
     const segmentRefs = segmentData.map(() => useRef<HTMLDivElement | null>(null));
-
+    const platform = getPlatform();
     useEffect(() => {
         console.log("##### 세팅화면 진입 #####")
         // 버전확인
@@ -78,6 +82,7 @@ const Setting: React.FC = () => {
             // setSystemIdx(parseInt(systemTyFromStorage));
             if (systemTyFromStorage === '1') {
                 // getKdsMstSection(store);
+                getKdsMstSection();
             }
         }
 
@@ -106,7 +111,11 @@ const Setting: React.FC = () => {
               for (const cmp of responseBody) {
                 const { cmpCd, cmpNm} = cmp;
                 console.log("cmpCd:"+cmpCd+", cmpNm:"+cmpNm)
-                await window.ipc.cmp.add(cmpCd, cmpNm);
+                if(platform==='electron') {
+                  await window.ipc.cmp.add(cmpCd, cmpNm);
+                } else {
+                  console.log("웹입니다")
+                }
               }
               setCmpNmList(
                 responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
@@ -122,7 +131,7 @@ const Setting: React.FC = () => {
           }
         }
         catch(error) {
-          window.alert("서버에1 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+          window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
         }
     };
 
@@ -165,6 +174,7 @@ const Setting: React.FC = () => {
     }
 
     const getStorList = (cmpCd: String, salesOrgCd: String) => {
+      console.log("cmpCd:"+cmpCd+", salesOrgCd:"+salesOrgCd)
         // setLoading(true)
         const request = {
             cmpCd : cmpCd,
@@ -241,33 +251,48 @@ const Setting: React.FC = () => {
             })
     }
 
-    // const getKdsMstSection = (store: Store) => {
-    //     const params = {
-    //         cmpCd: store.cmpCd,
-    //         brandCd: store.brandCd,
-    //         storeCd: store.storeCd,
-    //         systemTy: "1",
-    //         useYn: "Y",
-    //     };
-    //
-    //     // Replace the api call with a browser-friendly fetch or axios call
-    //     // fetch("/api/getKdsMstSection", { method: "POST", body: JSON.stringify(params) })
-    //     //     .then(res => res.json())
-    //     //     .then(result => {
-    //     //         const { responseCode, responseMessage, responseBody } = result;
-    //     //         if (responseCode === "200") {
-    //     //             setSectionList(responseBody);
-    //     //         } else {
-    //     //             alert(responseMessage);
-    //     //         }
-    //     //     })
-    //     //     .catch(ex => {
-    //     //         alert(ex.message);
-    //     //     })
-    //     //     .finally(() => {
-    //     //         setLoading(false);
-    //     //     });
-    // };
+    const getKdsMstSection = () => {
+        const params = {
+            cmpCd: '90000001',
+            brandCd: '9999',
+            storeCd: '000281',
+            systemTy: "1",
+            useYn: "Y",
+        }
+        api.getKdsMstSection(params).then(result => {
+          const {responseCode, responseMessage, responseBody} = result.data;
+          if (responseCode === "200") {
+            console.log("kdsMstSection:"+responseBody)
+            setSectionList(responseBody);
+          }
+          else {
+            // Alert.alert("!", responseMessage);
+          }
+        })
+          .catch(ex => {
+            // Alert.alert("!", ex.message);
+          })
+          .finally(() => {
+            setLoading(false);
+          })
+        // Replace the api call with a browser-friendly fetch or axios call
+        // fetch("/api/getKdsMstSection", { method: "POST", body: JSON.stringify(params) })
+        //     .then(res => res.json())
+        //     .then(result => {
+        //         const { responseCode, responseMessage, responseBody } = result;
+        //         if (responseCode === "200") {
+        //             setSectionList(responseBody);
+        //         } else {
+        //             alert(responseMessage);
+        //         }
+        //     })
+        //     .catch(ex => {
+        //         alert(ex.message);
+        //     })
+        //     .finally(() => {
+        //         setLoading(false);
+        //     });
+    };
     //
     // const renderItem = ({ item }: { item: Section }) => {
     //     return (
@@ -318,28 +343,42 @@ const Setting: React.FC = () => {
         // AppFuncRestart();
     };
 
-    const onSelectInfo = () => {
-
-    }
-
     const changeSelectedCmpCd = (item: { infoCd: string; infoNm: string })  => {
       setSelectedCmpCd(item.infoCd);
-      updateCmp(item.infoCd, "안녕")
+      if(platform==='electron') {
+        updateCmp(item.infoCd, "안녕")
+      }
       // 추가적인 로직이 필요하면 여기에 작성
+      getSalesOrgList(item.infoCd)
     };
 
     const changeSelectedSalesOrgCd = (item: { infoCd: string; infoNm: string })  => {
       console.log("326 item:"+JSON.stringify(item));
       setSelectedSalesOrgCd(item.infoCd);
+      getStorList(selectedCmpCd,item.infoCd)
     }
-  const loadCmpList = async () => {
-    try {
-      const cmpList = await window.ipc.cmp.getList();
-      console.log('회사 목록:', cmpList); // 👈 여기서 로그
-    } catch (err) {
-      console.error('에러 발생:', err);
+
+    const changeSelectedStorCd = (item: { infoCd: string; infoNm: string })  => {
+      console.log("358 item:"+JSON.stringify(item));
+      setSelectedStorCd(item.infoCd);
+      getCornerList(selectedCmpCd, selectedSalesOrgCd, item.infoCd);
     }
-  };
+
+    const changeSelectedCornerCd = (item: { infoCd: string; infoNm: string })  => {
+      console.log("358 item:"+JSON.stringify(item));
+      setSelectedCornerCd(item.infoCd);
+      getKdsMstSection();
+    }
+    const loadCmpList = async () => {
+      try {
+        if(platform==='electron') {
+          const cmpList = await window.ipc.cmp.getList();
+          console.log('회사 목록:', cmpList); // 👈 여기서 로그
+        }
+      } catch (err) {
+        console.error('에러 발생:', err);
+      }
+    };
 
     const deleteCmp = async (cmpCd:string) => {
       try {
@@ -358,6 +397,18 @@ const Setting: React.FC = () => {
         console.error('에러 발생:', err);
       }
     }
+    const memoizedSegmentData = useMemo(() =>
+      segmentData.map((seg, i) => ({
+        ...seg,
+        ref: segmentRefs[i],
+      })), [segmentData, segmentRefs]);
+
+    const handleChangeMode = useCallback((newMode: string) => {
+      setMode(newMode);
+    }, []);
+
+  const defaultIndex = useMemo(() =>
+    segmentData.findIndex(seg => seg.value === mode), [segmentData, mode]);
 
   if(loading) {
         return <></>
@@ -389,22 +440,34 @@ const Setting: React.FC = () => {
 
             <div className="field">
               <span>회사</span>
-              <DropdownMenu infoList={cmpNmList} onSelectInfo={changeSelectedCmpCd}/>
+              <DropdownMenu
+                infoList={cmpNmList}
+                selectedInfo={cmpNmList.find(item => item.infoCd === selectedCmpCd) ?? cmpNmList[0]}
+                onSelectInfo={changeSelectedCmpCd}/>
             </div>
 
             <div className="field">
               <span>영업조직</span>
-              <DropdownMenu infoList={salesOrgNmList} onSelectInfo={changeSelectedSalesOrgCd} />
+              <DropdownMenu
+                infoList={salesOrgNmList}
+                selectedInfo={salesOrgNmList.find(item => item.infoCd === selectedSalesOrgCd) ?? salesOrgNmList[0]}
+                onSelectInfo={changeSelectedSalesOrgCd} />
             </div>
 
             <div className="field">
               <span>점포</span>
-              <DropdownMenu infoList={storNmList} onSelectInfo={changeSelectedCmpCd} />
+              <DropdownMenu
+                infoList={storNmList}
+                selectedInfo={storNmList.find(item => item.infoCd === selectedStorCd) ?? storNmList[0]}
+                onSelectInfo={changeSelectedStorCd} />
             </div>
 
             <div className="field">
               <span>코너</span>
-              <DropdownMenu infoList={cornerNmList} onSelectInfo={changeSelectedCmpCd} />
+              <DropdownMenu
+                infoList={cornerNmList}
+                selectedInfo={cornerNmList.find(item => item.infoCd === selectedCornerCd) ?? cornerNmList[0]}
+                onSelectInfo={changeSelectedCornerCd} />
             </div>
           </div>
 
@@ -413,20 +476,28 @@ const Setting: React.FC = () => {
 
             <SegmentedControl
               name="group-1"
-              segments={segmentData.map((seg, i) => ({
-                ...seg,
-                ref: segmentRefs[i],
-              }))}
-              callback={setMode}
+              segments={memoizedSegmentData}
+              callback={handleChangeMode}
               controlRef={controlRef}
-              defaultIndex={segmentData.findIndex(
-                (seg) => seg.value === mode
-              )}
+              defaultIndex={defaultIndex}
             />
-            {/*<p className="selected-item">Selected: {mode}</p>*/}
+
 
             <div className="field">
               <span className="label">시스템구분</span>
+              <div>
+                <span className="label">{mode}</span>
+                {mode==='SECTION' &&
+                <div className="section-list">
+                  {sectionList.map((section, index) => (
+                    <RenderItem key={index} item={section} index={index} />
+                  ))}
+                  </div>
+                }
+
+
+              </div>
+
             </div>
           </div>
         </div>
@@ -442,5 +513,20 @@ const Setting: React.FC = () => {
       </div>
   );
 };
+
+interface SectionItem {
+  sectionCd: string;
+  sectionNm: string;
+}
+
+interface RenderItemProps {
+  item: SectionItem;
+  index: number;
+}
+function RenderItem({ item, index }: RenderItemProps): JSX.Element {
+  return (
+    <div className="section-item">{item.sectionNm}</div>
+  );
+}
 
 export default Setting;
