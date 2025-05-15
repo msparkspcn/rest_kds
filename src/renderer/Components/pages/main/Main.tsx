@@ -8,15 +8,16 @@ import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
 import History from '@Components/pages/main/order/History';
 import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
-import ConfirmDialog from '@Components/pages/main/ConfirmDialog';
+import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
+import { useConfigStore } from '@Components/store/config';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
   const [section, setSection] = useState({});
   const [sectionItemList, setSectionItemList] = useState([]);
   const [orderList, setOrderList] = useState([]);
-  const [systemType, setSystemType] = useState('1');
+  // const [systemType, setSystemType] = useState('1');
   const [filterList, setFilterList] = useState([]);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const navigate = useNavigate();
@@ -33,17 +34,30 @@ function Main(): JSX.Element {
     onConfirm: () => {},
   });
   const [isSoldOutOpen, setSoldOutOpen] = useState(false);
+  const config = useConfigStore((state) => state.config)
+  let systemType: number = 0;
+  let sectionCd: string ='';
+
   useEffect(() => {
-    getKdsMstSectionItemList('10000');
+    console.log("Config:"+JSON.stringify(config));
+    systemType = config!!.systemType
+    sectionCd = config!!.sectionCd
+    if(systemType !== 0) {
+      getKdsMstSectionItemList(config!!.sectionCd!!);
+    }
+    else {
+      // getOrderData()
+    }
+
   }, []);
 
   useEffect(() => {
     console.log('### 6. 주문정보 갱신 ###');
     console.log('### 시스템 구분 :: ', systemType);
-    if (systemType === '0') {
+    if (systemType === 0) {
       // EXPO
       setFilterList(orderList);
-    } else if (systemType === '1') {
+    } else if (systemType === 1) {
       // Section
       // 섹션별 아이템코드 추출
       const sectionItemCdList = sectionItemList.map((item) => item.productCd);

@@ -1,12 +1,12 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import './DropdownMenu.scss';
-import { useState } from 'react';
+import { memo } from 'react';
 
-export default function DropdownMenu({
-                                       infoList,
-                                       selectedInfo,
-                                       onSelectInfo
+function DropdownMenu({
+     infoList,
+     selectedInfo,
+     onSelectInfo
 }: {
     infoList: { infoCd: string, infoNm: string }[];
     selectedInfo: { infoCd: string, infoNm: string };
@@ -16,6 +16,7 @@ export default function DropdownMenu({
     console.log("111DropdownMenu infoList[0]:" + JSON.stringify(infoList[0].infoNm)); // 전달된 infoList 확인
 
   const handleSelectItem = (item: { infoCd: string, infoNm: string }) => {
+    if (item.infoCd === selectedInfo.infoCd) return;
     onSelectInfo(item); // 선택된 아이템을 부모로 전달
   };
     return (
@@ -46,3 +47,5 @@ export default function DropdownMenu({
       </Menu>
     )
 }
+
+export default memo(DropdownMenu);

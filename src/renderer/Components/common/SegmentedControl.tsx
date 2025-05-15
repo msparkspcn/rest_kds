@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, RefObject } from "react";
+import React, { useRef, useState, useEffect, RefObject, memo } from "react";
 import './SegmentedControl.scss';
 
 type Segment = {
@@ -80,8 +80,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           ))}
         </div>
       </div>
-
     );
 };
 
-export default React.memo(SegmentedControl);
+export default memo(SegmentedControl);

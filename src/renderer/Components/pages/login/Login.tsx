@@ -49,6 +49,7 @@ const Login: React.FC = () => {
             setAuthToken(user.apiKey); // 이제 user가 null이 아닐 경우에만 실행
           }
 
+
           // setDialogMessage("로그인 성공 userId:"+userId+", password:"+password);
           navigate('/setting');
         } else {
@@ -62,6 +63,25 @@ const Login: React.FC = () => {
         setLoading(false);
       });
   };
+
+  const getStoreSaleOpen = () => {
+    const params = {
+      cmpCd: '90000001',
+      brandCd: '9999',
+      storeCd: '000281'
+    };
+    api.getStoreSaleOpen(params)
+      .then((result) => {
+        const { responseBody, responseCode, responseMessage } = result.data;
+        if (responseCode === '200') {
+          console.log(`### 개점정보 res:${responseBody.saleDt}`);
+
+        }
+        else {
+          console.log('### 개점정보 수신 실패');
+        }
+      })
+  }
 
   return (
     <div className="login-container">

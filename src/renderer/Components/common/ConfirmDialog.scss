@@ -22,13 +22,15 @@
 
   .dialog-header {
     display: flex;
-    width: 100%;
     justify-content: space-between;
     align-items: center;
-    .h2 {
+    position: relative;
+    h2 {
+      flex:1;
       font-size: 1.5rem;
       font-weight: bold;
       margin: 0;
+      text-align: center;
     }
     .close-button {
       width: 2rem;

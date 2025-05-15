@@ -75,7 +75,10 @@ function createTables() {
 
     );`,
     `CREATE TABLE IF NOT EXISTS sale_open (
-      id INTEGER PRIMARY KEY AUTOINCREMENT
+      cmp_CD TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
+      stor_cd TEXT NOT NULL,
+      dt TEXT NOT NULL
     );`
   ];
 

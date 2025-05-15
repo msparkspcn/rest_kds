@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-// import { Alert } from "react-alert"; // You can use any web-compatible alert library or native JS alert
-// import { AppContext } from "../../../App";
 import * as api from "@Components/data/api/api";
 import {useUserStore} from "@Components/store/user";
 import { useNavigate } from "react-router-dom";
@@ -8,17 +6,11 @@ import './Setting.scss';
 import DropdownMenu from '@Components/common/DropdownMenu';
 import SegmentedControl from '@Components/common/SegmentedControl';
 import {getPlatform} from '@Components/utils/platform';
-// interface SettingPageProps {
-//     route: {
-//         params: {
-//             store: Store;
-//             saleOpen: boolean;
-//             config: Config;
-//             from: string;
-//         };
-//     };
-//     navigation: any;
-// }
+import packageJson from '../../../../../package.json';
+import ConfirmDialog from '@Components/common/ConfirmDialog';
+import { STRINGS } from '../../../constants/strings';
+import Alert from '@Components/common/Alert';
+import { useConfigStore } from '@Components/store/config';
 
 const Setting: React.FC = () => {
     // const { AppFuncRestart } = useContext(AppContext);
@@ -35,12 +27,7 @@ const Setting: React.FC = () => {
     // const [section, setSection] = useState<Section>({ sectionCd: "10000", sectionNm: "TEST" });
     // const [appVersion, setAppVersion] = useState<string>("");
     const user = useUserStore((state) => state.user);
-    // const setUser = useUserStore((state) => state.setUser);
-    // const getUser = useUserStore((state) => state.getUser);
-    // type Company = {
-    //     cmpCd: string;
-    //     cmpNm: string;
-    // }
+
     const [cmpNmList, setCmpNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [selectedCmpCd, setSelectedCmpCd] = useState<string>("");
     const [selectedSalesOrgCd, setSelectedSalesOrgCd] = useState<string>("");
@@ -49,12 +36,17 @@ const Setting: React.FC = () => {
     const [salesOrgNmList, setSalesOrgNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [storNmList, setStorNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [cornerNmList, setCornerNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
-    const [sectionList, setSectionList] = useState([
-      {sectionCd: "", sectionNm: ""}
-    ]);
+    const [sectionList, setSectionList] = useState([{sectionCd: "", sectionNm: ""}]);
     const navigate = useNavigate();
 
-    const [mode, setMode] = useState("EXPO");
+    const [mode, setMode] = useState(0);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmProps, setConfirmProps] = useState({
+      title: '',
+      message: '',
+      onConfirm: () => {},
+    });
+    const [alertOpen, setAlertOpen] = useState(false);
 
     const segmentData = [
         { label: "EXPO", value: "EXPO" },
@@ -63,6 +55,9 @@ const Setting: React.FC = () => {
     const controlRef = useRef<HTMLDivElement | null>(null);
     const segmentRefs = segmentData.map(() => useRef<HTMLDivElement | null>(null));
     const platform = getPlatform();
+    const [selectedSectionIdx, setSelectedSectionIdx] = useState(-1);
+    const setConfig = useConfigStore((state) => state.setConfig);
+
     useEffect(() => {
         console.log("##### 세팅화면 진입 #####")
         // 버전확인
@@ -71,11 +66,10 @@ const Setting: React.FC = () => {
         if(user!=null) {
           if ("cmpCd" in user) {
             console.log("cmpCd:"+user.cmpCd)
-            getCmpList(user.cmpCd)
             setSelectedCmpCd(user.cmpCd)
+            getCmpList(user.cmpCd)
           }
         }
-
 
         const systemTyFromStorage = localStorage.getItem("KDS_SYSTEM_TY");
         if (systemTyFromStorage !== null) {
@@ -94,6 +88,7 @@ const Setting: React.FC = () => {
 
     const init = () => {
       localStorage.clear();
+
       deleteCmp('SLKR')
     };
 
@@ -136,7 +131,7 @@ const Setting: React.FC = () => {
     };
 
     const getSalesOrgList = (cmpCd: String) => {
-        setLoading(true)
+        // setLoading(true)
         const request = {
             cmpCd : cmpCd,
             restValue : ""
@@ -153,10 +148,12 @@ const Setting: React.FC = () => {
                   }))
                 );
                 if(!(user) || user.salesOrgCd == "") {
-                  getStorList(cmpCd, responseBody[0].salesOrgCd)
+                  // getStorList(cmpCd, responseBody[0].salesOrgCd)
+                  getCornerList(cmpCd,responseBody[0].salesOrgCd)
                   setSelectedSalesOrgCd(responseBody[0].salesOrgCd)
                 } else {
-                  getStorList(cmpCd, user.salesOrgCd)
+                  // getStorList(cmpCd, user.salesOrgCd)
+                  getCornerList(cmpCd,user.salesOrgCd)
                   setSelectedSalesOrgCd(user.salesOrgCd)
                 }
               }
@@ -172,7 +169,7 @@ const Setting: React.FC = () => {
                 // setLoading(false)
             })
     }
-
+  /*
     const getStorList = (cmpCd: String, salesOrgCd: String) => {
       console.log("cmpCd:"+cmpCd+", salesOrgCd:"+salesOrgCd)
         // setLoading(true)
@@ -192,6 +189,7 @@ const Setting: React.FC = () => {
                     infoNm: storNm,
                   }))
                 );
+                console.log("1.storCd:"+user.storCd)
                 if (!(user) || user.storCd == "") {
                   getCornerList(cmpCd, salesOrgCd, responseBody[0].storCd)
                   setSelectedStorCd(responseBody[0].storCd)
@@ -216,14 +214,13 @@ const Setting: React.FC = () => {
                 // setLoading(false)
             })
     }
-
-    const getCornerList = (cmpCd: String, salesOrgCd: String, storCd: String) => {
+*/
+    const getCornerList = (cmpCd: String, salesOrgCd: String) => {
         // setLoading(true)
-        console.log("storCd:"+storCd)
+        console.log("getCornerList:")
         const request = {
             cmpCd : cmpCd,
-            salesOrgCd : salesOrgCd,
-            storeValue : ""
+            salesOrgCd : salesOrgCd
         }
         api.getCornerList(request).then((result) => {
             const {responseCode, responseMessage, responseBody} = result.data;
@@ -237,6 +234,7 @@ const Setting: React.FC = () => {
                   }))
                 );
                 setSelectedStorCd(responseBody[0].cornerCd)
+                getKdsMstSection();
               }
             }
             else {
@@ -293,17 +291,7 @@ const Setting: React.FC = () => {
         //         setLoading(false);
         //     });
     };
-    //
-    // const renderItem = ({ item }: { item: Section }) => {
-    //     return (
-    //         <button
-    //             className={`p-2 rounded ${item.sectionCd === section.sectionCd ? 'bg-primary' : ''}`}
-    //             onClick={() => onSelectedSection(item)}
-    //         >
-    //             <span className="text-white font-bold">{item.sectionNm}</span>
-    //         </button>
-    //     );
-    // };
+
 
     // const onSelectedSystemTy = (event: any) => {
     //     setSystemIdx(event.selectedIndex);
@@ -336,10 +324,32 @@ const Setting: React.FC = () => {
     };
 
     const onSave = () => {
-        alert('설정 정보를 저장하시겠어요? 저장 후 앱이 재실행 됩니다.');
+      console.log("mode:"+mode+", section:"+JSON.stringify(sectionList[selectedSectionIdx]))
+      if(mode==STRINGS.mode_section&&!isSectionListValid) {
+        setAlertOpen(true);
+        return;
+      }
+      else {
+        console.log("check:"+sectionList[0].sectionNm)
+      }
+
+      setConfirmProps({
+        title:'확인',
+        message:"설정 정보를 저장하시겠어요?\n저장 후 앱이 재실행 됩니다.",
+        onConfirm:()=>{
+          setConfig({
+            systemType:mode,
+            sectionCd:sectionList[selectedSectionIdx].sectionCd,
+            sectionNm:sectionList[selectedSectionIdx].sectionNm
+          })
+        console.log("저장");
+        navigate("/main");
+      }}
+      );
+      setConfirmOpen(true);
         // localStorage.setItem("KDS_SYSTEM_TY", systemIdx + "");
         // localStorage.setItem("KDS_SECTION_CD", JSON.stringify(section));
-        navigate("/main")
+
         // AppFuncRestart();
     };
 
@@ -355,13 +365,13 @@ const Setting: React.FC = () => {
     const changeSelectedSalesOrgCd = (item: { infoCd: string; infoNm: string })  => {
       console.log("326 item:"+JSON.stringify(item));
       setSelectedSalesOrgCd(item.infoCd);
-      getStorList(selectedCmpCd,item.infoCd)
+      getCornerList(selectedCmpCd,item.infoCd)
     }
 
     const changeSelectedStorCd = (item: { infoCd: string; infoNm: string })  => {
       console.log("358 item:"+JSON.stringify(item));
       setSelectedStorCd(item.infoCd);
-      getCornerList(selectedCmpCd, selectedSalesOrgCd, item.infoCd);
+      // getCornerList(selectedCmpCd, selectedSalesOrgCd);
     }
 
     const changeSelectedCornerCd = (item: { infoCd: string; infoNm: string })  => {
@@ -410,13 +420,13 @@ const Setting: React.FC = () => {
   const defaultIndex = useMemo(() =>
     segmentData.findIndex(seg => seg.value === mode), [segmentData, mode]);
 
+  const isSectionListValid = !(sectionList.length === 1 && sectionList[0].sectionCd === "" && sectionList[0].sectionNm === "");
+
   if(loading) {
         return <></>
     }
     return (
       <div className="container">
-        <div className="spacer-70" />
-
         <div className="button-container">
           <div className="empty-space" />
           <button onClick={init}>
@@ -426,20 +436,16 @@ const Setting: React.FC = () => {
             <span>마스터수신</span>
           </button>
         </div>
-
-        <div className="spacer-20" />
-
         <div className="info-section">
           <div className="info-left">
             <span className="title">기초정보</span>
-
             <div className="field">
-              <span>프로그램 버전</span>
-              {/* <span className="value">{appVersion}</span> */}
+              <span className="info-title">프로그램 버전</span>
+              <span className="value">{packageJson.version}</span>
             </div>
 
             <div className="field">
-              <span>회사</span>
+              <span className="info-title">휴게소 운영업체</span>
               <DropdownMenu
                 infoList={cmpNmList}
                 selectedInfo={cmpNmList.find(item => item.infoCd === selectedCmpCd) ?? cmpNmList[0]}
@@ -447,23 +453,23 @@ const Setting: React.FC = () => {
             </div>
 
             <div className="field">
-              <span>영업조직</span>
+              <span className="info-title">휴게소</span>
               <DropdownMenu
                 infoList={salesOrgNmList}
                 selectedInfo={salesOrgNmList.find(item => item.infoCd === selectedSalesOrgCd) ?? salesOrgNmList[0]}
                 onSelectInfo={changeSelectedSalesOrgCd} />
             </div>
 
-            <div className="field">
-              <span>점포</span>
-              <DropdownMenu
-                infoList={storNmList}
-                selectedInfo={storNmList.find(item => item.infoCd === selectedStorCd) ?? storNmList[0]}
-                onSelectInfo={changeSelectedStorCd} />
-            </div>
+            {/*<div className="field">*/}
+            {/*  <span className="info-title">점포</span>*/}
+            {/*  <DropdownMenu*/}
+            {/*    infoList={storNmList}*/}
+            {/*    selectedInfo={storNmList.find(item => item.infoCd === selectedStorCd) ?? storNmList[0]}*/}
+            {/*    onSelectInfo={changeSelectedStorCd} />*/}
+            {/*</div>*/}
 
             <div className="field">
-              <span>코너</span>
+              <span className="info-title">매장</span>
               <DropdownMenu
                 infoList={cornerNmList}
                 selectedInfo={cornerNmList.find(item => item.infoCd === selectedCornerCd) ?? cornerNmList[0]}
@@ -482,34 +488,46 @@ const Setting: React.FC = () => {
               defaultIndex={defaultIndex}
             />
 
-
             <div className="field">
-              <span className="label">시스템구분</span>
-              <div>
+              <span className="info-title">시스템구분</span>
+              <div className="check">
                 <span className="label">{mode}</span>
-                {mode==='SECTION' &&
+                {mode===STRINGS.mode_section && isSectionListValid &&
                 <div className="section-list">
                   {sectionList.map((section, index) => (
-                    <RenderItem key={index} item={section} index={index} />
+                    <RenderItem
+                      key={index}
+                      item={section}
+                      index={index}
+                      isSelected={index === selectedSectionIdx}
+                      onClick={() => setSelectedSectionIdx(index)}
+                    />
                   ))}
                   </div>
                 }
-
-
               </div>
-
             </div>
           </div>
         </div>
-
         <div className="action-buttons">
-          <button className="cancel" onClick={onCancel}>
-            취소
-          </button>
-          <button className="save" onClick={onSave}>
-            저장
-          </button>
+          <button className="cancel" onClick={onCancel}>로그아웃</button>
+          <button className="save" onClick={onSave}>저장</button>
         </div>
+        {confirmOpen && (
+          <ConfirmDialog
+            confirmOpen={confirmOpen}
+            onClose={() => setConfirmOpen(false)}
+            {...confirmProps}
+          />
+        )}
+        {alertOpen && (
+          <Alert
+            title="알림"
+            message="섹션을 선택해주세요."
+            onClose={()=>{setAlertOpen(false)}}
+          />
+        )}
+
       </div>
   );
 };
@@ -522,10 +540,17 @@ interface SectionItem {
 interface RenderItemProps {
   item: SectionItem;
   index: number;
+  isSelected: boolean;
+  onClick: () => void;
 }
-function RenderItem({ item, index }: RenderItemProps): JSX.Element {
+function RenderItem({ item, index, isSelected, onClick }: RenderItemProps): JSX.Element {
   return (
-    <div className="section-item">{item.sectionNm}</div>
+    <div
+      className={`section-item ${isSelected ? "selected" : ""}`}
+      onClick={onClick}
+    >
+      {item.sectionNm}
+    </div>
   );
 }
 
