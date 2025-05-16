@@ -31,4 +31,18 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('db:updateCmp', cmp_nm, cmp_cd),
     delete: (cmp_cd: string) => ipcRenderer.invoke('db:deleteCmp', cmp_cd),
   },
+  product: {
+    getList: () => ipcRenderer.invoke('db:getProductList'),
+    add: (  cmp_cd: string,
+            sales_org_Cd: string,
+            stor_cd: string,
+            corner_cd: string,
+            product_cd: string,
+            product_nm: string,
+            price: number,
+            soldout_yn: string
+    ) =>
+      ipcRenderer.invoke('db:addProduct',
+        cmp_cd, sales_org_Cd, stor_cd, corner_cd, product_cd, product_nm, price, soldout_yn)
+  }
 });

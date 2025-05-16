@@ -86,6 +86,11 @@ export function getCornerList(params: any) {
   return post(request, params);
 }
 
+export function getProductList(params:any) {
+  const request = `${host}/api/v1/did/item`;
+  return post(request, params);
+}
+
 export function updateOrderCallState(params: any) {
   const request = `${host}/api/v1/kds/hd/call/state`;
   return post(request, params);

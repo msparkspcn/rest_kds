@@ -4,7 +4,6 @@ import {useUserStore} from "@Components/store/user";
 import { useNavigate } from "react-router-dom";
 import './Setting.scss';
 import DropdownMenu from '@Components/common/DropdownMenu';
-import SegmentedControl from '@Components/common/SegmentedControl';
 import {getPlatform} from '@Components/utils/platform';
 import packageJson from '../../../../../package.json';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
@@ -17,7 +16,6 @@ const Setting: React.FC = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
     // const [saleOpen, setSaleOpen] = useState<boolean>(props.route.params.saleOpen);
-    // const [config, setConfig] = useState<Config>(props.route.params.config);
     // const [from, setFrom] = useState<string>(props.route.params.from);
     // const [systemIdx, setSystemIdx] = useState<number>(0);
     // const [systemTy, setSystemTy] = useState<string>('0');
@@ -31,15 +29,11 @@ const Setting: React.FC = () => {
     const [cmpNmList, setCmpNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [selectedCmpCd, setSelectedCmpCd] = useState<string>("");
     const [selectedSalesOrgCd, setSelectedSalesOrgCd] = useState<string>("");
-    const [selectedStorCd, setSelectedStorCd] = useState<string>("");
     const [selectedCornerCd, setSelectedCornerCd] = useState<string>("");
     const [salesOrgNmList, setSalesOrgNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
-    const [storNmList, setStorNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [cornerNmList, setCornerNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
-    const [sectionList, setSectionList] = useState([{sectionCd: "", sectionNm: ""}]);
     const navigate = useNavigate();
 
-    const [mode, setMode] = useState(0);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [confirmProps, setConfirmProps] = useState({
       title: '',
@@ -48,15 +42,7 @@ const Setting: React.FC = () => {
     });
     const [alertOpen, setAlertOpen] = useState(false);
 
-    const segmentData = [
-        { label: "EXPO", value: 0},
-        { label: "SECTION", value: 1 }
-    ];
-    const controlRef = useRef<HTMLDivElement | null>(null);
-    const segmentRefs = segmentData.map(() => useRef<HTMLDivElement | null>(null));
     const platform = getPlatform();
-    const [selectedSectionIdx, setSelectedSectionIdx] = useState(-1);
-    const setConfig = useConfigStore((state) => state.setConfig);
 
     useEffect(() => {
         console.log("##### 세팅화면 진입 #####")
@@ -80,10 +66,6 @@ const Setting: React.FC = () => {
             }
         }
 
-        // const sectionFromStorage = localStorage.getItem("KDS_SECTION_CD");
-        // if (sectionFromStorage !== null) {
-        //     setSection(JSON.parse(sectionFromStorage));
-        // }
     }, []);
 
     const init = () => {
@@ -93,9 +75,7 @@ const Setting: React.FC = () => {
     };
 
     const getCmpList = async (cmpCd: String) => {
-        const request = {
-            "cmpValue" : cmpCd
-        }
+        const request = { "cmpValue" : cmpCd }
         try {
           const result = await api.getCmpList(request);
           const {responseCode, responseMessage, responseBody} = result.data;
@@ -233,7 +213,6 @@ const Setting: React.FC = () => {
                     infoNm: cornerNm,
                   }))
                 );
-                setSelectedStorCd(responseBody[0].cornerCd)
                 getKdsMstSection();
               }
             }
@@ -261,7 +240,6 @@ const Setting: React.FC = () => {
           const {responseCode, responseMessage, responseBody} = result.data;
           if (responseCode === "200") {
             console.log("kdsMstSection:"+responseBody)
-            setSectionList(responseBody);
           }
           else {
             // Alert.alert("!", responseMessage);
@@ -324,24 +302,10 @@ const Setting: React.FC = () => {
     };
 
     const onSave = () => {
-      console.log("mode:"+mode+", section:"+JSON.stringify(sectionList[selectedSectionIdx]))
-      if(mode==STRINGS.mode_section&&!isSectionListValid) {
-        setAlertOpen(true);
-        return;
-      }
-      else {
-        console.log("check:"+sectionList[0].sectionNm)
-      }
-
       setConfirmProps({
         title:'확인',
         message:"설정 정보를 저장하시겠어요?\n저장 후 앱이 재실행 됩니다.",
         onConfirm:()=>{
-          setConfig({
-            systemType:mode,
-            sectionCd:sectionList[selectedSectionIdx].sectionCd,
-            sectionNm:sectionList[selectedSectionIdx].sectionNm
-          })
         console.log("저장");
         navigate("/main");
       }}
@@ -366,12 +330,6 @@ const Setting: React.FC = () => {
       console.log("326 item:"+JSON.stringify(item));
       setSelectedSalesOrgCd(item.infoCd);
       getCornerList(selectedCmpCd,item.infoCd)
-    }
-
-    const changeSelectedStorCd = (item: { infoCd: string; infoNm: string })  => {
-      console.log("358 item:"+JSON.stringify(item));
-      setSelectedStorCd(item.infoCd);
-      // getCornerList(selectedCmpCd, selectedSalesOrgCd);
     }
 
     const changeSelectedCornerCd = (item: { infoCd: string; infoNm: string })  => {
@@ -407,20 +365,6 @@ const Setting: React.FC = () => {
         console.error('에러 발생:', err);
       }
     }
-    const memoizedSegmentData = useMemo(() =>
-      segmentData.map((seg, i) => ({
-        ...seg,
-        ref: segmentRefs[i],
-      })), [segmentData, segmentRefs]);
-
-    const handleChangeMode = useCallback((newMode: string) => {
-      setMode(newMode);
-    }, []);
-
-  const defaultIndex = useMemo(() =>
-    segmentData.findIndex(seg => seg.value === mode), [segmentData, mode]);
-
-  const isSectionListValid = !(sectionList.length === 1 && sectionList[0].sectionCd === "" && sectionList[0].sectionNm === "");
 
   if(loading) {
         return <></>
@@ -460,52 +404,12 @@ const Setting: React.FC = () => {
                 onSelectInfo={changeSelectedSalesOrgCd} />
             </div>
 
-            {/*<div className="field">*/}
-            {/*  <span className="info-title">점포</span>*/}
-            {/*  <DropdownMenu*/}
-            {/*    infoList={storNmList}*/}
-            {/*    selectedInfo={storNmList.find(item => item.infoCd === selectedStorCd) ?? storNmList[0]}*/}
-            {/*    onSelectInfo={changeSelectedStorCd} />*/}
-            {/*</div>*/}
-
             <div className="field">
               <span className="info-title">매장</span>
               <DropdownMenu
                 infoList={cornerNmList}
                 selectedInfo={cornerNmList.find(item => item.infoCd === selectedCornerCd) ?? cornerNmList[0]}
                 onSelectInfo={changeSelectedCornerCd} />
-            </div>
-          </div>
-
-          <div className="info-right">
-            <span className="title">설정정보</span>
-
-            <SegmentedControl
-              name="group-1"
-              segments={memoizedSegmentData}
-              callback={handleChangeMode}
-              controlRef={controlRef}
-              defaultIndex={defaultIndex}
-            />
-
-            <div className="field">
-              <span className="info-title">시스템구분</span>
-              <div className="check">
-                <span className="label">{mode === 0 ? "EXPO" : "SECTION"}</span>
-                {mode===STRINGS.mode_section && isSectionListValid &&
-                <div className="section-list">
-                  {sectionList.map((section, index) => (
-                    <RenderItem
-                      key={index}
-                      item={section}
-                      index={index}
-                      isSelected={index === selectedSectionIdx}
-                      onClick={() => setSelectedSectionIdx(index)}
-                    />
-                  ))}
-                  </div>
-                }
-              </div>
             </div>
           </div>
         </div>
@@ -531,27 +435,5 @@ const Setting: React.FC = () => {
       </div>
   );
 };
-
-interface SectionItem {
-  sectionCd: string;
-  sectionNm: string;
-}
-
-interface RenderItemProps {
-  item: SectionItem;
-  index: number;
-  isSelected: boolean;
-  onClick: () => void;
-}
-function RenderItem({ item, index, isSelected, onClick }: RenderItemProps): JSX.Element {
-  return (
-    <div
-      className={`section-item ${isSelected ? "selected" : ""}`}
-      onClick={onClick}
-    >
-      {item.sectionNm}
-    </div>
-  );
-}
 
 export default Setting;

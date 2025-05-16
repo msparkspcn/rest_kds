@@ -14,10 +14,7 @@ import { useConfigStore } from '@Components/store/config';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
-  const [section, setSection] = useState({});
-  const [sectionItemList, setSectionItemList] = useState([]);
   const [orderList, setOrderList] = useState([]);
-  // const [systemType, setSystemType] = useState('1');
   const [filterList, setFilterList] = useState([]);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const navigate = useNavigate();
@@ -28,6 +25,7 @@ function Main(): JSX.Element {
   const [saleDt, setSaleDt] = useState('');
   const [callOrderOpen, setCallOrderOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [productList, setProductList] = useState([]);
   const [confirmProps, setConfirmProps] = useState({
     title: '',
     message: '',
@@ -37,18 +35,15 @@ function Main(): JSX.Element {
   const config = useConfigStore((state) => state.config)
   let systemType: number = 0;
   let sectionCd: string ='';
-  let sectionNm: string = '';
 
   useEffect(() => {
-    console.log("Config:"+JSON.stringify(config));
-    systemType = config!!.systemType
-    sectionCd = config!!.sectionCd
-    if(systemType !== 0) {
-      getKdsMstSectionItemList(config!!.sectionCd!!);
-    }
-    else {
-      // getOrderData()
-    }
+    getProductList()
+    // if(systemType !== 0) {
+    //   getKdsMstSectionItemList(config!!.sectionCd!!);
+    // }
+    // else {
+    //   // getOrderData()
+    // }
 
   }, []);
 
@@ -61,7 +56,7 @@ function Main(): JSX.Element {
     } else if (systemType === 1) {
       // Section
       // 섹션별 아이템코드 추출
-      const sectionItemCdList = sectionItemList.map((item) => item.productCd);
+      const sectionItemCdList = productList.map((item) => item.productCd);
 
       // 주문내역 필터링
       const filterOrderArray = orderList
@@ -76,7 +71,7 @@ function Main(): JSX.Element {
 
       setFilterList(filterOrderArray);
     }
-  }, [orderList, sectionItemList, systemType]);
+  }, [orderList]);
 
   useEffect(() => {
     console.log("페이지 변경:"+currentPage);
@@ -113,6 +108,28 @@ function Main(): JSX.Element {
           console.log('### 개점정보 수신 실패');
         }
       })
+  }
+
+  const getProductList = () => {
+    console.log("상품 조회")
+    const params = {
+      cmpCd: 'SLKR',
+      salesOrgCd: '8000',
+      storCd: '5000511',
+      cornerCd: 'CIHA'
+    };
+    api.getProductList(params).then((result) => {
+      const { responseBody, responseCode, responseMessage } = result.data;
+      if (responseCode === '200') {
+        setProductList(responseBody)
+        console.log(`### 상품정보 res:${responseBody}`);
+        // setSaleDt(responseBody.saleDt);
+        // getOrderData(responseBody.saleDt);
+      }
+      else {
+        console.log('### 개점정보 수신 실패');
+      }
+    })
   }
 
   const getOrderData = (saleDt:string) => {
@@ -202,7 +219,7 @@ function Main(): JSX.Element {
         const { responseBody, responseCode, responseMessage } = result.data;
         if (responseCode === '200') {
           console.log('### 5-2 Section Item 마스터 수신 완료 ###');
-          setSectionItemList(responseBody);
+          // setSectionItemList(responseBody);
           // 기본 구성이 끝나고 주문 정보를 가져온다
           getStoreSaleOpen();
         } else {
