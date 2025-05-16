@@ -49,8 +49,8 @@ const Setting: React.FC = () => {
     const [alertOpen, setAlertOpen] = useState(false);
 
     const segmentData = [
-        { label: "EXPO", value: "EXPO" },
-        { label: "SECTION", value: "SECTION" }
+        { label: "EXPO", value: 0},
+        { label: "SECTION", value: 1 }
     ];
     const controlRef = useRef<HTMLDivElement | null>(null);
     const segmentRefs = segmentData.map(() => useRef<HTMLDivElement | null>(null));
@@ -491,7 +491,7 @@ const Setting: React.FC = () => {
             <div className="field">
               <span className="info-title">시스템구분</span>
               <div className="check">
-                <span className="label">{mode}</span>
+                <span className="label">{mode === 0 ? "EXPO" : "SECTION"}</span>
                 {mode===STRINGS.mode_section && isSectionListValid &&
                 <div className="section-list">
                   {sectionList.map((section, index) => (

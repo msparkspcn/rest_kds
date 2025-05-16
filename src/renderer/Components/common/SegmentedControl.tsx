@@ -11,7 +11,7 @@ type SegmentedControlProps = {
     name: string;
     segments: Segment[];
     callback: (value: string, index: number) => void;
-  controlRef: RefObject<HTMLDivElement>;
+    controlRef: RefObject<HTMLDivElement>;
     defaultIndex?: number;
 };
 
@@ -19,7 +19,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
      name,
      segments,
      callback,
-   controlRef,
+     controlRef,
      defaultIndex = 0,
  }) => {
     const [activeIndex, setActiveIndex] = useState<number>(() => defaultIndex ?? 0);
@@ -27,6 +27,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
 
     useEffect(() => {
         componentReady.current = true;
+        // console.log("controlRef:"+JSON.stringify(controlRef))
     }, []);
 
     useEffect(() => {

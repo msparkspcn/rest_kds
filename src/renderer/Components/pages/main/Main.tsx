@@ -37,6 +37,7 @@ function Main(): JSX.Element {
   const config = useConfigStore((state) => state.config)
   let systemType: number = 0;
   let sectionCd: string ='';
+  let sectionNm: string = '';
 
   useEffect(() => {
     console.log("Config:"+JSON.stringify(config));

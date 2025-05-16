@@ -85,8 +85,14 @@
         "from": "app/dist",
         "to": "app/dist"
       },
+      {
+        "filter": ["node_modules/better-sqlite3/**/*"]
+      },
       "node_modules/better-sqlite3/**/*"
     ],
+    "directories": {
+      "app": "."
+    },
     "extraResources": [
       {
         "from": "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
