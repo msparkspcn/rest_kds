@@ -195,37 +195,47 @@ const Setting: React.FC = () => {
             })
     }
 */
-    const getCornerList = (cmpCd: String, salesOrgCd: String) => {
+    const getCornerList = async (cmpCd: String, salesOrgCd: String) => {
         // setLoading(true)
         console.log("getCornerList:")
         const request = {
             cmpCd : cmpCd,
             salesOrgCd : salesOrgCd
         }
-        api.getCornerList(request).then((result) => {
-            const {responseCode, responseMessage, responseBody} = result.data;
-            if (responseCode === "200") {
-                console.log("코너 조회 성공 responseBody:"+JSON.stringify(responseBody))
-              if(responseBody!=null) {
-                setCornerNmList(
-                  responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
-                    infoCd: cornerCd,
-                    infoNm: cornerNm,
-                  }))
-                );
-                getKdsMstSection();
+        try {
+          const result = await api.getCornerList(request);
+          const {responseCode, responseMessage, responseBody} = result.data;
+          if (responseCode === "200") {
+            console.log("코너 조회 성공 responseBody:"+JSON.stringify(responseBody))
+            if(responseBody!=null) {
+              for(const corner of responseBody) {
+                const { cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn } = corner;
+                if(platform==='electron') {
+                  await window.ipc.corner.add(cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn);
+                } else {
+                  console.log("웹입니다")
+                }
               }
+              setCornerNmList(
+                responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
+                  infoCd: cornerCd,
+                  infoNm: cornerNm,
+                }))
+              );
             }
-            else {
-                window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-            }
-        })
-            .catch(ex => {
-                window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
-            })
-            .finally(() => {
-                setLoading(false)
-            })
+          }
+          else {
+            window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+          }
+        }
+        catch(error) {
+          window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+        }
+        finally {
+          const cornerList = await window.ipc.corner.getList();
+          console.log('코너 목록:', cornerList); // 👈 여기서 로그
+            setLoading(false)
+        }
     }
 
     const getKdsMstSection = () => {
@@ -335,13 +345,17 @@ const Setting: React.FC = () => {
     const changeSelectedCornerCd = (item: { infoCd: string; infoNm: string })  => {
       console.log("358 item:"+JSON.stringify(item));
       setSelectedCornerCd(item.infoCd);
-      getKdsMstSection();
+      // getKdsMstSection();
     }
     const loadCmpList = async () => {
+      console.log("마스터 수신")
       try {
         if(platform==='electron') {
           const cmpList = await window.ipc.cmp.getList();
           console.log('회사 목록:', cmpList); // 👈 여기서 로그
+        }
+        else {
+          console.log("not electron")
         }
       } catch (err) {
         console.error('에러 발생:', err);

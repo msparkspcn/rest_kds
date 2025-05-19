@@ -5,6 +5,8 @@ import { isDebug, getAssetsPath, getHtmlPath, getPreloadPath, installExtensions 
 import './updater';
 import { db, createTables } from './db/db';
 import { registerCmpIpc } from './db/cmp';
+import { registerCornerIpc } from './db/corner';
+import { registerProductIpc } from './db/product';
 
 function setupDatabase() {
   // 필요한 경우 테이블 생성 작업을 수행
@@ -74,6 +76,8 @@ ipcMain.on('app:quit', () => app.quit());
 app.whenReady().then(() => {
   setupDatabase();
   registerCmpIpc();
+  registerCornerIpc();
+  registerProductIpc();
   createWindow();
 
   app.on('activate', () => {

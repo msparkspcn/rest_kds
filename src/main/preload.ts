@@ -2,6 +2,8 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('ipc', {
+  isElectron: true,
+  platform: process.platform,
   /*  ELECTRON IPC APIs */
   send(channel: string, args: unknown) {
     ipcRenderer.send(channel, args);
@@ -30,6 +32,18 @@ contextBridge.exposeInMainWorld('ipc', {
     update: (cmp_nm: string, cmp_cd: string) =>
       ipcRenderer.invoke('db:updateCmp', cmp_nm, cmp_cd),
     delete: (cmp_cd: string) => ipcRenderer.invoke('db:deleteCmp', cmp_cd),
+  },
+  corner: {
+    getList: () => ipcRenderer.invoke('db:getCornerList'),
+    add: (  cmp_cd: string,
+            sales_org_cd: string,
+            stor_cd: string,
+            corner_cd: string,
+            corner_nm: string,
+            use_yn: string
+    ) =>
+      ipcRenderer.invoke('db:addCorner',
+        cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn)
   },
   product: {
     getList: () => ipcRenderer.invoke('db:getProductList'),

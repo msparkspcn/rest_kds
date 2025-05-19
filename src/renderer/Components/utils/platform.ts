@@ -1,5 +1,5 @@
 export const isElectron = (): boolean => {
-  return !!(window && window.process && window.process.type);
+  return !!(window && window.ipc && window.ipc.isElectron);
 };
 
 export const getPlatform = (): 'electron' | 'web' => {

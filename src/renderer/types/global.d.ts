@@ -14,6 +14,16 @@ declare global {
         update: (cmp_nm: string, cmp_cd: string) => Promise<void>;
         delete: (cmp_cd: string) => Promise<void>;
       };
+      corner: {
+        getList: () => Promise<any>;
+        add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, corner_nm:string, use_yn:string)
+          => Promise<void>;
+      };
+      product: {
+        getList: () => Promise<any>;
+        add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, item_cd:string, item_nm:string, price:string, soldout_yn:string, use_yn:string)
+          => Promise<void>;
+      }
     };
   }
 }

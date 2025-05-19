@@ -11,6 +11,8 @@ import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
 import { useConfigStore } from '@Components/store/config';
+import { useWebSocket } from '@Components/hooks/useWebSocket';
+import { getPlatform } from '@Components/utils/platform';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -35,7 +37,7 @@ function Main(): JSX.Element {
   const config = useConfigStore((state) => state.config)
   let systemType: number = 0;
   let sectionCd: string ='';
-
+  const { isConnected, messages } = useWebSocket();
   useEffect(() => {
     getProductList()
     // if(systemType !== 0) {
@@ -46,6 +48,12 @@ function Main(): JSX.Element {
     // }
 
   }, []);
+  useEffect(() => {
+    if(messages.length > 0) {
+      console.log('품절 처리', messages);
+
+    }
+  },[messages])
 
   useEffect(() => {
     console.log('### 6. 주문정보 갱신 ###');
@@ -110,7 +118,7 @@ function Main(): JSX.Element {
       })
   }
 
-  const getProductList = () => {
+  const getProductList = async () => {
     console.log("상품 조회")
     const params = {
       cmpCd: 'SLKR',
@@ -118,18 +126,32 @@ function Main(): JSX.Element {
       storCd: '5000511',
       cornerCd: 'CIHA'
     };
-    api.getProductList(params).then((result) => {
+    try {
+      const result = await api.getProductList(params);
       const { responseBody, responseCode, responseMessage } = result.data;
+
       if (responseCode === '200') {
         setProductList(responseBody)
-        console.log(`### 상품정보 res:${responseBody}`);
+        for (const product of responseBody) {
+          if(getPlatform()==='electron') {
+            const {cmpCd, salesOrgCd, storCd, cornerCd,
+              productCd: itemCd, productNm: itemNm, price, soldoutYn, useYn} = product;
+            console.log("product:"+product)
+            await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
+          }
+        }
+
+        console.log(`### 상품정보 res:${responseBody}, count:${responseBody.length}`);
         // setSaleDt(responseBody.saleDt);
         // getOrderData(responseBody.saleDt);
       }
       else {
-        console.log('### 개점정보 수신 실패');
+        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
       }
-    })
+    }
+    catch(error) {
+      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
   }
 
   const getOrderData = (saleDt:string) => {

@@ -18,54 +18,41 @@ function createTables() {
       cmp_nm TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS salesorg (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
       cmp_cd TEXT NOT NULL,
-      saler_org_cd TEXT NOT NULL,
-      saler_org_nm TEXT,
+      sales_org_cd TEXT NOT NULL,
+      sales_org_nm TEXT,
       useYn TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS stor (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
       cmp_cd TEXT NOT NULL,
-      saler_org_cd TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       stor_nm TEXT,
       useYn TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS corner (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
       cmp_cd TEXT NOT NULL,
-      saler_org_cd TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       corner_cd TEXT NOT NULL,
       corner_nm TEXT,
-      useYn TEXT
+      use_yn TEXT,
+      PRIMARY KEY (cmp_cd, sales_org_cd, stor_cd, corner_cd)
     );`,
-    `CREATE TABLE IF NOT EXISTS kds_section (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    `CREATE TABLE IF NOT EXISTS product (
       cmp_cd TEXT NOT NULL,
-      saler_org_cd TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       corner_cd TEXT NOT NULL,
-      section_cd TEXT NOT NULL,
-      section_nm TEXT,
-      sort_cd INTEGER,
-      useYn TEXT
-    );`,
-    `CREATE TABLE IF NOT EXISTS kds_section_item (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      cmp_cd TEXT NOT NULL,
-      saler_org_cd TEXT NOT NULL,
-      stor_cd TEXT NOT NULL,
-      corner_cd TEXT NOT NULL,
-      section_cd TEXT NOT NULL,
       product_cd TEXT NOT NULL,
       product_nm TEXT,
-      qty INTEGER,
       price REAL,
       soldout_yn TEXT,
-      useYn TEXT
+      use_yn TEXT,
+       PRIMARY KEY (cmp_cd, sales_org_cd, stor_cd, corner_cd, product_cd)
     );`,
+
     `CREATE TABLE IF NOT EXISTS order_hd (
       id INTEGER PRIMARY KEY AUTOINCREMENT
 

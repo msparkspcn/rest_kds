@@ -24,7 +24,6 @@ const getFormattedTime = (date: Date) => {
   const hours = String(date.getHours()).padStart(2, '0'); // 시간을 두 자릿수로 맞추기
   const minutes = String(date.getMinutes()).padStart(2, '0'); // 분을 두 자릿수로 맞추기
 
-  // 원하는 형식: "11:11"
   return `${hours} : ${minutes}`;
 };
 interface FooterProps {
@@ -70,9 +69,7 @@ const Footer: React.FC<FooterProps> = (
 
   return (
     <footer className="footer">
-      <button type="button" className="footer__button" onClick={onHeaderClick}>EXPO</button>
-
-      <div className="footer__date">
+      <div className="footer__date" onClick={onHeaderClick}>
         {getFormattedDate(date)}
       </div>
 
@@ -86,7 +83,7 @@ const Footer: React.FC<FooterProps> = (
             <path d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        <div className="footer__page">{currentPage+1}/{totalPages}</div>
+        <div className="footer__page">{currentPage+1} / {totalPages}</div>
         <button type="button" className="footer__arrow" onClick={onNextPage}>
           <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
             <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
