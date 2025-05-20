@@ -49,10 +49,15 @@ function Main(): JSX.Element {
 
   }, []);
   useEffect(() => {
-    if(messages.length > 0) {
-      console.log('품절 처리', messages);
-
+    if (Object.keys(messages).length > 0) {
+      console.log('1.품절 처리', messages);
+      window.ipc.product.updateSoldout(messages.itemCd, messages.soldoutYn).then(r => {
+        console.log("완료")
+      })
+    } else {
+      console.log('빈 객체입니다');
     }
+
   },[messages])
 
   useEffect(() => {
@@ -64,14 +69,14 @@ function Main(): JSX.Element {
     } else if (systemType === 1) {
       // Section
       // 섹션별 아이템코드 추출
-      const sectionItemCdList = productList.map((item) => item.productCd);
+      const sectionItemCdList = productList.map((item) => item.itemCd);
 
       // 주문내역 필터링
       const filterOrderArray = orderList
         .map((order) => ({
           ...order,
           orderDtList: order.orderDtList.filter((product) =>
-            sectionItemCdList.includes(product.productCd),
+            sectionItemCdList.includes(product.itemCd),
           ),
         }))
         .filter((item) => item.orderDtList.some((order) => order.kdsState !== '9'));
@@ -118,6 +123,8 @@ function Main(): JSX.Element {
       })
   }
 
+
+
   const getProductList = async () => {
     console.log("상품 조회")
     const params = {
@@ -135,13 +142,13 @@ function Main(): JSX.Element {
         for (const product of responseBody) {
           if(getPlatform()==='electron') {
             const {cmpCd, salesOrgCd, storCd, cornerCd,
-              productCd: itemCd, productNm: itemNm, price, soldoutYn, useYn} = product;
-            console.log("product:"+product)
+              itemCd, itemNm, price, soldoutYn, useYn} = product;
+            // console.log("product:"+JSON.stringify(product))
             await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
           }
         }
 
-        console.log(`### 상품정보 res:${responseBody}, count:${responseBody.length}`);
+        console.log(`### count:${responseBody.length}`);
         // setSaleDt(responseBody.saleDt);
         // getOrderData(responseBody.saleDt);
       }

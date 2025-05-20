@@ -8,7 +8,7 @@ interface ContentsProps {
   onSelectOrderHd: (orderNo: string) => void;
 }
 interface OrderItem {
-  productNm: string;
+  itemNm: string;
   saleQty: number;
 }
 

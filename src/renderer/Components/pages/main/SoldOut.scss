@@ -12,23 +12,36 @@
     padding: 20px;
     border-radius: 8px;
     width: 80%;
-    height: 80%;
+    height: 80vh;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    .modal-desc-bar {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
 
+      .modal-desc {
+        flex: 1;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .btn {
+        margin-left: auto;
+        max-width: 140px;
+        min-width: 70px;
+        padding: 0.25rem 0;
+        text-align: center;
+      }
+    }
     .modal-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
 
       .modal-title {
         flex: 1;
         font-weight: bold;
         font-size: 1.75rem;
-      }
-      .modal-desc {
-        flex: 1;
-        font-weight: bold;
-        font-size: 1.2rem;
       }
 
       .close-button {
@@ -36,130 +49,115 @@
         border: none;
         font-size: 1.5rem;
         cursor: pointer;
-      }
-
-      .btn {
-        flex: 0 0 15%;
-        max-width: 140px; // 화면이 너무 클 때 제한
-        min-width: 70px;  // 화면이 너무 작을 때 제한
-        padding: 0.25rem 0.75rem;
-        text-align: center;
+        padding: 0;
+        margin-left: auto;
       }
     }
     .table-wrapper {
       display: flex;
+      flex-shrink: 0;
       gap: 1rem;
       height: 80%;
-      background-color: white;
+      //background-color: red;
       overflow-y: auto;
 
     }
     .data-table {
-      width: 100%;
       table-layout: fixed;
       border-collapse: collapse;
       border: 1px solid #e5e7eb;
+      width: 100%;
+
+      thead,
+      tbody {
+        display: block;
+        width: 100%;
+      }
+
+      thead tr {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+      }
 
       th, td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
         width: auto;
-        min-height: 20px;
-        overflow: hidden;
         white-space: nowrap;
+        overflow: hidden;
         text-overflow: ellipsis;
+        height: 10px;
+        line-height: 10px;
       }
-
-
 
       th {
         background-color: #f0f0f0;
       }
 
+      tbody {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      tbody tr {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+        height: 40px;
+      }
+
       tr:hover {
         background-color: #f1f1f1;
       }
-    }
-
-    .data-table.summary {
-      width: 40%;
-      th:nth-child(1), td:nth-child(1) {
-        text-align: center;
-        width: 10%;
-      }
-      th:nth-child(2), td:nth-child(2) {
-        text-align: center;
-        width: 70%;
-      }
-      th:nth-child(3), td:nth-child(3) {
-        text-align: center;
-        width: 10%;
-      }
-      th:nth-child(4), td:nth-child(4) {
-        text-align: center;
-        width: 10%;
-      }
-    }
-    .data-table.detail {
-      width: 60%;
-      th:nth-child(1), td:nth-child(1) {
-        text-align: center;
-        width: 10%;
-      }
-      th:nth-child(2), td:nth-child(2) {
-        text-align: center;
-        width: 20%;
-      }
-      th:nth-child(3), td:nth-child(3) {
-        text-align: center;
-        width: 45%;
-      }
-      th:nth-child(4), td:nth-child(4) {
-        text-align: center;
-        width: 10%;
-      }
-      th:nth-child(5), td:nth-child(5) {
-        text-align: center;
-        width: 15%;
-      }
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
-
-      .restore-button {
-        background-color: #3182ce; /* blue-500 */
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #2b6cb0; /* blue-600 */
+      &.summary {
+        width: 40%;
+        th:nth-child(1), td:nth-child(1) {
+          text-align: center;
+          width: 10%;
+          height: auto;
+        }
+        th:nth-child(2), td:nth-child(2) {
+          text-align: center;
+          width: 70%;
+        }
+        th:nth-child(3), td:nth-child(3) {
+          text-align: center;
+          width: 10%;
+        }
+        th:nth-child(4), td:nth-child(4) {
+          text-align: center;
+          width: 10%;
         }
       }
-
-      .pagination {
-        font-size: 1rem;
-      }
-
-      .next-button {
-        background-color: #f56565; /* red-500 */
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-
-        &:hover {
-          background-color: #e53e3e; /* red-600 */
+      &.detail {
+        margin-left: auto;
+        width: 57%;
+        th:nth-child(1), td:nth-child(1) {
+          text-align: center;
+          width: 7%;
+          height: auto;
+        }
+        th:nth-child(2), td:nth-child(2) {
+          text-align: center;
+          width: 21%;
+        }
+        th:nth-child(3), td:nth-child(3) {
+          text-align: center;
+          width: 45%;
+        }
+        th:nth-child(4), td:nth-child(4) {
+          text-align: center;
+          width: 13%;
+        }
+        th:nth-child(5), td:nth-child(5) {
+          text-align: center;
+          width: 14%;
         }
       }
     }
+
+
   }
 }

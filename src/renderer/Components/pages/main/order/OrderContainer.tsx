@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import './OrderContainer.scss';
 
 interface OrderItem {
-  productNm: string;
+  itemNm: string;
   saleQty: number;
 }
 
@@ -88,7 +88,7 @@ function RenderItem({ item, index }: RenderItemProps): JSX.Element {
   return (
     <div className="order-row">
       <div className="order-cell index">{index + 1}</div>
-      <div className="order-cell name">{item.productNm}</div>
+      <div className="order-cell name">{item.itemNm}</div>
       <div className="order-cell qty">{item.saleQty}</div>
     </div>
   );

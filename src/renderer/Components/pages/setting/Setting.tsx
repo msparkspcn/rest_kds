@@ -209,9 +209,10 @@ const Setting: React.FC = () => {
             console.log("코너 조회 성공 responseBody:"+JSON.stringify(responseBody))
             if(responseBody!=null) {
               for(const corner of responseBody) {
-                const { cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn } = corner;
+                const { cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn } = corner;
                 if(platform==='electron') {
-                  await window.ipc.corner.add(cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn);
+                  console.log("cmpCd:"+cmpCd);
+                  await window.ipc.corner.add(cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn);
                 } else {
                   console.log("웹입니다")
                 }
@@ -232,7 +233,7 @@ const Setting: React.FC = () => {
           window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
         }
         finally {
-          const cornerList = await window.ipc.corner.getList();
+          const cornerList = await window.ipc.corner.getList("1");
           console.log('코너 목록:', cornerList); // 👈 여기서 로그
             setLoading(false)
         }

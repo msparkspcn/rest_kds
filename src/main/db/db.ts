@@ -45,12 +45,12 @@ function createTables() {
       sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       corner_cd TEXT NOT NULL,
-      product_cd TEXT NOT NULL,
-      product_nm TEXT,
+      item_cd TEXT NOT NULL,
+      item_nm TEXT,
       price REAL,
       soldout_yn TEXT,
       use_yn TEXT,
-       PRIMARY KEY (cmp_cd, sales_org_cd, stor_cd, corner_cd, product_cd)
+       PRIMARY KEY (cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd)
     );`,
 
     `CREATE TABLE IF NOT EXISTS order_hd (
