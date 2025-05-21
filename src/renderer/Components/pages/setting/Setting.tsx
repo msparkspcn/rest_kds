@@ -10,6 +10,7 @@ import ConfirmDialog from '@Components/common/ConfirmDialog';
 import { STRINGS } from '../../../constants/strings';
 import Alert from '@Components/common/Alert';
 import { useConfigStore } from '@Components/store/config';
+import { getProductList } from '@Components/data/api/api';
 
 const Setting: React.FC = () => {
     // const { AppFuncRestart } = useContext(AppContext);
@@ -223,6 +224,7 @@ const Setting: React.FC = () => {
                   infoNm: cornerNm,
                 }))
               );
+              getProductList()
             }
           }
           else {
@@ -238,6 +240,45 @@ const Setting: React.FC = () => {
             setLoading(false)
         }
     }
+
+  const getProductList = async () => {
+    console.log("상품 조회")
+    const params = {
+      cmpCd: 'SLKR',
+      salesOrgCd: '8000',
+      storCd: '5000511',
+      cornerCd: 'CIHA'
+    };
+    try {
+      const result = await api.getProductList(params);
+      const { responseBody, responseCode, responseMessage } = result.data;
+
+      if (responseCode === '200') {
+        for (const product of responseBody) {
+          if(getPlatform()==='electron') {
+            const {cmpCd, salesOrgCd, storCd, cornerCd,
+              itemCd, itemNm, price, soldoutYn, useYn} = product;
+            // console.log("product:"+JSON.stringify(product))
+            await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
+          }
+        }
+
+        console.log(`### count:${responseBody.length}`);
+        // setSaleDt(responseBody.saleDt);
+        // getOrderData(responseBody.saleDt);
+      }
+      else {
+        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+      }
+    }
+    catch(error) {
+      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
+    finally {
+      const product = await window.ipc.product.getList("SLKR","8000","5000511","CIHA");
+      console.log('상품 목록:', product); // 👈 여기서 로그
+    }
+  }
 
     const getKdsMstSection = () => {
         const params = {
@@ -322,9 +363,6 @@ const Setting: React.FC = () => {
       }}
       );
       setConfirmOpen(true);
-        // localStorage.setItem("KDS_SYSTEM_TY", systemIdx + "");
-        // localStorage.setItem("KDS_SECTION_CD", JSON.stringify(section));
-
         // AppFuncRestart();
     };
 
@@ -439,14 +477,6 @@ const Setting: React.FC = () => {
             {...confirmProps}
           />
         )}
-        {alertOpen && (
-          <Alert
-            title="알림"
-            message="섹션을 선택해주세요."
-            onClose={()=>{setAlertOpen(false)}}
-          />
-        )}
-
       </div>
   );
 };

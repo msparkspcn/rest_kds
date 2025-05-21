@@ -10,7 +10,6 @@ import History from '@Components/pages/main/order/History';
 import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
-import { useConfigStore } from '@Components/store/config';
 import { useWebSocket } from '@Components/hooks/useWebSocket';
 import { getPlatform } from '@Components/utils/platform';
 
@@ -34,19 +33,11 @@ function Main(): JSX.Element {
     onConfirm: () => {},
   });
   const [isSoldOutOpen, setSoldOutOpen] = useState(false);
-  const config = useConfigStore((state) => state.config)
   let systemType: number = 0;
-  let sectionCd: string ='';
+
   const { isConnected, messages } = useWebSocket();
   useEffect(() => {
     getProductList()
-    // if(systemType !== 0) {
-    //   getKdsMstSectionItemList(config!!.sectionCd!!);
-    // }
-    // else {
-    //   // getOrderData()
-    // }
-
   }, []);
   useEffect(() => {
     if (Object.keys(messages).length > 0) {
@@ -414,10 +405,13 @@ function Main(): JSX.Element {
         onClose={() => setModalOpen(false)}
         data={data}
       />
-      <SoldOut
-        isOpen={isSoldOutOpen}
-        onClose={() => setSoldOutOpen(false)}
-      />
+      {isSoldOutOpen && (
+        <SoldOut
+          isOpen={isSoldOutOpen}
+          onClose={() => setSoldOutOpen(false)}
+        />
+      )}
+
     </div>
   );
 }

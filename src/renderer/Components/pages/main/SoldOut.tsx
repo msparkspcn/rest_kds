@@ -31,106 +31,96 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
   const [productList, setProductList] = useState<Product[]>([]);
   const getUser = useUserStore((state) => state.getUser);
   const [selectedCorner, setSelectedCorner] = useState({});
-  const [selectedCornerRow, setSelectedCornerRow] = useState(null);
   useEffect(() => {
     if (isOpen) {
       const user = getUser();
-      console.log("user:"+JSON.stringify(user))
+      // console.log("user:"+JSON.stringify(user))
       console.log("1user:"+user?.cmpCd+", cornerCd:"+user?.cornerCd)
       // getCornerList(user?.cmpCd,user?.salesOrgCd);
-      getLocalCornerList(user?.cmpCd,user?.salesOrgCd, user?.cornerCd);
+      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, "CIHA");
     }
   }, [isOpen]);
 
   useEffect(() => {
-    if (cornerList.length > 0) {
-      console.log("cornerList.length:"+cornerList.length)
-      getProductList(selectedCorner);
-    }
-  },[cornerList])
+    console.log("Here")
+    getProductList(selectedCorner);
+  },[selectedCorner])
 
   if (!isOpen) return null;
 
   const getLocalCornerList = async (cmpCd: String, salesOrgCd: String, cornerCd: String) => {
     console.log('코너 :', cornerCd);
-    const cornerList = await window.ipc.corner.getList("1")
-    // const cornerList = await window.ipc.corner.getList2("1")
-    console.log('코너 목록2:', cornerList);
+    // const cornerList = await window.ipc.corner.getList("1")
+
+    const product = await window.ipc.product.getList(
+      "SLKR","8000","5000511","CIHA");
+    console.log('상품 목록:', product); // 여기서 로그
+
+    const cornerList = await window.ipc.corner.getList2("1")
+    console.log('코너 목록:', cornerList);
     setCornerList(cornerList)
-    setSelectedCorner(cornerList[0])
-  }
 
-
-  const getCornerList = (cmpCd: String, salesOrgCd: String) => {
-    // setLoading(true)
-    console.log("getCornerList:")
-    const request = {
-      cmpCd : cmpCd,
-      salesOrgCd : salesOrgCd
+    if (Object.keys(selectedCorner).length === 0 && cornerList.length > 0) {
+      setSelectedCorner(cornerList[0]);
     }
-    api.getCornerList(request).then((result) => {
-      const {responseCode, responseMessage, responseBody} = result.data;
-      if (responseCode === "200") {
-        console.log("코너 조회 성공")
-        // console.log("코너 조회 성공 responseBody:"+JSON.stringify(responseBody))
-        if(responseBody!=null) {
-          setCornerList(responseBody);
-          getProductList(cornerList[0]);
-          // getKdsMstSection();
-        }
-      }
-      else {
-        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-      }
-    })
-      .catch(ex => {
-        window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
-      })
-      .finally(() => {
-      })
-  }
-  //TODO 설정화면에서 전체 product insert 후 SoldOut에서 조인되는지 확인
-  const getProductList = (corner: Corner) => {
-    console.log("상품 조회 corner:"+JSON.stringify(corner))
-    const params = {
-      cmpCd: corner.cmpCd,
-      salesOrgCd: corner.salesOrgCd,
-      storCd: corner.storCd,
-      cornerCd: corner.cornerCd
-    };
-    api.getProductList(params).then((result) => {
-      const { responseBody, responseCode, responseMessage } = result.data;
-      if (responseCode === '200') {
-        setProductList(responseBody)
-        console.log(`### 상품정보 res:${responseBody}`);
-        // setSaleDt(responseBody.saleDt);
-        // getOrderData(responseBody.saleDt);
-      }
-      else {
-        // console.log('### 개점정보 수신 실패');
-      }
-    })
   }
 
+  const getProductList = async (corner: Corner) => {
+    console.log("상품 조회 corner:"+JSON.stringify(corner))
+
+    const productList = await window.ipc.product.getList(
+      corner.cmpCd, corner.salesOrgCd, corner.storCd, corner.cornerCd)
+    setProductList(productList)
+    console.log('상품 목록:', productList);
+  }
 
   const handleCheckboxChange = (index) => {
-    setProductList((prevList) =>
-      prevList.map((item, i) =>
+    setProductList((prevList) => {
+      const updatedList = prevList.map((item, i) =>
         i === index
           ? {
             ...item,
             soldoutYn: item.soldoutYn === "1" ? "0" : "1",
           }
           : item
-      )
-    );
+      );
+      const targetProduct = updatedList[index]
+      const request = {
+        cmpCd: selectedCorner.cmpCd,
+        salesOrgCd: selectedCorner.salesOrgCd,
+        storCd: selectedCorner.storCd,
+        cornerCd: selectedCorner.cornerCd,
+        itemCd: targetProduct.itemCd.slice(0, 7),
+        itemSeq: targetProduct.itemCd.slice(7),
+        soldoutYn: targetProduct.soldoutYn,
+
+      }
+      console.log("request:" + JSON.stringify(request))
+      api
+        .updateSoldout(request)
+        .then((result) => {
+          const { responseCode, responseMessage, responseBody } = result.data;
+          if (responseCode === '200') {
+            console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
+            getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.cornerCd)
+          }
+          else {
+            window.alert(responseMessage);
+          }
+        })
+        .catch((ex) => {
+          window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')');
+        })
+
+      return updatedList;
+    });
   };
 
   return (
     <div className="soldout-modal">
       <div className="modal-content">
         <div className="modal-header">
-          <div className="modal-title">품절</div>
+          <div className="modal-title">품절 관리</div>
           <button className="close-button" onClick={onClose}>X</button>
         </div>
         <div className="modal-desc-bar">
@@ -153,17 +143,17 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
               return (
               <tr
                 key={item.cornerCd}
-                className={selectedCornerRow === index ? 'selected' : ''}
+                className={selectedCorner?.cornerCd === item.cornerCd ? 'selected' : ''}
                 onClick={() => {
                   console.log(index+"번 row 선택, :"+JSON.stringify(cornerList[index]))
-                  setSelectedCornerRow(index)
+                  setSelectedCorner(cornerList[index])
                   getProductList(cornerList[index])
                 }}
               >
                 <td>{index + 1}</td>
                 <td>{item.cornerNm}</td>
-                <td>1</td>
-                <td>1</td>
+                <td>{item.availableCount}</td>
+                <td>{item.soldoutCount}</td>
               </tr>
               )
             })}

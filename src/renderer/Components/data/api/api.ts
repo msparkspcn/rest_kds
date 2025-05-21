@@ -96,6 +96,11 @@ export function updateOrderCallState(params: any) {
   return post(request, params);
 }
 
+export function updateSoldout(params: any) {
+  const request = `${host}/api/v1/item/soldout`;
+  return post(request, params)
+}
+
 // export function getOrderDataList(params) {      //주문 조회(가칭)
 //     const request = host + "/order/getOrderDataList";
 //     return post(request, params);

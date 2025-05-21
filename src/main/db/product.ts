@@ -2,8 +2,22 @@ import { ipcMain } from 'electron';
 import { db } from './db';
 import camelcaseKeys from 'camelcase-keys';
 
+type Product = {
+  cmpCd: string;
+  cornerCd: string;
+  cornerNm: string;
+  salesOrgCd: string;
+  storCd: string;
+  price: number;
+  soldoutYn: string;
+  itemCd: string;
+  itemNm: string;
+}
+
+
 export function registerProductIpc() {
-  ipcMain.handle('db:getProductList', async () => {
+  ipcMain.handle('db:getProductList',
+    async (e, cmp_cd,sales_org_cd,stor_cd,corner_cd) => {
     const rows = db.prepare(
       `SELECT
          c.corner_cd,
@@ -23,10 +37,8 @@ export function registerProductIpc() {
          AND c.stor_cd = ?
          AND c.corner_cd = ?
          `
-    ).all();
-    const camelized = camelcaseKeys(rows, { deep: true });
-
-    return camelized;
+    ).all([cmp_cd,sales_org_cd,stor_cd,corner_cd]) as Product[];
+      return camelcaseKeys(rows, { deep: true });
   });
 
   ipcMain.handle('db:addProduct', async (_e,
@@ -41,7 +53,7 @@ export function registerProductIpc() {
       .run(cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd, item_nm, price, soldout_yn, use_yn);
   });
 
-  ipcMain.handle('db:updateSoldout', async (_e,soldout_yn, item_cd) => {
+  ipcMain.handle('db:updateSoldout', async (_e,item_cd, soldout_yn) => {
     db.prepare('UPDATE product SET soldout_yn = ? WHERE item_cd = ?').run(soldout_yn, item_cd)
   })
 }

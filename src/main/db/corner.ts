@@ -2,19 +2,40 @@ import { ipcMain } from 'electron';
 import { db } from './db';
 import camelcaseKeys from 'camelcase-keys';
 
+type Corner = {
+  cmpCd: string;
+  cornerCd: string;
+  cornerNm: string;
+  salesOrgCd: string;
+  storCd: string;
+  useYn: string;
+}
+
+type CornerSummary = {
+  cmpCd: string;
+  cornerCd: string;
+  cornerNm: string;
+  salesOrgCd: string;
+  storCd: string;
+  useYn: string;
+  availableCount: string;
+  soldoutCount: string;
+}
 export function registerCornerIpc() {
   ipcMain.handle('db:getCornerList', async (e, use_yn) => {
-    const rows = db.prepare('SELECT * FROM corner where use_yn = ?').all([use_yn]);
-    const camelized = camelcaseKeys(rows, { deep: true });
-
-    return camelized;
+    const rows = db.prepare('SELECT * FROM corner where use_yn = ?')
+      .all([use_yn]) as Corner[];
+    return camelcaseKeys(rows, { deep: true });
   });
 
   ipcMain.handle('db:getCornerSummary', async (e, use_yn) => {
     const rows = db.prepare(`
     SELECT
-      c.corner_cd,
-      c.corner_nm,
+        c.cmp_cd,
+        c.sales_org_cd,
+        c.stor_cd,
+        c.corner_cd,
+        c.corner_nm,
       COUNT(CASE WHEN p.soldout_yn = '0' THEN 1 END) AS available_count,
       COUNT(CASE WHEN p.soldout_yn != '0' THEN 1 END) AS soldout_count
     FROM
@@ -32,10 +53,8 @@ export function registerCornerIpc() {
       c.corner_cd, c.corner_nm
     ORDER BY
       c.corner_cd
-      `).all([use_yn]);
-    const camelized = camelcaseKeys(rows, { deep: true });
-
-    return camelized;
+      `).all([use_yn]) as CornerSummary[];
+    return camelcaseKeys(rows, { deep: true });
   });
 
   ipcMain.handle('db:addCorner', async (_e, cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn) => {
