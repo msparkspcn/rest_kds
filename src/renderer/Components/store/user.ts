@@ -1,4 +1,5 @@
 import {create} from "zustand";
+import { persist } from 'zustand/middleware';
 
 interface UserData {
     cmpCd: string;
@@ -23,19 +24,36 @@ interface UserData {
 
 interface UserStore {
     user: UserData | null;
-    password: string | null;
+    userId: string;
+    password: string;
     setUser: (user: UserData) => void;
     getUser: () => UserData | null;
+    setUserId: (userId: string) => void;
+    getUserId: () => string;
   setPassword: (password: string) => void;
-  getPassword: () => string | null;
+  getPassword: () => string;
 }
 
-export const useUserStore = create<UserStore>(
-  (set, get) => ({
-    user: null,
-    password: null,
-    setUser: (user) => set({ user }),
-    getUser: () => get().user,
-    setPassword: (password) => set({ password }),
-    getPassword: () => get().password,
-}));
+export const useUserStore = create<UserStore>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      userId: '',
+      password: '',
+      setUser: (user) => set({ user }),
+      getUser: () => get().user,
+      setUserId: (userId) => set({ userId }),
+      getUserId: () => get().userId,
+      setPassword: (password) => set({ password }),
+      getPassword: () => get().password,
+    }),
+    {
+      name: 'user-store',
+      partialize: (state) => ({
+        user: state.user,
+        userId: state.userId,
+        password: state.password,
+      }),
+    }
+  )
+);

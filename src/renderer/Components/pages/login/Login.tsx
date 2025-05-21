@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Loading from '../../common/Loading';
 import * as api from '../../data/api/api';
 import { useNavigate } from 'react-router-dom';
@@ -6,26 +6,34 @@ import { STRINGS } from '../../../constants/strings';
 import { useUserStore } from '../../store/user';
 import { setAuthToken } from '../../data/api/api';
 import './Login.scss';
+import Alert from '@Components/common/Alert';
 const Login: React.FC = () => {
-  // const [userId, setUserId] = useState<string>("");
-  const [userId, setUserId] = useState<string>('5000511001');
-  const [password, setPassword] = useState<string>('1234');
+  const [userId, setUserId] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  // const [error, setError] = useState<{ visible: boolean, message: string }>({ visible: false, message: "" });
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
   const [isChecked, setIsChecked] = useState(false);
 
   const navigate = useNavigate();
-  // const {search} = useLocation();
-  // const user = useUserStore((state) =>7 7 state.user);
   const setUser = useUserStore((state) => state.setUser);
   const getUser = useUserStore((state) => state.getUser);
+  const getUserId = useUserStore((state) => state.userId);
+  const getStorePassword = useUserStore((state) => state.getPassword);
+  const setStoreUserId = useUserStore((state) => state.setUserId);
   const setStorePassword = useUserStore((state) => state.setPassword);
+
+  useEffect(() => {
+    console.log("Login getUserId:"+getUserId)
+    if(getUserId && getStorePassword) {
+      setUserId(getUserId);
+      setPassword(getStorePassword);
+      setIsChecked(true);
+    }
+  },[])
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
   const handleLoginClick = () => {
-    // onLogin();
     if (userId.length === 0) {
       return;
     }
@@ -42,18 +50,22 @@ const Login: React.FC = () => {
         const { responseCode, responseMessage, responseBody } = result.data;
         if (responseCode === '200') {
           console.log('11성공 responseBody:' + JSON.stringify(responseBody));
-          setStorePassword(password);
           setUser(responseBody);
           const user = getUser();
           if (user && 'apiKey' in user) {
-            setAuthToken(user.apiKey); // 이제 user가 null이 아닐 경우에만 실행
+            setAuthToken(user.apiKey); // 이제 user 가 null 이 아닐 경우에만 실행
           }
-
-
-          // setDialogMessage("로그인 성공 userId:"+userId+", password:"+password);
+          if(isChecked) {
+            setStoreUserId(userId)
+            setStorePassword(password);
+          }
+          else {
+            setStoreUserId('')
+            setStorePassword('')
+          }
           navigate('/setting');
         } else {
-          window.alert(responseMessage);
+          setDialogMessage(responseMessage)
         }
       })
       .catch((ex) => {
@@ -75,9 +87,9 @@ const Login: React.FC = () => {
         const { responseBody, responseCode, responseMessage } = result.data;
         if (responseCode === '200') {
           console.log(`### 개점정보 res:${responseBody.saleDt}`);
-
         }
         else {
+          setDialogMessage(responseMessage);
           console.log('### 개점정보 수신 실패');
         }
       })
@@ -145,20 +157,12 @@ const Login: React.FC = () => {
           </div>
         </form>
       </div>
-
       {dialogMessage && (
-        <div className="dialog-overlay">
-          <div className="dialog-box">
-            <h3 className="dialog-title">{STRINGS.notification}</h3>
-            <p className="dialog-message">{dialogMessage}</p>
-            <button
-              className="dialog-confirm"
-              onClick={() => setDialogMessage(null)}
-            >
-              {STRINGS.confirm}
-            </button>
-          </div>
-        </div>
+        <Alert
+          title="알림"
+          message={dialogMessage}
+          onClose={()=>{setDialogMessage(null)}}
+        />
       )}
     </div>
   );
