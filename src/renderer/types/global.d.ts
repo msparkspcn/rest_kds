@@ -16,7 +16,7 @@ declare global {
       };
       corner: {
         getList: (use_yn: string) => Promise<any>;
-        getList2: (use_yn: string) => Promise<any>;
+        getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string, use_yn: string) => Promise<any>;
         add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, corner_nm:string, use_yn:string)
           => Promise<void>;
       };
@@ -30,3 +30,4 @@ declare global {
     };
   }
 }
+

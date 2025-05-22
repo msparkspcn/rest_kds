@@ -14,11 +14,8 @@
 .button-container {
   width: 100%;
   display: flex;
-  justify-content: space-between;
-
-  .empty-space {
-    width: 5%;
-  }
+  justify-content: flex-end;
+  gap: 0.5rem;
 
   button {
     padding: 1% 15px;

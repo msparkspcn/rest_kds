@@ -8,6 +8,8 @@ interface UserData {
     salesOrgNm: string | null;
     storCd: string | null;
     storNm: string | null;
+    cornerCd: string | null;
+    cornerNm: string | null;
     userId: string;
     userRoleType: string;
     langSettng: string;

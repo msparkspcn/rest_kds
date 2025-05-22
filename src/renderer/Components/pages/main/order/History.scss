@@ -9,7 +9,6 @@
 
   .modal-content {
     background: white;
-    padding: 20px 20px 0 20px;
     border-radius: 8px;
     width: 80%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -18,44 +17,89 @@
     height: 80%;
 
     .modal-header {
-      flex-shrink: 0;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      flex-shrink: 0;
+      padding: 1% 2%;
+      border-bottom: 1px solid #ccc;
+      background-color: #3b82f6;
 
       .modal-title {
         flex: 1;
         font-weight: bold;
         font-size: 1.75rem;
+        color: white
       }
 
       .close-button {
         background-color: transparent;
         border: none;
-        font-size: 1.5rem;
+        font-size: 1.75rem;
         cursor: pointer;
+        padding: 0;
+        margin-left: auto;
+        color: white
       }
     }
     .table-wrapper {
-      flex: 0 0 80%;
-      min-height: 0;
+      display: flex;
+      flex-shrink: 0;
+      gap: 1rem;
+      height: 80%;
+      margin-top:1%;
+      padding: 0% 2%;
       overflow-y: auto;
-      border: 1px solid #e5e7eb;
+      //border: 1px solid #e5e7eb;
     }
     .data-table {
-      width: 100%;
       table-layout: fixed;
       border-collapse: collapse;
+      border: 1px solid #e5e7eb;
+      width: 100%;
 
+      thead,
+      tbody {
+        display: block;
+        width: 100%;
+      }
+
+      thead tr {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+      }
 
       th, td {
         border: 1px solid #ddd;
         padding: 8px;
         text-align: left;
+        width: auto;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        height: 10px;
+        line-height: 10px;
+      }
+
+      th {
+        background-color: #f0f0f0;
+      }
+
+      tbody {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      tbody tr {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+        height: 40px;
+      }
+
+
+      tr.selected {
+        background-color: #f1f1f1;
       }
 
       th:nth-child(1), td:nth-child(1) {
@@ -93,10 +137,6 @@
       th {
         background-color: #f0f0f0;
       }
-
-      tr:hover {
-        background-color: #f1f1f1;
-      }
     }
 
     .modal-footer {
@@ -104,7 +144,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 20px;
+      padding: 0% 2%;
+      margin-top: 2%;
+
+      .invisible-button {
+        flex: 0 0 20%;
+        background-color: white;
+      }
 
       .restore-button {
         flex: 0 0 20%;

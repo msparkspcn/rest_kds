@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Footer.scss';
-import History from '@Components/pages/main/order/History';
+import { STRINGS } from '../../../constants/strings';
+
 const getFormattedDate = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
@@ -97,13 +98,13 @@ const Footer: React.FC<FooterProps> = (
       </div>
 
       <ul className="footer__menu">
-        <li><div className="footer__menu-item">전체완료</div></li>
-        <li><div className="footer__menu-item">직전복원</div></li>
-        <li><div className="footer__menu-item" onClick={onRestore}>조회복원</div></li>
+        <li><div className="footer__menu-item">{STRINGS.complete_all}</div></li>
+        <li><div className="footer__menu-item">{STRINGS.restore_recent}</div></li>
+        <li><div className="footer__menu-item" onClick={onRestore}>{STRINGS.restore_search}</div></li>
         <li><div className="footer__menu-item" onClick={() => {
           console.log('종료 버튼 클릭');
           window.ipc.quitApp()
-        }}>프로그램 종료 X</div></li>
+        }}>{STRINGS.exit_app}</div></li>
       </ul>
     </footer>
 

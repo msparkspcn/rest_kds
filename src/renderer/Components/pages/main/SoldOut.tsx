@@ -23,21 +23,31 @@ type Corner = {
   salesOrgCd: string;
   storCd: string;
   useYn: string;
+  availableCount: number;
+  soldoutCount: number;
 }
 //좌측 코너별 판매, 품절 상품
 //우측 코너별 상품 목록
 const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
-  const [cornerList, setCornerList] = useState([]);
+  const [cornerList, setCornerList] = useState<Corner[]>([]);
   const [productList, setProductList] = useState<Product[]>([]);
   const getUser = useUserStore((state) => state.getUser);
-  const [selectedCorner, setSelectedCorner] = useState({});
+  const [selectedCorner, setSelectedCorner] = useState<Corner>({
+    cmpCd: '',
+    salesOrgCd: '',
+    storCd: '',
+    cornerCd: '',
+    cornerNm:'',
+    useYn:'',
+    availableCount:0,
+    soldoutCount:0,
+  });
   useEffect(() => {
     if (isOpen) {
       const user = getUser();
       // console.log("user:"+JSON.stringify(user))
-      console.log("1user:"+user?.cmpCd+", cornerCd:"+user?.cornerCd)
-      // getCornerList(user?.cmpCd,user?.salesOrgCd);
-      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, "CIHA");
+      console.log("1user:"+user?.cmpCd+", salesOrgCd:"+user?.salesOrgCd+", storCd:"+user?.storCd)
+      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd);
     }
   }, [isOpen]);
 
@@ -48,15 +58,9 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
 
   if (!isOpen) return null;
 
-  const getLocalCornerList = async (cmpCd: String, salesOrgCd: String, cornerCd: String) => {
-    console.log('코너 :', cornerCd);
-    // const cornerList = await window.ipc.corner.getList("1")
-
-    const product = await window.ipc.product.getList(
-      "SLKR","8000","5000511","CIHA");
-    console.log('상품 목록:', product); // 여기서 로그
-
-    const cornerList = await window.ipc.corner.getList2("1")
+  const getLocalCornerList = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
+    console.log("getLocalCornerList cmpCd:"+cmpCd+", salesOrgCd:"+salesOrgCd+", storCd:"+storCd)
+    const cornerList = await window.ipc.corner.getList2(cmpCd, salesOrgCd, storCd,"1")
     console.log('코너 목록:', cornerList);
     setCornerList(cornerList)
 
@@ -70,11 +74,12 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
 
     const productList = await window.ipc.product.getList(
       corner.cmpCd, corner.salesOrgCd, corner.storCd, corner.cornerCd)
+    console.log('상품 목록:', productList);
     setProductList(productList)
     console.log('상품 목록:', productList);
   }
 
-  const handleCheckboxChange = (index) => {
+  const handleCheckboxChange = (index: number) => {
     setProductList((prevList) => {
       const updatedList = prevList.map((item, i) =>
         i === index
@@ -102,7 +107,7 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
           const { responseCode, responseMessage, responseBody } = result.data;
           if (responseCode === '200') {
             console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
-            getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.cornerCd)
+            getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
           }
           else {
             window.alert(responseMessage);

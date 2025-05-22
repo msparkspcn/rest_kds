@@ -22,8 +22,8 @@ function setupDatabase() {
 function createWindow() {
   const mainWindow = new BrowserWindow({
     icon: getAssetsPath('icon.ico'),
-    width: 1100,
-    height: 750,
+    width: 1500,
+    height: 900,
     webPreferences: {
       devTools: isDebug,
       preload: getPreloadPath('preload.js'), // 👈 Don't USE PRELOAD.JS IF YOUR USING NODE IN RENDERER PROCESS

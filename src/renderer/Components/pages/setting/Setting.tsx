@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as api from "@Components/data/api/api";
 import {useUserStore} from "@Components/store/user";
 import { useNavigate } from "react-router-dom";
@@ -7,32 +7,23 @@ import DropdownMenu from '@Components/common/DropdownMenu';
 import {getPlatform} from '@Components/utils/platform';
 import packageJson from '../../../../../package.json';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
-import { STRINGS } from '../../../constants/strings';
-import Alert from '@Components/common/Alert';
-import { useConfigStore } from '@Components/store/config';
-import { getProductList } from '@Components/data/api/api';
 
 const Setting: React.FC = () => {
-    // const { AppFuncRestart } = useContext(AppContext);
-
     const [loading, setLoading] = useState<boolean>(true);
     // const [saleOpen, setSaleOpen] = useState<boolean>(props.route.params.saleOpen);
     // const [from, setFrom] = useState<string>(props.route.params.from);
-    // const [systemIdx, setSystemIdx] = useState<number>(0);
     // const [systemTy, setSystemTy] = useState<string>('0');
-    // const [sectionList, setSectionList] = useState<Section[]>([
-    //     { sectionCd: "", sectionNm: "" }
-    // ]);
-    // const [section, setSection] = useState<Section>({ sectionCd: "10000", sectionNm: "TEST" });
     // const [appVersion, setAppVersion] = useState<string>("");
     const user = useUserStore((state) => state.user);
 
     const [cmpNmList, setCmpNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [selectedCmpCd, setSelectedCmpCd] = useState<string>("");
     const [selectedSalesOrgCd, setSelectedSalesOrgCd] = useState<string>("");
+    const [selectedStorCd, setSelectedStorCd] = useState<string>("");
     const [selectedCornerCd, setSelectedCornerCd] = useState<string>("");
     const [salesOrgNmList, setSalesOrgNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
     const [cornerNmList, setCornerNmList] = useState<{infoCd: string, infoNm: string}[]>([]);
+    const [cornerList, setCornerList] = useState([]);
     const navigate = useNavigate();
 
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -41,7 +32,6 @@ const Setting: React.FC = () => {
       message: '',
       onConfirm: () => {},
     });
-    const [alertOpen, setAlertOpen] = useState(false);
 
     const platform = getPlatform();
 
@@ -57,25 +47,14 @@ const Setting: React.FC = () => {
             getCmpList(user.cmpCd)
           }
         }
-
-        const systemTyFromStorage = localStorage.getItem("KDS_SYSTEM_TY");
-        if (systemTyFromStorage !== null) {
-            // setSystemIdx(parseInt(systemTyFromStorage));
-            if (systemTyFromStorage === '1') {
-                // getKdsMstSection(store);
-                getKdsMstSection();
-            }
-        }
-
     }, []);
 
-    const init = () => {
+    const updateVersion = () => {
+      console.log("업데이트 버전")
       localStorage.clear();
-
-      deleteCmp('SLKR')
     };
 
-    const getCmpList = async (cmpCd: String) => {
+    const getCmpList = async (cmpCd: string) => {
         const request = { "cmpValue" : cmpCd }
         try {
           const result = await api.getCmpList(request);
@@ -111,7 +90,7 @@ const Setting: React.FC = () => {
         }
     };
 
-    const getSalesOrgList = (cmpCd: String) => {
+    const getSalesOrgList = (cmpCd: string) => {
         // setLoading(true)
         const request = {
             cmpCd : cmpCd,
@@ -147,56 +126,12 @@ const Setting: React.FC = () => {
                 window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
             })
             .finally(() => {
-                // setLoading(false)
-            })
-    }
-  /*
-    const getStorList = (cmpCd: String, salesOrgCd: String) => {
-      console.log("cmpCd:"+cmpCd+", salesOrgCd:"+salesOrgCd)
-        // setLoading(true)
-        const request = {
-            cmpCd : cmpCd,
-            salesOrgCd : salesOrgCd,
-            storeValue : ""
-        }
-        api.getStorList(request).then((result) => {
-            const {responseCode, responseMessage, responseBody} = result.data;
-            if (responseCode === "200") {
-                console.log("점포 조회 성공 responseBody:"+JSON.stringify(responseBody))
-              if(responseBody != null) {
-                setStorNmList(
-                  responseBody.map(({ storCd, storNm }: { storCd: string; storNm: string }) => ({
-                    infoCd: storCd,
-                    infoNm: storNm,
-                  }))
-                );
-                console.log("1.storCd:"+user.storCd)
-                if (!(user) || user.storCd == "") {
-                  getCornerList(cmpCd, salesOrgCd, responseBody[0].storCd)
-                  setSelectedStorCd(responseBody[0].storCd)
-                } else {
-                  if (user.storCd) {
-                    getCornerList(cmpCd, salesOrgCd, user.storCd)
-                    setSelectedStorCd(user.storCd)
-                  }
 
-                }
-              }
-                // getSalesOrgList(cmpCd)
-            }
-            else {
-                window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-            }
-        })
-            .catch(ex => {
-                window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
-            })
-            .finally(() => {
                 // setLoading(false)
             })
     }
-*/
-    const getCornerList = async (cmpCd: String, salesOrgCd: String) => {
+
+    const getCornerList = async (cmpCd: string, salesOrgCd: string) => {
         // setLoading(true)
         console.log("getCornerList:")
         const request = {
@@ -207,7 +142,7 @@ const Setting: React.FC = () => {
           const result = await api.getCornerList(request);
           const {responseCode, responseMessage, responseBody} = result.data;
           if (responseCode === "200") {
-            console.log("코너 조회 성공 responseBody:"+JSON.stringify(responseBody))
+            console.log("코너 조회 성공")
             if(responseBody!=null) {
               for(const corner of responseBody) {
                 const { cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn } = corner;
@@ -218,13 +153,16 @@ const Setting: React.FC = () => {
                   console.log("웹입니다")
                 }
               }
+              setCornerList(responseBody);
               setCornerNmList(
                 responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
                   infoCd: cornerCd,
-                  infoNm: cornerNm,
+                  infoNm: cornerNm
                 }))
               );
-              getProductList()
+              setSelectedStorCd(responseBody[0].storCd)
+              setSelectedCornerCd(responseBody[0].cornerCd)
+              getProductList(cmpCd, salesOrgCd, responseBody[0].storCd)
             }
           }
           else {
@@ -241,12 +179,12 @@ const Setting: React.FC = () => {
         }
     }
 
-  const getProductList = async () => {
-    console.log("상품 조회")
+  const getProductList = async (cmpCd:string, salesOrgCd:string, storCd:string) => {
+    console.log("상품 조회:"+cmpCd+", "+salesOrgCd+", "+storCd)
     const params = {
-      cmpCd: 'SLKR',
-      salesOrgCd: '8000',
-      storCd: '5000511',
+      cmpCd: cmpCd,
+      salesOrgCd: salesOrgCd,
+      storCd: storCd,
       cornerCd: 'CIHA'
     };
     try {
@@ -258,7 +196,7 @@ const Setting: React.FC = () => {
           if(getPlatform()==='electron') {
             const {cmpCd, salesOrgCd, storCd, cornerCd,
               itemCd, itemNm, price, soldoutYn, useYn} = product;
-            // console.log("product:"+JSON.stringify(product))
+            console.log("product:"+JSON.stringify(product))
             await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
           }
         }
@@ -275,101 +213,44 @@ const Setting: React.FC = () => {
       window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
     }
     finally {
-      const product = await window.ipc.product.getList("SLKR","8000","5000511","CIHA");
-      console.log('상품 목록:', product); // 👈 여기서 로그
+      console.log('상품 insert 완료'); // 👈 여기서 로그
+      const productList = await window.ipc.product.getList(
+        cmpCd, salesOrgCd, storCd, 'CIHA')
+      console.log("상품 목록",JSON.stringify(productList))
     }
   }
 
-    const getKdsMstSection = () => {
-        const params = {
-            cmpCd: '90000001',
-            brandCd: '9999',
-            storeCd: '000281',
-            systemTy: "1",
-            useYn: "Y",
-        }
-        api.getKdsMstSection(params).then(result => {
-          const {responseCode, responseMessage, responseBody} = result.data;
-          if (responseCode === "200") {
-            console.log("kdsMstSection:"+responseBody)
-          }
-          else {
-            // Alert.alert("!", responseMessage);
-          }
+  const onCancel = () => {
+      navigate(-1);
+  };
+
+  const onSave = () => {
+    console.log("정보", selectedCmpCd+","+selectedSalesOrgCd+","+selectedStorCd+","+selectedCornerCd);
+    setConfirmProps({
+      title:'확인',
+      message:"설정 정보를 저장하시겠어요?",
+      onConfirm:()=>{
+      console.log("저장");
+      const user = useUserStore.getState().getUser();
+      if(user) {
+        useUserStore.getState().setUser({
+          ...user,
+          cmpCd: selectedCmpCd,
+          salesOrgCd: selectedSalesOrgCd,
+          storCd: selectedStorCd,
+          cornerCd:selectedCornerCd
         })
-          .catch(ex => {
-            // Alert.alert("!", ex.message);
-          })
-          .finally(() => {
-            setLoading(false);
-          })
-        // Replace the api call with a browser-friendly fetch or axios call
-        // fetch("/api/getKdsMstSection", { method: "POST", body: JSON.stringify(params) })
-        //     .then(res => res.json())
-        //     .then(result => {
-        //         const { responseCode, responseMessage, responseBody } = result;
-        //         if (responseCode === "200") {
-        //             setSectionList(responseBody);
-        //         } else {
-        //             alert(responseMessage);
-        //         }
-        //     })
-        //     .catch(ex => {
-        //         alert(ex.message);
-        //     })
-        //     .finally(() => {
-        //         setLoading(false);
-        //     });
-    };
-
-
-    // const onSelectedSystemTy = (event: any) => {
-    //     setSystemIdx(event.selectedIndex);
-    //     if (event.selectedIndex !== 0) {
-    //         getKdsMstSection(store);
-    //     }
-    // };
-
-    // const onSelectedSection = (item: Section) => {
-    //     setSection(item);
-    // };
-
-    const onCancel = () => {
-        // console.log("### from :: ", from);
-        // if (from === "main") {
-        //     props.navigation.navigate("Main", {
-        //         store: store,
-        //         saleOpen: saleOpen,
-        //         config: config,
-        //     });
-        // } else {
-        //     props.navigation.navigate("Login", {
-        //         store: store,
-        //         saleOpen: saleOpen,
-        //         config: config,
-        //     });
-        //     navigate()
-        // }
-        navigate(-1);
-    };
-
-    const onSave = () => {
-      setConfirmProps({
-        title:'확인',
-        message:"설정 정보를 저장하시겠어요?\n저장 후 앱이 재실행 됩니다.",
-        onConfirm:()=>{
-        console.log("저장");
-        navigate("/main");
-      }}
-      );
-      setConfirmOpen(true);
-        // AppFuncRestart();
-    };
+      }
+      navigate("/main");
+    }}
+    );
+    setConfirmOpen(true);
+  };
 
     const changeSelectedCmpCd = (item: { infoCd: string; infoNm: string })  => {
       setSelectedCmpCd(item.infoCd);
       if(platform==='electron') {
-        updateCmp(item.infoCd, "안녕")
+        // updateCmp(item.infoCd, "안녕")
       }
       // 추가적인 로직이 필요하면 여기에 작성
       getSalesOrgList(item.infoCd)
@@ -384,7 +265,13 @@ const Setting: React.FC = () => {
     const changeSelectedCornerCd = (item: { infoCd: string; infoNm: string })  => {
       console.log("358 item:"+JSON.stringify(item));
       setSelectedCornerCd(item.infoCd);
-      // getKdsMstSection();
+      const storCd = cornerList.find(corner => corner.cornerCd === item.infoCd)?.storCd || null;
+      console.log("storCd:"+storCd)
+      // console.log("cornerList:"+JSON.stringify(cornerList))
+      if(storCd) {
+        setSelectedStorCd(storCd);
+        getProductList(selectedCmpCd, selectedSalesOrgCd, storCd)
+      }
     }
     const loadCmpList = async () => {
       console.log("마스터 수신")
@@ -401,33 +288,14 @@ const Setting: React.FC = () => {
       }
     };
 
-    const deleteCmp = async (cmpCd:string) => {
-      try {
-        const result = await window.ipc.cmp.delete(cmpCd);
-        console.log('삭제 결과:'+result)
-      } catch(err) {
-        console.error('에러 발생:', err);
-      }
-    }
-
-    const updateCmp = async (cmpCd:string, cmpNm:string) => {
-      try {
-        const result = await window.ipc.cmp.update(cmpNm, cmpCd);
-        console.log('업데이트 결과:'+result)
-      } catch(err) {
-        console.error('에러 발생:', err);
-      }
-    }
-
   if(loading) {
         return <></>
     }
     return (
       <div className="container">
         <div className="button-container">
-          <div className="empty-space" />
-          <button onClick={init}>
-            <span>초기화</span>
+          <button onClick={updateVersion}>
+            <span>업데이트</span>
           </button>
           <button onClick={loadCmpList}>
             <span>마스터수신</span>

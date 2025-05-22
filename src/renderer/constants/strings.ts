@@ -11,4 +11,8 @@ export const STRINGS = {
   total_order_cnt: "총 주문\n건수",
   mode_section: 1,
   mode_expo: 0,
+  complete_all:"전체완료",
+  restore_recent:"직전복원",
+  restore_search:"조회복원",
+  exit_app:"프로그램 종료 X",
 }

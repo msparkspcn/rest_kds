@@ -28,7 +28,8 @@ export function registerCornerIpc() {
     return camelcaseKeys(rows, { deep: true });
   });
 
-  ipcMain.handle('db:getCornerSummary', async (e, use_yn) => {
+  ipcMain.handle('db:getCornerSummary',
+    async (e, cmp_cd, sales_org_cd, stor_cd, use_yn) => {
     const rows = db.prepare(`
     SELECT
         c.cmp_cd,
@@ -48,12 +49,15 @@ export function registerCornerIpc() {
       AND c.stor_cd = p.stor_cd
       AND c.corner_cd = p.corner_cd
     WHERE
-      c.use_yn = ?
+    c.cmp_cd = ?
+    AND c.sales_org_cd = ?
+    AND c.stor_cd = ?
+      AND c.use_yn = ?
     GROUP BY
       c.corner_cd, c.corner_nm
     ORDER BY
       c.corner_cd
-      `).all([use_yn]) as CornerSummary[];
+      `).all([cmp_cd, sales_org_cd, stor_cd, use_yn]) as CornerSummary[];
     return camelcaseKeys(rows, { deep: true });
   });
 

@@ -78,7 +78,7 @@ const CallOrderDialog: React.FC<CallOrderProps> =
         </div>
 
         <button className="confirm-button" onClick={onPasswordCheck}>
-          확인
+          호출
         </button>
       </div>
     </div>

@@ -60,7 +60,7 @@ const Login: React.FC = () => {
             setStorePassword(password);
           }
           else {
-            setStoreUserId('')
+            setStoreUserId(userId)
             setStorePassword('')
           }
           navigate('/setting');

@@ -11,7 +11,6 @@ import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
 import { useWebSocket } from '@Components/hooks/useWebSocket';
-import { getPlatform } from '@Components/utils/platform';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -36,13 +35,11 @@ function Main(): JSX.Element {
   let systemType: number = 0;
 
   const { isConnected, messages } = useWebSocket();
-  useEffect(() => {
-    getProductList()
-  }, []);
+
   useEffect(() => {
     if (Object.keys(messages).length > 0) {
       console.log('1.품절 처리', messages);
-      window.ipc.product.updateSoldout(messages.itemCd, messages.soldoutYn).then(r => {
+      window.ipc.product.updateSoldout(messages.itemCd, messages.soldoutYn).then(() => {
         console.log("완료")
       })
     } else {
@@ -52,7 +49,6 @@ function Main(): JSX.Element {
   },[messages])
 
   useEffect(() => {
-    console.log('### 6. 주문정보 갱신 ###');
     console.log('### 시스템 구분 :: ', systemType);
     if (systemType === 0) {
       // EXPO
@@ -112,44 +108,6 @@ function Main(): JSX.Element {
           console.log('### 개점정보 수신 실패');
         }
       })
-  }
-
-
-
-  const getProductList = async () => {
-    console.log("상품 조회")
-    const params = {
-      cmpCd: 'SLKR',
-      salesOrgCd: '8000',
-      storCd: '5000511',
-      cornerCd: 'CIHA'
-    };
-    try {
-      const result = await api.getProductList(params);
-      const { responseBody, responseCode, responseMessage } = result.data;
-
-      if (responseCode === '200') {
-        setProductList(responseBody)
-        for (const product of responseBody) {
-          if(getPlatform()==='electron') {
-            const {cmpCd, salesOrgCd, storCd, cornerCd,
-              itemCd, itemNm, price, soldoutYn, useYn} = product;
-            // console.log("product:"+JSON.stringify(product))
-            await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
-          }
-        }
-
-        console.log(`### count:${responseBody.length}`);
-        // setSaleDt(responseBody.saleDt);
-        // getOrderData(responseBody.saleDt);
-      }
-      else {
-        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-      }
-    }
-    catch(error) {
-      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
-    }
   }
 
   const getOrderData = (saleDt:string) => {
@@ -223,37 +181,6 @@ function Main(): JSX.Element {
       });
   };
 
-  const getKdsMstSectionItemList = (sectionCd: string) => {
-    const params = {
-      cmpCd: '90000001',
-      brandCd: '9999',
-      storeCd: '000281',
-      sectionCd,
-      useYn: 'Y',
-    };
-
-    console.log('### 5-2 Section 일 경우 Section Item 마스터 수신 ###');
-    api
-      .getKdsMstSectionItemList(params)
-      .then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
-        if (responseCode === '200') {
-          console.log('### 5-2 Section Item 마스터 수신 완료 ###');
-          // setSectionItemList(responseBody);
-          // 기본 구성이 끝나고 주문 정보를 가져온다
-          getStoreSaleOpen();
-        } else {
-          // Alert.alert("!", responseMessage);
-        }
-      })
-      .catch((e) => {
-        // Alert.alert("!", e.message);
-      })
-      .finally(() => {
-        console.log('### 5-2 완료');
-        // setLoading(false);
-      });
-  };
 
   const onSetting = () => {
     console.info("### 설정화면 진입 시도 ###")
@@ -301,6 +228,126 @@ function Main(): JSX.Element {
       no: 2,
       pos: "91",
       orderNo: "9100011",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '02',
+      menuName: "옛날돈까스",
+      quantity: 1
+    },
+    {
+      no: 1,
+      pos: "91",
+      orderNo: "9100010",
+      orderDateTime: "11:58:17",
+      completionDateTime: "12:01:58",
+      seq: '02',
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "9100013",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '03',
+      menuName: "옛날돈까스",
+      quantity: 1
+    },
+    {
+      no: 1,
+      pos: "91",
+      orderNo: "9100014",
+      orderDateTime: "11:58:17",
+      completionDateTime: "12:01:58",
+      seq: '03',
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "9100015",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '01',
+      menuName: "옛날돈까스",
+      quantity: 1
+    },
+    {
+      no: 1,
+      pos: "91",
+      orderNo: "9100016",
+      orderDateTime: "11:58:17",
+      completionDateTime: "12:01:58",
+      seq: '01',
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "9100017",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '01',
+      menuName: "옛날돈까스",
+      quantity: 1
+    },
+    {
+      no: 1,
+      pos: "91",
+      orderNo: "9100018",
+      orderDateTime: "11:58:17",
+      completionDateTime: "12:01:58",
+      seq: '01',
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "9100019",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '01',
+      menuName: "옛날돈까스",
+      quantity: 1
+    },
+    {
+      no: 1,
+      pos: "91",
+      orderNo: "9100020",
+      orderDateTime: "11:58:17",
+      completionDateTime: "12:01:58",
+      seq: '01',
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "9100021",
+      orderDateTime: "11:56:28",
+      completionDateTime: "11:58:28",
+      seq: '01',
+      menuName: "옛날돈까스",
+      quantity: 1
+    },
+    {
+      no: 1,
+      pos: "91",
+      orderNo: "9100022",
+      orderDateTime: "11:58:17",
+      completionDateTime: "12:01:58",
+      seq: '01',
+      menuName: "돈모밀국수",
+      quantity: 1
+    },
+    {
+      no: 2,
+      pos: "91",
+      orderNo: "9100023",
       orderDateTime: "11:56:28",
       completionDateTime: "11:58:28",
       seq: '01',
@@ -388,7 +435,7 @@ function Main(): JSX.Element {
       )}
       {callOrderOpen && (
         <CallOrderDialog
-          title="임의호출"
+          title="주문번호 입력"
           errorMsg="주문번호를 다시 입력해주세요."
           onClose={() => setCallOrderOpen(false)}
           onCorrect={() => setCallOrderOpen(false)} />

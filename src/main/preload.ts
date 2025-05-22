@@ -35,7 +35,8 @@ contextBridge.exposeInMainWorld('ipc', {
   },
   corner: {
     getList: (use_yn: string) => ipcRenderer.invoke('db:getCornerList', use_yn),
-    getList2: (corner_cd: string, use_yn: string) => ipcRenderer.invoke('db:getCornerSummary', use_yn),
+    getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string, use_yn: string) =>
+      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd,stor_cd, use_yn),
     add: (  cmp_cd: string,
             sales_org_cd: string,
             stor_cd: string,
@@ -47,7 +48,9 @@ contextBridge.exposeInMainWorld('ipc', {
         cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn)
   },
   product: {
-    getList: () => ipcRenderer.invoke('db:getProductList'),
+    getList: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) =>
+      ipcRenderer.invoke('db:getProductList', cmp_cd, sales_org_cd, stor_cd, corner_cd),
+    // getList: () => ipcRenderer.invoke('db:getProductList'),
     add: (  cmp_cd: string,
             sales_org_Cd: string,
             stor_cd: string,
