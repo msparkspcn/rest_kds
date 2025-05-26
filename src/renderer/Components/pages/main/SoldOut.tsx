@@ -47,7 +47,7 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
       const user = getUser();
       // console.log("user:"+JSON.stringify(user))
       console.log("1user:"+user?.cmpCd+", salesOrgCd:"+user?.salesOrgCd+", storCd:"+user?.storCd)
-      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd);
+      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd).then(r => {});
     }
   }, [isOpen]);
 
@@ -76,7 +76,6 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
       corner.cmpCd, corner.salesOrgCd, corner.storCd, corner.cornerCd)
     console.log('상품 목록:', productList);
     setProductList(productList)
-    console.log('상품 목록:', productList);
   }
 
   const handleCheckboxChange = (index: number) => {

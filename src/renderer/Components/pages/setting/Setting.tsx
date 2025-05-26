@@ -174,7 +174,7 @@ const Setting: React.FC = () => {
         }
         finally {
           const cornerList = await window.ipc.corner.getList("1");
-          console.log('코너 목록:', cornerList); // 👈 여기서 로그
+          console.log('코너 목록:', cornerList);
             setLoading(false)
         }
     }
@@ -185,7 +185,7 @@ const Setting: React.FC = () => {
       cmpCd: cmpCd,
       salesOrgCd: salesOrgCd,
       storCd: storCd,
-      cornerCd: 'CIHA'
+      cornerCd: ''
     };
     try {
       const result = await api.getProductList(params);
@@ -198,6 +198,9 @@ const Setting: React.FC = () => {
               itemCd, itemNm, price, soldoutYn, useYn} = product;
             console.log("product:"+JSON.stringify(product))
             await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
+          }
+          else {
+            console.log("platform:"+getPlatform())
           }
         }
 
@@ -213,9 +216,9 @@ const Setting: React.FC = () => {
       window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
     }
     finally {
-      console.log('상품 insert 완료'); // 👈 여기서 로그
+      console.log('상품 insert 완료'+storCd);
       const productList = await window.ipc.product.getList(
-        cmpCd, salesOrgCd, storCd, 'CIHA')
+        cmpCd, salesOrgCd, storCd, '')
       console.log("상품 목록",JSON.stringify(productList))
     }
   }
@@ -278,7 +281,7 @@ const Setting: React.FC = () => {
       try {
         if(platform==='electron') {
           const cmpList = await window.ipc.cmp.getList();
-          console.log('회사 목록:', cmpList); // 👈 여기서 로그
+          console.log('회사 목록:', cmpList);
         }
         else {
           console.log("not electron")

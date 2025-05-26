@@ -214,147 +214,210 @@ function Main(): JSX.Element {
     }
     console.log("현재 페이지:"+currentPage)
   };
-  const data = [{
-    no: 1,
-    pos: "91",
-    orderNo: "9100012",
-    orderDateTime: "11:58:17",
-    completionDateTime: "12:01:58",
-    seq: '01',
-    menuName: "돈모밀국수",
-    quantity: 1
-  },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100011",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '02',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-    {
-      no: 1,
-      pos: "91",
-      orderNo: "9100010",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
-      seq: '02',
-      menuName: "돈모밀국수",
-      quantity: 1
-    },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100013",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '03',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-    {
-      no: 1,
-      pos: "91",
-      orderNo: "9100014",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
-      seq: '03',
-      menuName: "돈모밀국수",
-      quantity: 1
-    },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100015",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-    {
-      no: 1,
-      pos: "91",
-      orderNo: "9100016",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
-      seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
-    },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100017",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-    {
-      no: 1,
-      pos: "91",
-      orderNo: "9100018",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
-      seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
-    },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100019",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-    {
-      no: 1,
-      pos: "91",
-      orderNo: "9100020",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
-      seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
-    },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100021",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-    {
-      no: 1,
-      pos: "91",
-      orderNo: "9100022",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
-      seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
-    },
-    {
-      no: 2,
-      pos: "91",
-      orderNo: "9100023",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
-      seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
-    },
-  ]
+  const data =
+    [
+      {
+        "no": 1,
+        "pos": "91",
+        "orderNo": "9100001",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 2,
+        "pos": "91",
+        "orderNo": "9100002",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 3,
+        "pos": "91",
+        "orderNo": "9100003",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 4,
+        "pos": "91",
+        "orderNo": "9100004",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 5,
+        "pos": "91",
+        "orderNo": "9100005",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 6,
+        "pos": "91",
+        "orderNo": "9100006",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 7,
+        "pos": "91",
+        "orderNo": "9100007",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 8,
+        "pos": "91",
+        "orderNo": "9100008",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 9,
+        "pos": "91",
+        "orderNo": "9100009",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 10,
+        "pos": "91",
+        "orderNo": "9100010",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 11,
+        "pos": "91",
+        "orderNo": "9100011",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 12,
+        "pos": "91",
+        "orderNo": "9100012",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 13,
+        "pos": "91",
+        "orderNo": "9100013",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 14,
+        "pos": "91",
+        "orderNo": "9100014",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 15,
+        "pos": "91",
+        "orderNo": "9100015",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 16,
+        "pos": "91",
+        "orderNo": "9100016",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 17,
+        "pos": "91",
+        "orderNo": "9100017",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 18,
+        "pos": "91",
+        "orderNo": "9100018",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      },
+      {
+        "no": 19,
+        "pos": "91",
+        "orderNo": "9100019",
+        "orderDateTime": "11:58:17",
+        "completionDateTime": "12:01:58",
+        "seq": "01",
+        "menuName": "돈모밀국수",
+        "quantity": 1
+      },
+      {
+        "no": 20,
+        "pos": "91",
+        "orderNo": "9100020",
+        "orderDateTime": "11:56:28",
+        "completionDateTime": "11:58:28",
+        "seq": "01",
+        "menuName": "옛날돈까스",
+        "quantity": 1
+      }
+    ]
+
   const onOpenCallOrder = () => {
     setCallOrderOpen(true)
   }
