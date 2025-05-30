@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
-import { db } from './db';
 import camelcaseKeys from 'camelcase-keys';
+import { db } from './db';
 
 type Corner = {
   cmpCd: string;
@@ -9,7 +9,7 @@ type Corner = {
   salesOrgCd: string;
   storCd: string;
   useYn: string;
-}
+};
 
 type CornerSummary = {
   cmpCd: string;
@@ -20,17 +20,17 @@ type CornerSummary = {
   useYn: string;
   availableCount: string;
   soldoutCount: string;
-}
+};
 export function registerCornerIpc() {
   ipcMain.handle('db:getCornerList', async (e, use_yn) => {
-    const rows = db.prepare('SELECT * FROM corner where use_yn = ?')
-      .all([use_yn]) as Corner[];
+    const rows = db.prepare('SELECT * FROM corner where use_yn = ?').all([use_yn]) as Corner[];
     return camelcaseKeys(rows, { deep: true });
   });
 
-  ipcMain.handle('db:getCornerSummary',
-    async (e, cmp_cd, sales_org_cd, stor_cd, use_yn) => {
-    const rows = db.prepare(`
+  ipcMain.handle('db:getCornerSummary', async (e, cmp_cd, sales_org_cd, stor_cd, use_yn) => {
+    const rows = db
+      .prepare(
+        `
     SELECT
         c.cmp_cd,
         c.sales_org_cd,
@@ -57,18 +57,24 @@ export function registerCornerIpc() {
       c.corner_cd, c.corner_nm
     ORDER BY
       c.corner_cd
-      `).all([cmp_cd, sales_org_cd, stor_cd, use_yn]) as CornerSummary[];
+      `,
+      )
+      .all([cmp_cd, sales_org_cd, stor_cd, use_yn]) as CornerSummary[];
     return camelcaseKeys(rows, { deep: true });
   });
 
-  ipcMain.handle('db:addCorner', async (_e, cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn) => {
-    db.prepare(`INSERT INTO corner (cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn)
+  ipcMain.handle(
+    'db:addCorner',
+    async (_e, cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn) => {
+      db.prepare(
+        `INSERT INTO corner (cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn)
           VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(cmp_cd, sales_org_cd, stor_cd, corner_cd)
           DO UPDATE SET
             corner_nm = excluded.corner_nm,
-            use_yn = excluded.use_yn`)
-      .run(cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn);
-  });
+            use_yn = excluded.use_yn`,
+      ).run(cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn);
+    },
+  );
 
   ipcMain.handle('db:updateCorner', async (_e, cmp_nm, cmp_cd) => {
     db.prepare('UPDATE corner SET cmp_nm = ? WHERE cmp_cd = ?').run(cmp_nm, cmp_cd);

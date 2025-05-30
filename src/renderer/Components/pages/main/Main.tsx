@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Contents from '@Components/pages/main/Contents';
 import OrderActionBar from '@Components/pages/main/order/OrderActionBar';
 import Footer from '@Components/pages/main/Footer';
-import * as api from "@Components/data/api/api";
+import * as api from '@Components/data/api/api';
 import './Main.scss';
 import InputPassword from '@Components/common/InputPassword';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +21,7 @@ function Main(): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>("");
+  const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>('');
   const [saleDt, setSaleDt] = useState('');
   const [callOrderOpen, setCallOrderOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -32,7 +32,7 @@ function Main(): JSX.Element {
     onConfirm: () => {},
   });
   const [isSoldOutOpen, setSoldOutOpen] = useState(false);
-  let systemType: number = 0;
+  const systemType = 0;
 
   const { isConnected, messages } = useWebSocket();
 
@@ -40,13 +40,12 @@ function Main(): JSX.Element {
     if (Object.keys(messages).length > 0) {
       console.log('1.품절 처리', messages);
       window.ipc.product.updateSoldout(messages.itemCd, messages.soldoutYn).then(() => {
-        console.log("완료")
-      })
+        console.log('완료');
+      });
     } else {
       console.log('빈 객체입니다');
     }
-
-  },[messages])
+  }, [messages]);
 
   useEffect(() => {
     console.log('### 시스템 구분 :: ', systemType);
@@ -74,7 +73,7 @@ function Main(): JSX.Element {
   }, [orderList]);
 
   useEffect(() => {
-    console.log("페이지 변경:"+currentPage);
+    console.log(`페이지 변경:${currentPage}`);
     const startIndex = currentPage * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     setFilterList(orderList.slice(startIndex, endIndex));
@@ -94,30 +93,28 @@ function Main(): JSX.Element {
     const params = {
       cmpCd: '90000001',
       brandCd: '9999',
-      storeCd: '000281'
+      storeCd: '000281',
     };
-    api.getStoreSaleOpen(params)
-      .then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
-        if (responseCode === '200') {
-          console.log(`### 개점정보 res:${responseBody.saleDt}`);
-          setSaleDt(responseBody.saleDt);
-          getOrderData(responseBody.saleDt);
-        }
-        else {
-          console.log('### 개점정보 수신 실패');
-        }
-      })
-  }
+    api.getStoreSaleOpen(params).then((result) => {
+      const { responseBody, responseCode, responseMessage } = result.data;
+      if (responseCode === '200') {
+        console.log(`### 개점정보 res:${responseBody.saleDt}`);
+        setSaleDt(responseBody.saleDt);
+        getOrderData(responseBody.saleDt);
+      } else {
+        console.log('### 개점정보 수신 실패');
+      }
+    });
+  };
 
-  const getOrderData = (saleDt:string) => {
+  const getOrderData = (saleDt: string) => {
     // const {cmpCd, brandCd, storeCd} = store;
-    console.log("개점일:"+saleDt);
+    console.log(`개점일:${saleDt}`);
     const params = {
       cmpCd: '90000001',
       brandCd: '9999',
       storeCd: '000281',
-      saleDt: saleDt,
+      saleDt,
       state: '0',
     };
 
@@ -133,12 +130,12 @@ function Main(): JSX.Element {
             console.log('### 5-1 주문내역 변경점이 있으므로 갱신');
             // playSound();
           }
-          console.log("페이징:"+responseBody.length);
+          console.log(`페이징:${responseBody.length}`);
           // ITEMS_PER_PAGE)
           setOrderCount(responseBody.length);
-          console.log("orderCnt:"+responseBody.length+", ITEMS_PER_PAGE:"+ITEMS_PER_PAGE);
-          if((responseBody.length / ITEMS_PER_PAGE) > 0) {
-            console.log("1이상 ="+Math.ceil(responseBody.length / ITEMS_PER_PAGE));
+          console.log(`orderCnt:${responseBody.length}, ITEMS_PER_PAGE:${ITEMS_PER_PAGE}`);
+          if (responseBody.length / ITEMS_PER_PAGE > 0) {
+            console.log(`1이상 =${Math.ceil(responseBody.length / ITEMS_PER_PAGE)}`);
             setTotalPages(Math.ceil(responseBody.length / ITEMS_PER_PAGE));
           }
         } else {
@@ -181,231 +178,216 @@ function Main(): JSX.Element {
       });
   };
 
-
   const onSetting = () => {
-    console.info("### 설정화면 진입 시도 ###")
+    console.info('### 설정화면 진입 시도 ###');
     setPasswordOpen(true);
-  }
+  };
 
   const goSettingPage = () => {
-    console.log("비밀번호 인증 성공! 설정 페이지로 이동");
+    console.log('비밀번호 인증 성공! 설정 페이지로 이동');
     setPasswordOpen(false);
-    navigate("/setting", { replace: true });
+    navigate('/setting', { replace: true });
   };
   const [isModalOpen, setModalOpen] = useState(false);
   const onRestore = () => {
-    setModalOpen(true)
-  }
+    setModalOpen(true);
+  };
   const onSoldOut = () => {
-    setSoldOutOpen(true)
-  }
+    setSoldOutOpen(true);
+  };
 
   const onNextPage = () => {
-
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
-    console.log("현재 페이지:"+currentPage)
+    console.log(`현재 페이지:${currentPage}`);
   };
 
   const onPrevPage = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
-    console.log("현재 페이지:"+currentPage)
+    console.log(`현재 페이지:${currentPage}`);
   };
-  const data = [{
-    no: 1,
-    pos: "91",
-    orderNo: "9100012",
-    orderDateTime: "11:58:17",
-    completionDateTime: "12:01:58",
-    seq: '01',
-    menuName: "돈모밀국수",
-    quantity: 1
-  },
+  const data = [
+    {
+      no: 1,
+      pos: '91',
+      orderNo: '9100012',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
+      seq: '01',
+      menuName: '돈모밀국수',
+      quantity: 1,
+    },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100011",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100011',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '02',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
     {
       no: 1,
-      pos: "91",
-      orderNo: "9100010",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
+      pos: '91',
+      orderNo: '9100010',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
       seq: '02',
-      menuName: "돈모밀국수",
-      quantity: 1
+      menuName: '돈모밀국수',
+      quantity: 1,
     },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100013",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100013',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '03',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
     {
       no: 1,
-      pos: "91",
-      orderNo: "9100014",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
+      pos: '91',
+      orderNo: '9100014',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
       seq: '03',
-      menuName: "돈모밀국수",
-      quantity: 1
+      menuName: '돈모밀국수',
+      quantity: 1,
     },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100015",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100015',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
     {
       no: 1,
-      pos: "91",
-      orderNo: "9100016",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
+      pos: '91',
+      orderNo: '9100016',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
       seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
+      menuName: '돈모밀국수',
+      quantity: 1,
     },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100017",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100017',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
     {
       no: 1,
-      pos: "91",
-      orderNo: "9100018",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
+      pos: '91',
+      orderNo: '9100018',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
       seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
+      menuName: '돈모밀국수',
+      quantity: 1,
     },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100019",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100019',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
     {
       no: 1,
-      pos: "91",
-      orderNo: "9100020",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
+      pos: '91',
+      orderNo: '9100020',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
       seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
+      menuName: '돈모밀국수',
+      quantity: 1,
     },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100021",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100021',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
     {
       no: 1,
-      pos: "91",
-      orderNo: "9100022",
-      orderDateTime: "11:58:17",
-      completionDateTime: "12:01:58",
+      pos: '91',
+      orderNo: '9100022',
+      orderDateTime: '11:58:17',
+      completionDateTime: '12:01:58',
       seq: '01',
-      menuName: "돈모밀국수",
-      quantity: 1
+      menuName: '돈모밀국수',
+      quantity: 1,
     },
     {
       no: 2,
-      pos: "91",
-      orderNo: "9100023",
-      orderDateTime: "11:56:28",
-      completionDateTime: "11:58:28",
+      pos: '91',
+      orderNo: '9100023',
+      orderDateTime: '11:56:28',
+      completionDateTime: '11:58:28',
       seq: '01',
-      menuName: "옛날돈까스",
-      quantity: 1
+      menuName: '옛날돈까스',
+      quantity: 1,
     },
-  ]
+  ];
   const onOpenCallOrder = () => {
-    setCallOrderOpen(true)
-  }
+    setCallOrderOpen(true);
+  };
 
   const openDialog = (title: string, message: string, onConfirm: () => void) => {
     setConfirmProps({ title, message, onConfirm });
     setConfirmOpen(true);
   };
   const handleCallOrder = () => {
-    if(selectedOrderNo!='') {
-      openDialog(
-        '주문 호출',
-        selectedOrderNo+'번 주문을\n호출하시겠습니까?',
-        () => {
-          console.log('주문 호출 실행');
-          // 호출 로직
-        }
-      );
+    if (selectedOrderNo != '') {
+      openDialog('주문 호출', `${selectedOrderNo}번 주문을\n호출하시겠습니까?`, () => {
+        console.log('주문 호출 실행');
+        // 호출 로직
+      });
     }
   };
 
   const handleCompleteOrder = () => {
-    if(selectedOrderNo!='') {
-      openDialog(
-        '주문 완료',
-        selectedOrderNo+'번 주문을\n완료하시겠습니까?',
-        () => {
-          console.log('주문 완료 실행');
-          // 완료 로직
-        }
-      );
+    if (selectedOrderNo != '') {
+      openDialog('주문 완료', `${selectedOrderNo}번 주문을\n완료하시겠습니까?`, () => {
+        console.log('주문 완료 실행');
+        // 완료 로직
+      });
     }
   };
 
-
   const onSelectOrderHd = (orderNo: string) => {
-    if(orderNo==selectedOrderNo) {
-      setSelectedOrderNo("")
-    }
-    else {
+    if (orderNo == selectedOrderNo) {
+      setSelectedOrderNo('');
+    } else {
       setSelectedOrderNo(orderNo); // 선택된 주문 번호 업데이트
     }
   };
   return (
     <div className="layout-root">
       <div className="layout-content">
-        <Contents
-          orderList={filterList}
-          onRefresh={onRefresh}
-          onSelectOrderHd = {onSelectOrderHd}
-        />
+        <Contents orderList={filterList} onRefresh={onRefresh} onSelectOrderHd={onSelectOrderHd} />
       </div>
       <div className="order-action-bar">
         <OrderActionBar
@@ -420,25 +402,23 @@ function Main(): JSX.Element {
       <div className="footer-area">
         <Footer
           onSetting={onSetting}
-          currentPage = {currentPage}
-          totalPages = {totalPages}
+          currentPage={currentPage}
+          totalPages={totalPages}
           onNextPage={onNextPage}
           onPrevPage={onPrevPage}
           onRestore={onRestore}
         />
       </div>
       {passwordOpen && (
-        <InputPassword
-          onClose={() => setPasswordOpen(false)}
-          onCorrect={goSettingPage}
-        />
+        <InputPassword onClose={() => setPasswordOpen(false)} onCorrect={goSettingPage} />
       )}
       {callOrderOpen && (
         <CallOrderDialog
           title="주문번호 입력"
           errorMsg="주문번호를 다시 입력해주세요."
           onClose={() => setCallOrderOpen(false)}
-          onCorrect={() => setCallOrderOpen(false)} />
+          onCorrect={() => setCallOrderOpen(false)}
+        />
       )}
       {confirmOpen && (
         <ConfirmDialog
@@ -447,18 +427,8 @@ function Main(): JSX.Element {
           {...confirmProps}
         />
       )}
-      <History
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        data={data}
-      />
-      {isSoldOutOpen && (
-        <SoldOut
-          isOpen={isSoldOutOpen}
-          onClose={() => setSoldOutOpen(false)}
-        />
-      )}
-
+      <History isOpen={isModalOpen} onClose={() => setModalOpen(false)} data={data} />
+      {isSoldOutOpen && <SoldOut isOpen={isSoldOutOpen} onClose={() => setSoldOutOpen(false)} />}
     </div>
   );
 }

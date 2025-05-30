@@ -5,22 +5,33 @@ import installExtension, {
   REDUX_DEVTOOLS,
 } from 'electron-devtools-installer';
 import path from 'path';
+import os from 'os';
 import { port } from '../../DevConfig.json';
 
 const isDebug = process.env.ELECTRON_ENV === 'debug';
 
+const isWindows = os.platform() === 'win32';
+const isMac = os.platform() === 'darwin';
+const isLinux = os.platform() === 'linux';
+
+// 안전하게 환경변수 접근 (괄호 포함된 키는 대괄호 표기법 사용)
+function safeGetEnv(key: string): string | undefined {
+  console.log(`os:${process.env[key]}`);
+  return process.env[key];
+}
+
 function getAssetsPath(fileName: string) {
-  if (process.env.NODE_ENV === 'production' && app.isPackaged === true) {
+  if (safeGetEnv('NODE_ENV') === 'production' && app.isPackaged === true) {
     return path.resolve(process.resourcesPath, 'assets', fileName);
   }
-  if (process.env.NODE_ENV === 'production' && app.isPackaged === false) {
+  if (safeGetEnv('NODE_ENV') === 'production' && app.isPackaged === false) {
     return path.resolve(__dirname, '../../../assets', fileName);
   }
   return path.resolve(__dirname, '../../../assets', fileName);
 }
 
 function getHtmlPath(htmlFileName: string) {
-  if (process.env.NODE_ENV === 'development') {
+  if (safeGetEnv('NODE_ENV') === 'development') {
     const url = `http://localhost:${port}`;
     return url;
   }
@@ -28,7 +39,7 @@ function getHtmlPath(htmlFileName: string) {
 }
 
 function getPreloadPath(Name: string) {
-  if (process.env.NODE_ENV === 'development') {
+  if (safeGetEnv('NODE_ENV') === 'development') {
     return path.resolve(__dirname, '../../dist/main', Name);
   }
   return path.resolve(__dirname, Name);
@@ -44,4 +55,13 @@ function installExtensions() {
   });
 }
 
-export { isDebug, getAssetsPath, getHtmlPath, getPreloadPath, installExtensions };
+export {
+  isDebug,
+  getAssetsPath,
+  getHtmlPath,
+  getPreloadPath,
+  installExtensions,
+  isWindows,
+  isMac,
+  isLinux,
+};

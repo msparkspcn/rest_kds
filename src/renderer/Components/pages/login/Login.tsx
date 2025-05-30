@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Loading from '../../common/Loading';
 import * as api from '../../data/api/api';
-import { useNavigate } from 'react-router-dom';
 import { STRINGS } from '../../../constants/strings';
 import { useUserStore } from '../../store/user';
 import { setAuthToken } from '../../data/api/api';
 import './Login.scss';
 import Alert from '@Components/common/Alert';
+
 const Login: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -23,13 +24,13 @@ const Login: React.FC = () => {
   const setStorePassword = useUserStore((state) => state.setPassword);
 
   useEffect(() => {
-    console.log("Login getUserId:"+getUserId)
-    if(getUserId && getStorePassword) {
+    console.log(`Login getUserId:${getUserId}`);
+    if (getUserId && getStorePassword) {
       setUserId(getUserId);
       setPassword(getStorePassword);
       setIsChecked(true);
     }
-  },[])
+  }, []);
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
@@ -41,35 +42,34 @@ const Login: React.FC = () => {
       return;
     }
     const params = {
-      userId: userId,
-      password: password,
+      userId,
+      password,
     };
     api
       .login(params)
       .then((result) => {
         const { responseCode, responseMessage, responseBody } = result.data;
         if (responseCode === '200') {
-          console.log('11성공 responseBody:' + JSON.stringify(responseBody));
+          console.log(`11성공 responseBody:${JSON.stringify(responseBody)}`);
           setUser(responseBody);
           const user = getUser();
           if (user && 'apiKey' in user) {
             setAuthToken(user.apiKey); // 이제 user 가 null 이 아닐 경우에만 실행
           }
-          if(isChecked) {
-            setStoreUserId(userId)
+          if (isChecked) {
+            setStoreUserId(userId);
             setStorePassword(password);
-          }
-          else {
-            setStoreUserId(userId)
-            setStorePassword('')
+          } else {
+            setStoreUserId(userId);
+            setStorePassword('');
           }
           navigate('/setting');
         } else {
-          setDialogMessage(responseMessage)
+          setDialogMessage(responseMessage);
         }
       })
       .catch((ex) => {
-        window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')');
+        window.alert(`서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(${ex.message})`);
       })
       .finally(() => {
         setLoading(false);
@@ -80,20 +80,18 @@ const Login: React.FC = () => {
     const params = {
       cmpCd: '90000001',
       brandCd: '9999',
-      storeCd: '000281'
+      storeCd: '000281',
     };
-    api.getStoreSaleOpen(params)
-      .then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
-        if (responseCode === '200') {
-          console.log(`### 개점정보 res:${responseBody.saleDt}`);
-        }
-        else {
-          setDialogMessage(responseMessage);
-          console.log('### 개점정보 수신 실패');
-        }
-      })
-  }
+    api.getStoreSaleOpen(params).then((result) => {
+      const { responseBody, responseCode, responseMessage } = result.data;
+      if (responseCode === '200') {
+        console.log(`### 개점정보 res:${responseBody.saleDt}`);
+      } else {
+        setDialogMessage(responseMessage);
+        console.log('### 개점정보 수신 실패');
+      }
+    });
+  };
 
   return (
     <div className="login-container">
@@ -103,10 +101,13 @@ const Login: React.FC = () => {
       <h2 className="member-login">{STRINGS.member_login}</h2>
 
       <div className="form-wrapper">
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleLoginClick();
-        }} className="login-form">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLoginClick();
+          }}
+          className="login-form"
+        >
           <div className="input-box">
             <input
               type="text"
@@ -135,16 +136,25 @@ const Login: React.FC = () => {
                 id="check-2"
               />
               <span className="checkbox-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="check-svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" clipRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="check-svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414
                   0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0
                   011.414 0z"
                   />
                 </svg>
               </span>
             </label>
-            <label htmlFor="check-2" className="checkbox-text">자동 로그인</label>
+            <label htmlFor="check-2" className="checkbox-text">
+              자동 로그인
+            </label>
           </div>
           <div className="login-button-wrapper">
             <button
@@ -161,7 +171,9 @@ const Login: React.FC = () => {
         <Alert
           title="알림"
           message={dialogMessage}
-          onClose={()=>{setDialogMessage(null)}}
+          onClose={() => {
+            setDialogMessage(null);
+          }}
         />
       )}
     </div>

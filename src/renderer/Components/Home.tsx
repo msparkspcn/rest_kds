@@ -11,8 +11,7 @@ function Home() {
 
   return (
     <div>
-      <header className="App-Header">
-      </header>
+      <header className="App-Header" />
       <section className="Content">
         <h1>Welcome to</h1>
         <h2>Vite Electron React Boilerplate!</h2>
@@ -35,9 +34,9 @@ function Home() {
             </button>
           </a>
           <a href="https://www.buymeacoffee.com/ajaykanniyappan" target="_blank" rel="noreferrer">
-            {/*<button type="button" className="Bmc-Button">*/}
-            {/*  <img className="Bmc-Logo" src={bmc} alt="Buy me a coffee" /> Buy me a coffee*/}
-            {/*</button>*/}
+            {/* <button type="button" className="Bmc-Button"> */}
+            {/*  <img className="Bmc-Logo" src={bmc} alt="Buy me a coffee" /> Buy me a coffee */}
+            {/* </button> */}
           </a>
         </div>
       </section>

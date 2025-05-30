@@ -29,24 +29,23 @@ const getFormattedTime = (date: Date) => {
 };
 interface FooterProps {
   onSetting: () => void;
-  currentPage:number;
-  totalPages:number;
+  currentPage: number;
+  totalPages: number;
   onNextPage: () => void;
   onPrevPage: () => void;
   onRestore: () => void;
 }
 
-const Footer: React.FC<FooterProps> = (
-  { onSetting,
-    currentPage,
-    totalPages,
-    onNextPage,
-    onPrevPage,
-    onRestore,
-  }) => {
+const Footer: React.FC<FooterProps> = ({
+  onSetting,
+  currentPage,
+  totalPages,
+  onNextPage,
+  onPrevPage,
+  onRestore,
+}) => {
   const [date, setDate] = useState(new Date());
   let clickCnt = 0;
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,7 +65,7 @@ const Footer: React.FC<FooterProps> = (
       onSetting();
       clickCnt = 0;
     }
-  }
+  };
 
   return (
     <footer className="footer">
@@ -74,41 +73,62 @@ const Footer: React.FC<FooterProps> = (
         {getFormattedDate(date)}
       </div>
 
-      <div className="footer__time">
-        {getFormattedTime(date)}
-      </div>
+      <div className="footer__time">{getFormattedTime(date)}</div>
 
       <div className="footer__pagination">
         <button type="button" className="footer__arrow" onClick={onPrevPage}>
           <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
-            <path d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M7 1 1.3 6.326a.91.91 0 0 0 0 1.348L7 13"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
-        <div className="footer__page">{currentPage+1} / {totalPages}</div>
+        <div className="footer__page">
+          {currentPage + 1} / {totalPages}
+        </div>
         <button type="button" className="footer__arrow" onClick={onNextPage}>
           <svg className="footer__arrow" viewBox="0 0 8 14" fill="none">
-            <path d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            <path
+              d="m1 13 5.7-5.326a.909.909 0 0 0 0-1.348L1 1"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </button>
       </div>
 
       <ul className="footer__menu">
-        <li><div className="footer__menu-item">{STRINGS.complete_all}</div></li>
-        <li><div className="footer__menu-item">{STRINGS.restore_recent}</div></li>
-        <li><div className="footer__menu-item" onClick={onRestore}>{STRINGS.restore_search}</div></li>
-        <li><div className="footer__menu-item" onClick={() => {
-          console.log('종료 버튼 클릭');
-          window.ipc.quitApp()
-        }}>{STRINGS.exit_app}</div></li>
+        <li>
+          <div className="footer__menu-item">{STRINGS.complete_all}</div>
+        </li>
+        <li>
+          <div className="footer__menu-item">{STRINGS.restore_recent}</div>
+        </li>
+        <li>
+          <div className="footer__menu-item" onClick={onRestore}>
+            {STRINGS.restore_search}
+          </div>
+        </li>
+        <li>
+          <div
+            className="footer__menu-item"
+            onClick={() => {
+              console.log('종료 버튼 클릭');
+              window.ipc.quitApp();
+            }}
+          >
+            {STRINGS.exit_app}
+          </div>
+        </li>
       </ul>
     </footer>
-
   );
-}
+};
 
 export default Footer;

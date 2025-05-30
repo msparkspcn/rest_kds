@@ -3,7 +3,7 @@ import { app, BrowserWindow, ipcMain, Menu, shell } from 'electron';
 import Store from 'electron-store';
 import { isDebug, getAssetsPath, getHtmlPath, getPreloadPath, installExtensions } from './utils';
 import './updater';
-import { db, createTables } from './db/db';
+import { createTables } from './db/db';
 import { registerCmpIpc } from './db/cmp';
 import { registerCornerIpc } from './db/corner';
 import { registerProductIpc } from './db/product';
@@ -13,9 +13,9 @@ function setupDatabase() {
   try {
     createTables();
   } catch (error) {
-    console.error("Error creating tables:", error);
+    console.error('Error creating tables:', error);
   } finally {
-    console.log("디비 생성 완료")
+    console.log('디비 생성 완료');
   }
 }
 
@@ -25,7 +25,7 @@ function createWindow() {
     width: 1500,
     height: 900,
     webPreferences: {
-      devTools: isDebug,
+      devTools: true,
       preload: getPreloadPath('preload.js'), // 👈 Don't USE PRELOAD.JS IF YOUR USING NODE IN RENDERER PROCESS
       nodeIntegration: true, // 렌더러 프로세스에서 Node.js 모듈을 사용할 수 있도록 함
       contextIsolation: true, // 👈 ENABLE THIS FOR NODE INTEGRATION IN RENDERER
@@ -38,10 +38,16 @@ function createWindow() {
   // autoUpdater.checkForUpdatesAndNotify();
 
   /* DEBUG DEVTOOLS */
-  if (isDebug) {
-    mainWindow.webContents.openDevTools(); // ELECTRON DEVTOOLS
-    installExtensions(); // REACT DEVTOOLS INSTALLER
-  }
+  // if (isDebug) {
+  // mainWindow.webContents.openDevTools(); // ELECTRON DEVTOOLS
+  // installExtensions(); // REACT DEVTOOLS INSTALLER
+  // }
+
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`❌ Failed to load: ${validatedURL} (${errorCode}) - ${errorDescription}`);
+  });
 
   /* URLs OPEN IN DEFAULT BROWSER */
   mainWindow.webContents.setWindowOpenHandler((data) => {
@@ -92,4 +98,3 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-

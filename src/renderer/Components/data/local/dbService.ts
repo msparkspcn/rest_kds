@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron';
 
 export const getCmpList = async () => {
-  return await ipcRenderer.invoke('db:getCmpList');
+  return ipcRenderer.invoke('db:getCmpList');
 };
 
 export const addCmp = async (cmp_cd: string, cmp_nm: string) => {

@@ -12,10 +12,8 @@ interface ConfigStore {
   getConfig: () => ConfigData | null;
 }
 
-export const useConfigStore = create<ConfigStore>(
-  (set, get) => ({
-    config: null,
-    setConfig: (config) => set({ config }),
-    getConfig: () => get().config
-  }));
-
+export const useConfigStore = create<ConfigStore>((set, get) => ({
+  config: null,
+  setConfig: (config) => set({ config }),
+  getConfig: () => get().config,
+}));

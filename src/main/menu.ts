@@ -13,7 +13,7 @@ const template: (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] = [
         },
       },
     ],
-  }
+  },
 ];
 
 const menu = Menu.buildFromTemplate(template);

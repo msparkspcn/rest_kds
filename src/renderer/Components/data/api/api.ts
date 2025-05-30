@@ -1,17 +1,17 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 // export const host = process.env.REACT_APP_API_URL;
-export const host = "https://s9rest.ngrok.io";
+export const host = 'https://s9rest.ngrok.io';
 // export const host = 'https://o2api.spc.co.kr';
 const api = axios.create({ baseURL: host });
 
 let authToken: string | null = null;
 api.interceptors.request.use((config) => {
-    if (authToken) {
-        // console.log("Using authToken:", authToken);
-        config.headers["Authorization"] = authToken;
-    }
-    return config;
+  if (authToken) {
+    // console.log("Using authToken:", authToken);
+    config.headers.Authorization = authToken;
+  }
+  return config;
 });
 
 export function getOrderDataList(params: any) {
@@ -57,8 +57,8 @@ export function deleteM(request: string, body: any) {
 }
 
 export function setAuthToken(token: string) {
-    console.log("Set Token:", token);
-    authToken = token;
+  console.log('Set Token:', token);
+  authToken = token;
 }
 
 export function login(params: any) {
@@ -86,7 +86,7 @@ export function getCornerList(params: any) {
   return post(request, params);
 }
 
-export function getProductList(params:any) {
+export function getProductList(params: any) {
   const request = `${host}/api/v1/did/item`;
   return post(request, params);
 }
@@ -98,7 +98,7 @@ export function updateOrderCallState(params: any) {
 
 export function updateSoldout(params: any) {
   const request = `${host}/api/v1/item/soldout`;
-  return post(request, params)
+  return post(request, params);
 }
 
 // export function getOrderDataList(params) {      //주문 조회(가칭)
@@ -110,9 +110,11 @@ export function updateSoldout(params: any) {
 //     const request = host + "/saleOpen/getSaleOpen";
 //     return post(request, params);
 // }
-export function getStoreSaleOpen(params:any) {
-  const request = 'https://o2api.spc.co.kr/api/v1/store/getStoreSaleOpen?' + new URLSearchParams(params).toString();
-  return post(request,params);
+export function getStoreSaleOpen(params: any) {
+  const request = `https://o2api.spc.co.kr/api/v1/store/getStoreSaleOpen?${new URLSearchParams(
+    params,
+  ).toString()}`;
+  return post(request, params);
 }
 //
 // export function getKdsMstSection(params) {      //kds 섹션 마스터 목록 조회

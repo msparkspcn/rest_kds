@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useUserStore } from '@Components/store/user';
 
-const WS_URL = "ws://10.120.44.88:8082/ws";
+const WS_URL = 'ws://10.120.44.88:8082/ws';
 
 export const useWebSocket = () => {
   const ws = useRef<WebSocket | null>(null);
@@ -13,12 +13,10 @@ export const useWebSocket = () => {
     ws.current = new WebSocket(WS_URL);
 
     ws.current.onopen = () => {
-      console.log('[WebSocket] connected userId:'+getUserId);
+      console.log(`[WebSocket] connected userId:${getUserId}`);
       setIsConnected(true);
 
-      ws.current?.send(JSON.stringify(
-        { type: 'subscribe', topic: 'item', userId:getUserId}
-      ));
+      ws.current?.send(JSON.stringify({ type: 'subscribe', topic: 'item', userId: getUserId }));
     };
 
     ws.current.onmessage = (event) => {
@@ -26,7 +24,7 @@ export const useWebSocket = () => {
         const data = JSON.parse(event.data);
         // 예: topic 기반 메시지 필터링
         if (data.type === 'SOLDOUT') {
-          console.log("SOLDOUT data:"+JSON.stringify(data))
+          console.log(`SOLDOUT data:${JSON.stringify(data)}`);
           setMessages(data.body);
         }
       } catch (err) {

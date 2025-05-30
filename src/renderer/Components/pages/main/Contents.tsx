@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import OrderContainer from './order/OrderContainer';
 import './Contents.scss';
+
 interface ContentsProps {
   orderList: string | any[];
   onRefresh: () => void;

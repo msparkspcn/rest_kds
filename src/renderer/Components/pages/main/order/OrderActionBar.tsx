@@ -1,51 +1,54 @@
-import React from "react";
-import {STRINGS} from "../../../../constants/strings";
+import React from 'react';
+import { STRINGS } from '../../../../constants/strings';
 import './OrderActionBar.scss';
 
 interface OrderActionBarProps {
-    orderCnt: number;
-    selectedOrderNo: string | null;
-    onOpenCallOrder: () => void;
-    onCallOrder: () => void;
-    onCompleteOrder: () => void;
-    onSoldOut: () => void;
+  orderCnt: number;
+  selectedOrderNo: string | null;
+  onOpenCallOrder: () => void;
+  onCallOrder: () => void;
+  onCompleteOrder: () => void;
+  onSoldOut: () => void;
 }
 
-const OrderActionBar: React.FC<OrderActionBarProps> =
-  ({ orderCnt,
-     selectedOrderNo,
-     onOpenCallOrder,
-     onCallOrder,
-     onCompleteOrder,
-     onSoldOut,
-  }) => {
+const OrderActionBar: React.FC<OrderActionBarProps> = ({
+  orderCnt,
+  selectedOrderNo,
+  onOpenCallOrder,
+  onCallOrder,
+  onCompleteOrder,
+  onSoldOut,
+}) => {
+  return (
+    <div className="order-action-bar-root">
+      <button type="button" className="btn btn-blue" onClick={onOpenCallOrder}>
+        임의호출
+      </button>
+      <button type="button" className="btn btn-orange" onClick={onSoldOut}>
+        품절
+      </button>
+      <div className="count-wrap">
+        <div className="label">{STRINGS.selected_order_no}</div>
+        <button type="button" className="selected-btn">
+          {selectedOrderNo || ''}
+        </button>
+      </div>
 
-    return (
-        <div className="order-action-bar-root">
-          <button type="button" className="btn btn-blue" onClick={onOpenCallOrder}>
-            임의호출
-          </button>
-          <button type="button" className="btn btn-orange" onClick={onSoldOut}>
-            품절
-          </button>
-          <div className="count-wrap">
-            <div className="label">{STRINGS.selected_order_no}</div>
-            <button type="button" className="selected-btn">{selectedOrderNo || ''}</button>
-          </div>
+      <button type="button" className="btn btn-blue" onClick={onCallOrder}>
+        Call(호출)
+      </button>
+      <button type="button" className="btn btn-orange" onClick={onCompleteOrder}>
+        완료
+      </button>
 
-          <button type="button" className="btn btn-blue" onClick={onCallOrder}>
-            Call(호출)
-          </button>
-          <button type="button" className="btn btn-orange" onClick={onCompleteOrder}>
-            완료
-          </button>
-
-          <div className="count-wrap">
-            <div className="label">{STRINGS.total_order_cnt}</div>
-            <button type="button" className="count-btn">{orderCnt}</button>
-          </div>
-        </div>
-    )
-}
+      <div className="count-wrap">
+        <div className="label">{STRINGS.total_order_cnt}</div>
+        <button type="button" className="count-btn">
+          {orderCnt}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default OrderActionBar;

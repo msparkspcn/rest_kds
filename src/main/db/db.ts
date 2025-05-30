@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3';
 import path from 'path';
-import fs from 'fs';
 
 // DB 파일 생성 경로 (Electron 앱 로컬 디렉터리 기준)
 const dbPath = path.join(__dirname, 'app.db');
@@ -66,14 +65,13 @@ function createTables() {
       sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       dt TEXT NOT NULL
-    );`
+    );`,
   ];
 
-  for (const query of tables) {
+  tables.forEach((query) => {
     db.prepare(query).run();
     console.log('Table created or already exists.');
-  }
-
+  });
 
   console.log('✅ All tables created.');
   console.log('Database will be created at:', dbPath);
@@ -81,4 +79,4 @@ function createTables() {
 
 createTables();
 
-export {db, createTables};
+export { db, createTables };

@@ -32,8 +32,7 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
       // console.log("timeDiff:"+timeDiff)
       if (timeDiff > -5) {
         setBackColor('bg-green');
-      }
-      else if (timeDiff <= -5 && timeDiff > -10) {
+      } else if (timeDiff <= -5 && timeDiff > -10) {
         setBackColor('bg-yellow');
       } else if (timeDiff <= -10) {
         // console.log("here")
@@ -46,14 +45,8 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
   });
 
   return (
-    <div
-      className={`order-container ${backColor}`}
-      onClick={() => onSelectOrder(item.orderNo)}
-    >
-      <OrderHeader
-        orderNo={item.orderNo}
-        instTime={displayInstTime}
-        diff={diff} />
+    <div className={`order-container ${backColor}`} onClick={() => onSelectOrder(item.orderNo)}>
+      <OrderHeader orderNo={item.orderNo} instTime={displayInstTime} diff={diff} />
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
           <RenderItem key={index} item={orderItem} index={index} />
@@ -69,7 +62,7 @@ interface OrderHeaderProps {
   diff: number;
 }
 /* hd 가져오고 orderNo, updTime, 경과시간 처리.(경과시간 무엇을 기준으로 하는지 확인 필요) */
-function OrderHeader({ orderNo, instTime, diff}: OrderHeaderProps): JSX.Element {
+function OrderHeader({ orderNo, instTime, diff }: OrderHeaderProps): JSX.Element {
   return (
     <div className="order-header">
       <div className="header-cell order-no">{orderNo}</div>

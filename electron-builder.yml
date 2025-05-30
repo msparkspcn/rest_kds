@@ -7,7 +7,7 @@ artifactName: '${productName}-${version}.${ext}'
 asar: true
 
 files:
-  - 'dist/'
+  - '**/*'
   - 'package.json'
 
 extraResources:
@@ -16,7 +16,7 @@ extraResources:
 directories:
   app: 'app'
   buildResources: 'assets'
-  output: 'release/build'
+  output: 'dist'
 
 # Windows Configuration
 win:

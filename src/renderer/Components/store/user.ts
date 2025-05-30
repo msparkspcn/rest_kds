@@ -1,37 +1,37 @@
-import {create} from "zustand";
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface UserData {
-    cmpCd: string;
-    cmpNm: string | null;
-    salesOrgCd: string;
-    salesOrgNm: string | null;
-    storCd: string | null;
-    storNm: string | null;
-    cornerCd: string | null;
-    cornerNm: string | null;
-    userId: string;
-    userRoleType: string;
-    langSettng: string;
-    userNm: string;
-    empNo: string | null;
-    useYn: string;
-    regDate: string;
-    regUserId: string | null;
-    updDate: string;
-    updUserId: string | null;
-    apiKey: string;
-    apiKeyExpireDate: string | null;
+  cmpCd: string;
+  cmpNm: string | null;
+  salesOrgCd: string;
+  salesOrgNm: string | null;
+  storCd: string | null;
+  storNm: string | null;
+  cornerCd: string | null;
+  cornerNm: string | null;
+  userId: string;
+  userRoleType: string;
+  langSettng: string;
+  userNm: string;
+  empNo: string | null;
+  useYn: string;
+  regDate: string;
+  regUserId: string | null;
+  updDate: string;
+  updUserId: string | null;
+  apiKey: string;
+  apiKeyExpireDate: string | null;
 }
 
 interface UserStore {
-    user: UserData | null;
-    userId: string;
-    password: string;
-    setUser: (user: UserData) => void;
-    getUser: () => UserData | null;
-    setUserId: (userId: string) => void;
-    getUserId: () => string;
+  user: UserData | null;
+  userId: string;
+  password: string;
+  setUser: (user: UserData) => void;
+  getUser: () => UserData | null;
+  setUserId: (userId: string) => void;
+  getUserId: () => string;
   setPassword: (password: string) => void;
   getPassword: () => string;
 }
@@ -56,6 +56,6 @@ export const useUserStore = create<UserStore>()(
         userId: state.userId,
         password: state.password,
       }),
-    }
-  )
+    },
+  ),
 );
