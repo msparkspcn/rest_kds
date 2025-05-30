@@ -131,58 +131,61 @@ const Setting: React.FC = () => {
       });
   };
 
-  const getCornerList = async (cmpCd: string, salesOrgCd: string) => {
-    // setLoading(true)
-    console.log('getCornerList:');
-    const request = {
-      cmpCd,
-      salesOrgCd,
-    };
-    try {
-      const result = await api.getCornerList(request);
-      const { responseCode, responseMessage, responseBody } = result.data;
-      if (responseCode === '200') {
-        console.log('코너 조회 성공');
-        if (responseBody != null) {
-          for (const corner of responseBody) {
-            const { cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn } = corner;
-            if (platform === 'electron') {
-              console.log(`cmpCd:${cmpCd}`);
-              await window.ipc.corner.add(cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn);
-            } else {
-              console.log('웹입니다');
+    const getCornerList = async (cmpCd: string, salesOrgCd: string) => {
+        // setLoading(true)
+        console.log("getCornerList:")
+        const request = {
+            cmpCd : cmpCd,
+            salesOrgCd : salesOrgCd
+        }
+        try {
+          const result = await api.getCornerList(request);
+          const {responseCode, responseMessage, responseBody} = result.data;
+          if (responseCode === "200") {
+            console.log("코너 조회 성공")
+            if(responseBody!=null) {
+              for(const corner of responseBody) {
+                const { cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn } = corner;
+                if(platform==='electron') {
+                  console.log("cmpCd:"+cmpCd);
+                  await window.ipc.corner.add(cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn);
+                } else {
+                  console.log("웹입니다")
+                }
+              }
+              setCornerList(responseBody);
+              setCornerNmList(
+                responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
+                  infoCd: cornerCd,
+                  infoNm: cornerNm
+                }))
+              );
+              setSelectedStorCd(responseBody[0].storCd)
+              setSelectedCornerCd(responseBody[0].cornerCd)
+              getProductList(cmpCd, salesOrgCd, responseBody[0].storCd)
             }
           }
-          setCornerList(responseBody);
-          setCornerNmList(
-            responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
-              infoCd: cornerCd,
-              infoNm: cornerNm,
-            })),
-          );
-          setSelectedStorCd(responseBody[0].storCd);
-          setSelectedCornerCd(responseBody[0].cornerCd);
-          getProductList(cmpCd, salesOrgCd, responseBody[0].storCd);
+          else {
+            window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+          }
         }
-      } else {
-        window.alert(`ErrorCode :: ${responseCode}\n${responseMessage}`);
-      }
-    } catch (error) {
-      window.alert(`서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:${error}`);
-    } finally {
-      const cornerList = await window.ipc.corner.getList('1');
-      console.log('코너 목록:', cornerList); // 👈 여기서 로그
-      setLoading(false);
+        catch(error) {
+          window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+        }
+        finally {
+          const cornerList = await window.ipc.corner.getList("1");
+          console.log('코너 목록:', cornerList);
+            setLoading(false)
+        }
     }
-  };
 
   const getProductList = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
     console.log(`상품 조회:${cmpCd}, ${salesOrgCd}, ${storCd}`);
     const params = {
-      cmpCd,
-      salesOrgCd,
-      storCd,
-      cornerCd: 'CIHA',
+      cmpCd: cmpCd,
+      salesOrgCd: salesOrgCd,
+      storCd: storCd,
+      cornerCd: ''
     };
     try {
       const result = await api.getProductList(params);
@@ -190,36 +193,33 @@ const Setting: React.FC = () => {
 
       if (responseCode === '200') {
         for (const product of responseBody) {
-          if (getPlatform() === 'electron') {
-            const { cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn } =
-              product;
-            console.log(`product:${JSON.stringify(product)}`);
-            await window.ipc.product.add(
-              cmpCd,
-              salesOrgCd,
-              storCd,
-              cornerCd,
-              itemCd,
-              itemNm,
-              price,
-              soldoutYn,
-              useYn,
-            );
+          if(getPlatform()==='electron') {
+            const {cmpCd, salesOrgCd, storCd, cornerCd,
+              itemCd, itemNm, price, soldoutYn, useYn} = product;
+            console.log("product:"+JSON.stringify(product))
+            await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
+          }
+          else {
+            console.log("platform:"+getPlatform())
           }
         }
 
         console.log(`### count:${responseBody.length}`);
         // setSaleDt(responseBody.saleDt);
         // getOrderData(responseBody.saleDt);
-      } else {
-        window.alert(`ErrorCode :: ${responseCode}\n${responseMessage}`);
       }
-    } catch (error) {
-      window.alert(`서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:${error}`);
-    } finally {
-      console.log('상품 insert 완료'); // 👈 여기서 로그
-      const productList = await window.ipc.product.getList(cmpCd, salesOrgCd, storCd, 'CIHA');
-      console.log('상품 목록', JSON.stringify(productList));
+      else {
+        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+      }
+    }
+    catch(error) {
+      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
+    finally {
+      console.log('상품 insert 완료'+storCd);
+      const productList = await window.ipc.product.getList(
+        cmpCd, salesOrgCd, storCd, '')
+      console.log("상품 목록",JSON.stringify(productList))
     }
   };
 
@@ -293,76 +293,64 @@ const Setting: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <></>;
-  }
-  return (
-    <div className="container">
-      <div className="button-container">
-        <button onClick={updateVersion}>
-          <span>업데이트</span>
-        </button>
-        <button onClick={loadCmpList}>
-          <span>마스터수신</span>
-        </button>
-      </div>
-      <div className="info-section">
-        <div className="info-left">
-          <span className="title">기초정보</span>
-          <div className="field">
-            <span className="info-title">프로그램 버전</span>
-            <span className="value">{packageJson.version}</span>
-          </div>
+  if(loading) {
+        return <></>
+    }
+    return (
+      <div className="container">
+        <div className="button-container">
+          <button onClick={updateVersion}>
+            <span>업데이트</span>
+          </button>
+          <button onClick={loadCmpList}>
+            <span>마스터수신</span>
+          </button>
+        </div>
+        <div className="info-section">
+          <div className="info-left">
+            <span className="title">기초정보</span>
+            <div className="field">
+              <span className="info-title">프로그램 버전</span>
+              <span className="value">{packageJson.version}</span>
+            </div>
 
-          <div className="field">
-            <span className="info-title">휴게소 운영업체</span>
-            <DropdownMenu
-              infoList={cmpNmList}
-              selectedInfo={cmpNmList.find((item) => item.infoCd === selectedCmpCd) ?? cmpNmList[0]}
-              onSelectInfo={changeSelectedCmpCd}
-            />
-          </div>
+            <div className="field">
+              <span className="info-title">휴게소 운영업체</span>
+              <DropdownMenu
+                infoList={cmpNmList}
+                selectedInfo={cmpNmList.find(item => item.infoCd === selectedCmpCd) ?? cmpNmList[0]}
+                onSelectInfo={changeSelectedCmpCd}/>
+            </div>
 
-          <div className="field">
-            <span className="info-title">휴게소</span>
-            <DropdownMenu
-              infoList={salesOrgNmList}
-              selectedInfo={
-                salesOrgNmList.find((item) => item.infoCd === selectedSalesOrgCd) ??
-                salesOrgNmList[0]
-              }
-              onSelectInfo={changeSelectedSalesOrgCd}
-            />
-          </div>
+            <div className="field">
+              <span className="info-title">휴게소</span>
+              <DropdownMenu
+                infoList={salesOrgNmList}
+                selectedInfo={salesOrgNmList.find(item => item.infoCd === selectedSalesOrgCd) ?? salesOrgNmList[0]}
+                onSelectInfo={changeSelectedSalesOrgCd} />
+            </div>
 
-          <div className="field">
-            <span className="info-title">매장</span>
-            <DropdownMenu
-              infoList={cornerNmList}
-              selectedInfo={
-                cornerNmList.find((item) => item.infoCd === selectedCornerCd) ?? cornerNmList[0]
-              }
-              onSelectInfo={changeSelectedCornerCd}
-            />
+            <div className="field">
+              <span className="info-title">매장</span>
+              <DropdownMenu
+                infoList={cornerNmList}
+                selectedInfo={cornerNmList.find(item => item.infoCd === selectedCornerCd) ?? cornerNmList[0]}
+                onSelectInfo={changeSelectedCornerCd} />
+            </div>
           </div>
         </div>
+        <div className="action-buttons">
+          <button className="cancel" onClick={onCancel}>로그아웃</button>
+          <button className="save" onClick={onSave}>저장</button>
+        </div>
+        {confirmOpen && (
+          <ConfirmDialog
+            confirmOpen={confirmOpen}
+            onClose={() => setConfirmOpen(false)}
+            {...confirmProps}
+          />
+        )}
       </div>
-      <div className="action-buttons">
-        <button className="cancel" onClick={onCancel}>
-          로그아웃
-        </button>
-        <button className="save" onClick={onSave}>
-          저장
-        </button>
-      </div>
-      {confirmOpen && (
-        <ConfirmDialog
-          confirmOpen={confirmOpen}
-          onClose={() => setConfirmOpen(false)}
-          {...confirmProps}
-        />
-      )}
-    </div>
   );
 };
 

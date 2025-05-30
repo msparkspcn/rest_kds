@@ -45,8 +45,8 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       const user = getUser();
       // console.log("user:"+JSON.stringify(user))
-      console.log(`1user:${user?.cmpCd}, salesOrgCd:${user?.salesOrgCd}, storCd:${user?.storCd}`);
-      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd);
+      console.log("1user:"+user?.cmpCd+", salesOrgCd:"+user?.salesOrgCd+", storCd:"+user?.storCd)
+      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd).then(r => {});
     }
   }, [isOpen]);
 
@@ -58,8 +58,8 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const getLocalCornerList = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
-    console.log(`getLocalCornerList cmpCd:${cmpCd}, salesOrgCd:${salesOrgCd}, storCd:${storCd}`);
-    const cornerList = await window.ipc.corner.getList2(cmpCd, salesOrgCd, storCd, '1');
+    console.log("getLocalCornerList cmpCd:"+cmpCd+", salesOrgCd:"+salesOrgCd+", storCd:"+storCd)
+    const cornerList = await window.ipc.corner.getList2(cmpCd, salesOrgCd, storCd,"1")
     console.log('코너 목록:', cornerList);
     setCornerList(cornerList);
 
@@ -78,9 +78,8 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
       corner.cornerCd,
     );
     console.log('상품 목록:', productList);
-    setProductList(productList);
-    console.log('상품 목록:', productList);
-  };
+    setProductList(productList)
+  }
 
   const handleCheckboxChange = (index: number) => {
     setProductList((prevList) => {
@@ -108,13 +107,10 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
         .then((result) => {
           const { responseCode, responseMessage, responseBody } = result.data;
           if (responseCode === '200') {
-            console.log(`품절여부 변경 성공 responseBody:${JSON.stringify(responseBody)}`);
-            getLocalCornerList(
-              selectedCorner.cmpCd,
-              selectedCorner.salesOrgCd,
-              selectedCorner.storCd,
-            );
-          } else {
+            console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
+            getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
+          }
+          else {
             window.alert(responseMessage);
           }
         })
