@@ -164,6 +164,35 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
       })
   }
 
+  const toggleAllCheckboxes = () => {
+    setProductList((prevList) => {
+      const allChecked = prevList.every((item) => item.soldoutYn === "1");
+      const newValue = allChecked ? "0" : "1";
+
+      const updatedList = prevList.map((item) => ({
+        ...item,
+        soldoutYn: newValue,
+      }));
+
+      setChangedProducts((prevChanges) => {
+        const newChanges = { ...prevChanges };
+
+        updatedList.forEach((item, index) => {
+          const originalItem = prevList[index]; // 원래 값
+          if (originalItem.soldoutYn !== item.soldoutYn) {
+            newChanges[item.itemCd] = item;
+          } else {
+            delete newChanges[item.itemCd];
+          }
+        });
+
+        return newChanges;
+      });
+
+      return updatedList;
+    });
+  };
+
   return (
     <div className="soldout-modal">
       <div className="modal-content">
@@ -217,7 +246,7 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
                 <th>상품코드</th>
                 <th>상품명</th>
                 <th>판매가</th>
-                <th>품절여부</th>
+                <th onClick={toggleAllCheckboxes} >품절여부</th>
               </tr>
             </thead>
             <tbody>

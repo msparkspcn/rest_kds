@@ -11,6 +11,7 @@ import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
 import { useWebSocket } from '@Components/hooks/useWebSocket';
+import Alert from '@Components/common/Alert';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -35,6 +36,7 @@ function Main(): JSX.Element {
   let systemType: number = 0;
 
   const { isConnected, messages } = useWebSocket();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (Array.isArray(messages) && messages.length > 0) {
@@ -49,7 +51,7 @@ function Main(): JSX.Element {
         })
         .catch((err) => {
           console.error("품절 처리 중 오류 발생:", err);
-          window.alert("일부 품절 처리에 실패했습니다.");
+          setErrorMessage("품절 처리에 실패했습니다.\n다시 시도해주세요.")
         });
     } else {
       console.log('빈 객체입니다');
@@ -519,6 +521,7 @@ function Main(): JSX.Element {
           {...confirmProps}
         />
       )}
+
       <History
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
@@ -528,6 +531,13 @@ function Main(): JSX.Element {
         <SoldOut
           isOpen={isSoldOutOpen}
           onClose={() => setSoldOutOpen(false)}
+        />
+      )}
+      {errorMessage && (
+        <Alert
+          title="알림"
+          message={errorMessage}
+          onClose={()=>{setErrorMessage(null)}}
         />
       )}
 

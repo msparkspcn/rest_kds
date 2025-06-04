@@ -65,11 +65,12 @@ const Login: React.FC = () => {
           }
           navigate('/setting');
         } else {
+          console.log("로그인 실패"+responseCode)
           setDialogMessage(responseMessage)
         }
       })
       .catch((ex) => {
-        window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')');
+        setDialogMessage('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')')
       })
       .finally(() => {
         setLoading(false);

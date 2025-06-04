@@ -195,9 +195,9 @@ const Setting: React.FC = () => {
         for (const product of responseBody) {
           if(getPlatform()==='electron') {
             const {cmpCd, salesOrgCd, storCd, cornerCd,
-              itemCd, itemNm, price, soldoutYn, useYn} = product;
+              itemCd, itemNm, price, soldoutYn, useYn, sortOrder} = product;
             console.log("product:"+JSON.stringify(product))
-            await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn)
+            await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn, sortOrder)
           }
           else {
             console.log("platform:"+getPlatform())
