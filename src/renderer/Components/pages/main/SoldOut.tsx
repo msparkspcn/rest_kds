@@ -4,6 +4,7 @@ import * as api from "@Components/data/api/api";
 import './SoldOut.scss';
 import numeral from "numeral";
 import { useUserStore } from '@Components/store/user';
+import ConfirmDialog from '@Components/common/ConfirmDialog';
 interface SoldOutProps {
   isOpen: boolean;
   onClose: () => void;
@@ -42,6 +43,14 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
     availableCount:0,
     soldoutCount:0,
   });
+  const [changedProducts, setChangedProducts] = useState<Record<string, Product>>({});
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmProps, setConfirmProps] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
   useEffect(() => {
     if (isOpen) {
       const user = getUser();
@@ -89,36 +98,71 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
           : item
       );
       const targetProduct = updatedList[index]
-      const request = {
-        cmpCd: selectedCorner.cmpCd,
-        salesOrgCd: selectedCorner.salesOrgCd,
-        storCd: selectedCorner.storCd,
-        cornerCd: selectedCorner.cornerCd,
-        itemCd: targetProduct.itemCd.slice(0, 7),
-        itemSeq: targetProduct.itemCd.slice(7),
-        soldoutYn: targetProduct.soldoutYn,
-
-      }
-      console.log("request:" + JSON.stringify(request))
-      api
-        .updateSoldout(request)
-        .then((result) => {
-          const { responseCode, responseMessage, responseBody } = result.data;
-          if (responseCode === '200') {
-            console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
-            getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
-          }
-          else {
-            window.alert(responseMessage);
-          }
-        })
-        .catch((ex) => {
-          window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')');
-        })
+      setChangedProducts((prev) => {
+        const newChanges = { ...prev };
+        if (
+          newChanges[targetProduct.itemCd] &&
+          newChanges[targetProduct.itemCd].soldoutYn === targetProduct.soldoutYn
+        ) {
+          // 변경 후 원래 상태로 돌아갔다면 제거
+          delete newChanges[targetProduct.itemCd];
+        } else {
+          newChanges[targetProduct.itemCd] = targetProduct;
+        }
+        return newChanges;
+      });
 
       return updatedList;
     });
   };
+  const openDialog = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmProps({ title, message, onConfirm });
+    setConfirmOpen(true);
+  };
+  const handleSave = () => {
+
+    const request = Object.values(changedProducts).map((product) => ({
+      cmpCd: selectedCorner.cmpCd,
+      salesOrgCd: selectedCorner.salesOrgCd,
+      storCd: selectedCorner.storCd,
+      cornerCd: selectedCorner.cornerCd,
+      itemCd: product.itemCd.slice(0, 7),
+      itemSeq: product.itemCd.slice(7),
+      soldoutYn: product.soldoutYn,
+    }));
+
+    if (request.length === 0) {
+      openDialog(
+        '확인',
+        '변경된 품절 정보가 없습니다.',
+        () => {
+          setConfirmOpen(false)
+        }
+      )
+      return;
+    }
+
+    console.log("저장할 변경사항:", request);
+
+
+    console.log("request:" + JSON.stringify(request))
+    api
+      .updateSoldout(request)
+      .then((result) => {
+        const { responseCode, responseMessage, responseBody } = result.data;
+        if (responseCode === '200') {
+          console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
+          setChangedProducts({});
+          getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
+        }
+        else {
+          window.alert(responseMessage);
+        }
+      })
+      .catch((ex) => {
+        window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')');
+      })
+  }
 
   return (
     <div className="soldout-modal">
@@ -129,17 +173,17 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
         </div>
         <div className="modal-desc-bar">
           <div className="modal-desc">주문에 대한 품절 관리 화면</div>
-          <button type="button" className="btn btn-orange" onClick={onClose}>저장</button>
+          <button type="button" className="btn" onClick={handleSave}>저장</button>
         </div>
         <div className="table-wrapper">
           <table className="data-table summary">
             <thead>
-            <tr>
-              <th>No</th>
-              <th>매장명</th>
-              <th>판매</th>
-              <th>품절</th>
-            </tr>
+              <tr>
+                <th>No</th>
+                <th>매장명</th>
+                <th>판매</th>
+                <th>품절</th>
+              </tr>
             </thead>
             <tbody>
             {cornerList.map((item, index) => {
@@ -147,7 +191,10 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
               return (
               <tr
                 key={item.cornerCd}
-                className={selectedCorner?.cornerCd === item.cornerCd ? 'selected' : ''}
+                className={`
+                ${selectedCorner?.cornerCd === item.cornerCd ? 'selected' : ''}
+                ${index % 2 === 0 ? 'even-row' : 'odd-row'}
+                `}
                 onClick={() => {
                   console.log(index+"번 row 선택, :"+JSON.stringify(cornerList[index]))
                   setSelectedCorner(cornerList[index])
@@ -175,7 +222,9 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
             </thead>
             <tbody>
             {productList.map((item, index) => (
-              <tr key={item.itemCd}>
+              <tr key={item.itemCd}
+                  className={`${index % 2 === 0 ? 'even-row' : 'odd-row'}`}
+              >
                 <td>{index+1}</td>
                 <td>{item.itemCd}</td>
                 <td>{item.itemNm}</td>
@@ -196,6 +245,13 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
           </table>
         </div>
       </div>
+      {confirmOpen && (
+        <ConfirmDialog
+          confirmOpen={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          {...confirmProps}
+        />
+      )}
     </div>
   )
 }

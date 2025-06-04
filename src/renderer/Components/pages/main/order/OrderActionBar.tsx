@@ -22,10 +22,10 @@ const OrderActionBar: React.FC<OrderActionBarProps> =
 
     return (
         <div className="order-action-bar-root">
-          <button type="button" className="btn btn-blue" onClick={onOpenCallOrder}>
+          <button type="button" className="btn" onClick={onOpenCallOrder}>
             임의호출
           </button>
-          <button type="button" className="btn btn-orange" onClick={onSoldOut}>
+          <button type="button" className="btn" onClick={onSoldOut}>
             품절
           </button>
           <div className="count-wrap">
@@ -33,10 +33,10 @@ const OrderActionBar: React.FC<OrderActionBarProps> =
             <button type="button" className="selected-btn">{selectedOrderNo || ''}</button>
           </div>
 
-          <button type="button" className="btn btn-blue" onClick={onCallOrder}>
+          <button type="button" className="btn" onClick={onCallOrder}>
             Call(호출)
           </button>
-          <button type="button" className="btn btn-orange" onClick={onCompleteOrder}>
+          <button type="button" className="btn" onClick={onCompleteOrder}>
             완료
           </button>
 

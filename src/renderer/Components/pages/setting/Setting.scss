@@ -1,4 +1,4 @@
-/* 전체 화면을 커버하는 컨테이너 */
+@import "./src/renderer/styles/colors";
 .container {
   display: flex;
   height: 100vh;
@@ -20,7 +20,17 @@
   button {
     padding: 1% 15px;
     border-radius: 8px;
-    background-color: #f56565; /* red-500 */
+    &.update {
+      background-color: white;
+      border: 0.125rem solid $primary;
+      color:$primary;
+      font-size: 1rem;
+    }
+    &.master {
+      background-color: $primary;
+      color:white;
+      font-size: 1rem;
+    }
 
     span {
       color: white;
@@ -158,11 +168,12 @@
     color: white;
 
     &.cancel {
-      background-color: #2d3748;
+      background-color: #E1E1E1;
+      color:#1C1C1C;
     }
 
     &.save {
-      background-color: #3b82f6;
+      background-color: $primary;
     }
   }
 }

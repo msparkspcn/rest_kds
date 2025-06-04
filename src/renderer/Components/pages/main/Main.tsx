@@ -37,11 +37,20 @@ function Main(): JSX.Element {
   const { isConnected, messages } = useWebSocket();
 
   useEffect(() => {
-    if (Object.keys(messages).length > 0) {
+    if (Array.isArray(messages) && messages.length > 0) {
       console.log('1.품절 처리', messages);
-      window.ipc.product.updateSoldout(messages.itemCd, messages.soldoutYn).then(() => {
-        console.log("완료")
-      })
+      Promise.all(
+        messages.map((msg) =>
+          window.ipc.product.updateSoldout(msg.itemCd, msg.soldoutYn)
+        )
+      )
+        .then(() => {
+          console.log("모든 품절 처리 완료");
+        })
+        .catch((err) => {
+          console.error("품절 처리 중 오류 발생:", err);
+          window.alert("일부 품절 처리에 실패했습니다.");
+        });
     } else {
       console.log('빈 객체입니다');
     }

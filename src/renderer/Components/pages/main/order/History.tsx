@@ -114,7 +114,9 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
             {currentItems.map((item,index) => (
               <tr
                 key={item.orderNo}
-                className={selectedOrder.orderNo === item.orderNo ? 'selected':''}
+                className={`${selectedOrder.orderNo === item.orderNo ? 'selected':''}
+                ${index % 2 === 0 ? 'even-row' : 'odd-row'}
+                `}
                 onClick={() => {
                   setSelectedOrder(data[index])
                 }}

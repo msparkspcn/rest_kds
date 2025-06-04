@@ -297,12 +297,8 @@ const Setting: React.FC = () => {
     return (
       <div className="container">
         <div className="button-container">
-          <button onClick={updateVersion}>
-            <span>업데이트</span>
-          </button>
-          <button onClick={loadCmpList}>
-            <span>마스터수신</span>
-          </button>
+          <button className="update" onClick={updateVersion}>업데이트</button>
+          <button className="master" onClick={loadCmpList}>마스터수신</button>
         </div>
         <div className="info-section">
           <div className="info-left">
