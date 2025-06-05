@@ -11,7 +11,7 @@
   .modal-content {
     background: white;
     border-radius: 8px;
-    width: 80%;
+    width: 85%;
     height: 80vh;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
@@ -133,7 +133,7 @@
         background-color: #f1f1f1;
       }
       &.summary {
-        width: 40%;
+        width: 39%;
         th:nth-child(1),
         td:nth-child(1) {
           text-align: center;
@@ -161,7 +161,7 @@
       }
       &.detail {
         margin-left: auto;
-        width: 57%;
+        width: 61%;
         th:nth-child(1),
         td:nth-child(1) {
           text-align: center;

@@ -24,7 +24,7 @@ contextBridge.exposeInMainWorld('ipc', {
   quitApp: () => {
     ipcRenderer.send('app:quit')
   },
-
+  log: (message: any) => ipcRenderer.send('log-to-file', message),
   cmp: {
     getList: () => ipcRenderer.invoke('db:getCmpList'),
     add: (cmp_cd: string, cmp_nm: string) =>

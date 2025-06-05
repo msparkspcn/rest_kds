@@ -7,6 +7,8 @@ import { useUserStore } from '../../store/user';
 import { setAuthToken } from '../../data/api/api';
 import './Login.scss';
 import Alert from '@Components/common/Alert';
+import { log } from '@Components/utils/logUtil';
+
 const Login: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -23,7 +25,7 @@ const Login: React.FC = () => {
   const setStorePassword = useUserStore((state) => state.setPassword);
 
   useEffect(() => {
-    console.log("Login getUserId:"+getUserId)
+    log("로그인 화면 진입")
     if(getUserId && getStorePassword) {
       setUserId(getUserId);
       setPassword(getStorePassword);
@@ -65,7 +67,7 @@ const Login: React.FC = () => {
           }
           navigate('/setting');
         } else {
-          console.log("로그인 실패"+responseCode)
+          log("로그인 실패. 실패코드:"+responseCode)
           setDialogMessage(responseMessage)
         }
       })

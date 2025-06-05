@@ -27,23 +27,14 @@ type Corner = {
   availableCount: number;
   soldoutCount: number;
 }
-//좌측 코너별 판매, 품절 상품
-//우측 코너별 상품 목록
+
 const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
   const [cornerList, setCornerList] = useState<Corner[]>([]);
   const [productList, setProductList] = useState<Product[]>([]);
   const getUser = useUserStore((state) => state.getUser);
-  const [selectedCorner, setSelectedCorner] = useState<Corner>({
-    cmpCd: '',
-    salesOrgCd: '',
-    storCd: '',
-    cornerCd: '',
-    cornerNm:'',
-    useYn:'',
-    availableCount:0,
-    soldoutCount:0,
-  });
+  const [selectedCorner, setSelectedCorner] = useState<Corner | undefined>(undefined);
   const [changedProducts, setChangedProducts] = useState<Record<string, Product>>({});
+  const [isLoading, setIsLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmProps, setConfirmProps] = useState({
     title: '',
@@ -52,17 +43,22 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
   });
 
   useEffect(() => {
-    if (isOpen) {
-      const user = getUser();
-      // console.log("user:"+JSON.stringify(user))
+    if(!isOpen) return;
+
+    const user = getUser();
+    if(user) {
       console.log("1user:"+user?.cmpCd+", salesOrgCd:"+user?.salesOrgCd+", storCd:"+user?.storCd)
-      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd).then(r => {});
+      getLocalCornerList(user?.cmpCd, user?.salesOrgCd, user?.storCd).then(() =>{console.log("코너 조회 완료!");});
     }
   }, [isOpen]);
 
   useEffect(() => {
-    console.log("Here")
-    getProductList(selectedCorner);
+    console.log("Here selectedCorner:"+JSON.stringify(selectedCorner))
+    if(selectedCorner) {
+      getProductList(selectedCorner).then(() => {
+        console.log("상품 조회 완료!");
+      });
+    }
   },[selectedCorner])
 
   if (!isOpen) return null;

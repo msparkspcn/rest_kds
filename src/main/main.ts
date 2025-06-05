@@ -7,6 +7,8 @@ import { db, createTables } from './db/db';
 import { registerCmpIpc } from './db/cmp';
 import { registerCornerIpc } from './db/corner';
 import { registerProductIpc } from './db/product';
+import path from 'path';
+const fs = require('fs');
 
 function setupDatabase() {
   // 필요한 경우 테이블 생성 작업을 수행
@@ -72,6 +74,24 @@ ipcMain.on('get', (event, val) => {
 });
 
 ipcMain.on('app:quit', () => app.quit());
+
+ipcMain.on('log-to-file', (event, log) => {
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10).replace(/-/g, ''); // '2025-06-05' → '20250605'
+  const logFileName = `${dateStr}.log`;
+  const logFilePath = path.join(__dirname, logFileName);
+
+  const timeStampedLog = `[${new Date().toLocaleString('ko-KR', {
+    timeZone: 'Asia/Seoul'
+  })}] ${log}\n`;
+
+  console.log("logFilePath:"+logFilePath)
+  fs.appendFile(logFilePath, timeStampedLog, (err: any) => {
+    if (err) {
+      console.error('Failed to write log:', err);
+    }
+  });
+})
 
 app.whenReady().then(() => {
   setupDatabase();

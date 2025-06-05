@@ -12,6 +12,7 @@ import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
 import { useWebSocket } from '@Components/hooks/useWebSocket';
 import Alert from '@Components/common/Alert';
+import { log } from '@Components/utils/logUtil';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -40,7 +41,7 @@ function Main(): JSX.Element {
 
   useEffect(() => {
     if (Array.isArray(messages) && messages.length > 0) {
-      console.log('1.품절 처리', messages);
+      log('1.품절 처리:'+messages);
       Promise.all(
         messages.map((msg) =>
           window.ipc.product.updateSoldout(msg.itemCd, msg.soldoutYn)
@@ -109,7 +110,7 @@ function Main(): JSX.Element {
     };
     api.getStoreSaleOpen(params)
       .then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
+        const { responseBody, responseCode} = result.data;
         if (responseCode === '200') {
           console.log(`### 개점정보 res:${responseBody.saleDt}`);
           setSaleDt(responseBody.saleDt);
@@ -204,12 +205,6 @@ function Main(): JSX.Element {
     navigate("/setting", { replace: true });
   };
   const [isModalOpen, setModalOpen] = useState(false);
-  const onRestore = () => {
-    setModalOpen(true)
-  }
-  const onSoldOut = () => {
-    setSoldOutOpen(true)
-  }
 
   const onNextPage = () => {
 
@@ -488,7 +483,7 @@ function Main(): JSX.Element {
           onOpenCallOrder={onOpenCallOrder}
           onCallOrder={handleCallOrder}
           onCompleteOrder={handleCompleteOrder}
-          onSoldOut={onSoldOut}
+          onSoldOut={()=>setSoldOutOpen(true)}
         />
       </div>
       <div className="footer-area">
@@ -498,7 +493,7 @@ function Main(): JSX.Element {
           totalPages = {totalPages}
           onNextPage={onNextPage}
           onPrevPage={onPrevPage}
-          onRestore={onRestore}
+          onRestore={() => setModalOpen(true)}
         />
       </div>
       {passwordOpen && (
