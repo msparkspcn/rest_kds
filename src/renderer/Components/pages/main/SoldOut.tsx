@@ -69,7 +69,7 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
     console.log('코너 목록:', cornerList);
     setCornerList(cornerList)
 
-    if (Object.keys(selectedCorner).length === 0 && cornerList.length > 0) {
+    if (!selectedCorner && cornerList.length > 0) {
       setSelectedCorner(cornerList[0]);
     }
   }
@@ -111,11 +111,14 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
       return updatedList;
     });
   };
+
   const openDialog = (title: string, message: string, onConfirm: () => void) => {
     setConfirmProps({ title, message, onConfirm });
     setConfirmOpen(true);
   };
-  const handleSave = () => {
+
+  const handleSoldout = async () => {
+    if (!selectedCorner) return;
 
     const request = Object.values(changedProducts).map((product) => ({
       cmpCd: selectedCorner.cmpCd,
@@ -138,26 +141,27 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
       return;
     }
 
-    console.log("저장할 변경사항:", request);
-
-
     console.log("request:" + JSON.stringify(request))
-    api
-      .updateSoldout(request)
-      .then((result) => {
-        const { responseCode, responseMessage, responseBody } = result.data;
-        if (responseCode === '200') {
-          console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
-          setChangedProducts({});
-          getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
-        }
-        else {
-          window.alert(responseMessage);
-        }
-      })
-      .catch((ex) => {
-        window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex.message + ')');
-      })
+    setIsLoading(true);
+
+    try {
+      const result = await api.updateSoldout(request);
+      const { responseCode, responseMessage, responseBody } = result.data;
+      if (responseCode === '200') {
+        console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
+        setChangedProducts({});
+        getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
+          .then(() =>{console.log("코너 조회 완료!");});
+      }
+      else {
+        window.alert(responseMessage);
+      }
+    }catch(ex) {
+      window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex + ')');
+    } finally {
+      console.log("soldout 완료")
+      setIsLoading(false);
+    }
   }
 
   const toggleAllCheckboxes = () => {
@@ -197,8 +201,10 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
           <button className="close-button" onClick={onClose}>X</button>
         </div>
         <div className="modal-desc-bar">
-          <div className="modal-desc">주문에 대한 품절 관리 화면</div>
-          <button type="button" className="btn" onClick={handleSave}>저장</button>
+          <div className="modal-desc">매장별 상품 품절 관리 화면</div>
+          <button type="button" className="btn" onClick={handleSoldout}>
+            {isLoading ? '저장 중...' : '저장'}
+          </button>
         </div>
         <div className="table-wrapper">
           <table className="data-table summary">
@@ -212,7 +218,6 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
             </thead>
             <tbody>
             {cornerList.map((item, index) => {
-              // console.log('렌더링 아이템:', item);
               return (
               <tr
                 key={item.cornerCd}
@@ -221,9 +226,9 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
                 ${index % 2 === 0 ? 'even-row' : 'odd-row'}
                 `}
                 onClick={() => {
-                  console.log(index+"번 row 선택, :"+JSON.stringify(cornerList[index]))
-                  setSelectedCorner(cornerList[index])
-                  getProductList(cornerList[index])
+                  if (selectedCorner?.cornerCd !== item.cornerCd) {
+                    setSelectedCorner(item);
+                  }
                 }}
               >
                 <td>{index + 1}</td>
@@ -242,7 +247,7 @@ const SoldOut: React.FC<SoldOutProps> = ({isOpen, onClose}) => {
                 <th>상품코드</th>
                 <th>상품명</th>
                 <th>판매가</th>
-                <th onClick={toggleAllCheckboxes} >품절여부</th>
+                <th onClick={toggleAllCheckboxes}>품절여부</th>
               </tr>
             </thead>
             <tbody>
