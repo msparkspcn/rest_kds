@@ -1,4 +1,4 @@
-@import "./src/renderer/styles/colors";
+@use  "./src/renderer/styles/colors" as colors;
 .restore-query-modal {
   position: fixed;
   inset: 0;
@@ -23,7 +23,7 @@
       flex-shrink: 0;
       padding: 1% 2%;
       border-bottom: 1px solid #ccc;
-      background-color: $primary;
+      background-color: colors.$primary;
 
       .modal-title {
         flex: 1;
@@ -103,7 +103,7 @@
       }
 
       .odd-row {
-        background-color: $odd-row;
+        background-color: colors.$odd-row;
       }
 
       .even-row {
@@ -147,7 +147,7 @@
       }
 
       th {
-        background-color: $table-header;
+        background-color: colors.$table-header;
         font-weight: normal;
         height: 2.5vh;
         box-sizing: border-box;
@@ -169,7 +169,7 @@
 
       .restore-button {
         flex: 0 0 20%;
-        background-color: $primary;
+        background-color: colors.$primary;
         color: white;
         border: none;
         padding: 10px 15px;

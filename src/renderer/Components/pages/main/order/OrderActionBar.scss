@@ -1,4 +1,4 @@
-@import "./src/renderer/styles/colors";
+@use  "./src/renderer/styles/colors" as colors;
 .order-action-bar-root {
   display: flex;
   flex-wrap: wrap;
@@ -22,14 +22,14 @@
   padding: 0.625rem 1rem;
   margin: 0.3rem;
   border-radius: 0.5rem;
-  border: 0.125rem solid $primary;
-  color:$primary;
+  border: 0.125rem solid colors.$primary;
+  color:colors.$primary;
   outline: none;
   position: relative;
   z-index: 10;
 
   &.btn-blue {
-    color:$primary
+    color:colors.$primary
   }
 
   &.dark {
@@ -46,7 +46,7 @@
 
   .label {
     margin-left: 1rem;
-    color: $primary;
+    color: colors.$primary;
     text-align: right;
     white-space: pre-line;
   }
@@ -63,7 +63,7 @@
     margin-left: 0.5rem;
     background-color: #d1d5db; // bg-gray-300
     border: 1px solid #e5e7eb;
-    color: $primary;
+    color: colors.$primary;
     border-radius: 0.5rem;
 
     &.dark {

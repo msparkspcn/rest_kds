@@ -1,4 +1,4 @@
-@import "./src/renderer/styles/colors";
+@use  "./src/renderer/styles/colors" as colors;
 
 .login-container {
   display: flex;
@@ -16,7 +16,7 @@
   font-size: 3rem;
   line-height: 2.25rem;
   font-weight: 700;
-  color: $primary;
+  color: colors.$primary;
 }
 
 .member-login {
@@ -25,7 +25,7 @@
   font-size: 1.5rem;
   line-height: 2.25rem;
   font-weight: 700;
-  color: $primary;
+  color: colors.$primary;
 }
 
 .form-wrapper {
@@ -69,7 +69,7 @@
   }
 
   &:focus {
-    outline: 2px solid $primary;
+    outline: 2px solid colors.$primary;
     outline-offset: -2px;
   }
 }
@@ -135,7 +135,7 @@
   box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 
   &.active {
-    background-color: $primary;
+    background-color: colors.$primary;
   }
 
   &.inactive {

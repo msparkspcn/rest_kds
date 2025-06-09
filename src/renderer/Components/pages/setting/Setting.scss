@@ -1,4 +1,4 @@
-@import "./src/renderer/styles/colors";
+@use  "./src/renderer/styles/colors" as colors;
 .container {
   display: flex;
   height: 100vh;
@@ -23,12 +23,12 @@
     border-radius: 8px;
     &.update {
       background-color: white;
-      border: 0.125rem solid $primary;
-      color:$primary;
+      border: 0.125rem solid colors.$primary;
+      color:colors.$primary;
       font-size: 1rem;
     }
     &.master {
-      background-color: $primary;
+      background-color: colors.$primary;
       color:white;
       font-size: 1rem;
       border: none;
@@ -63,7 +63,7 @@
     span.title {
       border: 2px solid var(--primary);
       border-radius: 8px;
-      color: $primary;
+      color: colors.$primary;
       font-size: 2rem;
       font-weight: bold;
     }
@@ -176,7 +176,7 @@
     }
 
     &.save {
-      background-color: $primary;
+      background-color: colors.$primary;
     }
   }
 }

@@ -23,6 +23,16 @@ export default defineConfig({
     assetsDir: '',
     outDir: resolve('./app/dist/renderer'),
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        implementation: require('sass-embedded'),
+        includePaths: [
+          resolve(__dirname, '..', 'src', 'renderer', 'styles'), // 👈 바로 이 폴더를 추가합니다.
+        ],
+      },
+    },
+  },
   plugins: [
     React(),
     EnvironmentPlugin(['NODE_ENV', 'ELECTRON_ENV'], { prefix: '' }),
@@ -37,6 +47,16 @@ export default defineConfig({
         ]);
       },
       vite: {
+        css: {
+          preprocessorOptions: {
+            scss: {
+              implementation: require('sass-embedded'),
+              includePaths: [
+                resolve(__dirname, '..', 'src', 'renderer', 'styles'),
+              ],
+            },
+          },
+        },
         build: {
           assetsDir: '',
           outDir: resolve('./app/dist/main'),
