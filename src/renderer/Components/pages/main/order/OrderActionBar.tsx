@@ -34,21 +34,19 @@ const OrderActionBar: React.FC<OrderActionBarProps> = ({
         </button>
       </div>
 
-      <button type="button" className="btn btn-blue" onClick={onCallOrder}>
-        Call(호출)
-      </button>
-      <button type="button" className="btn btn-orange" onClick={onCompleteOrder}>
-        완료
-      </button>
+          <button type="button" className="btn" onClick={onCallOrder}>
+            Call(호출)
+          </button>
+          <button type="button" className="btn" onClick={onCompleteOrder}>
+            완료
+          </button>
 
-      <div className="count-wrap">
-        <div className="label">{STRINGS.total_order_cnt}</div>
-        <button type="button" className="count-btn">
-          {orderCnt}
-        </button>
-      </div>
-    </div>
-  );
-};
+          <div className="count-wrap">
+            <div className="label">{STRINGS.total_order_cnt}</div>
+            <button type="button" className="count-btn">{orderCnt}</button>
+          </div>
+        </div>
+    )
+}
 
 export default OrderActionBar;

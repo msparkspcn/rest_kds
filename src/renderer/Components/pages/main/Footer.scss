@@ -16,20 +16,6 @@
     justify-content: space-between;
   }
 
-  //&__button {
-  //  margin-left: 0.5rem;
-  //  padding: 0.5rem 1rem;
-  //  background-color: #6b7280; // gray-500
-  //  color: white;
-  //  border-radius: 0.25rem;
-  //  cursor: pointer;
-  //  transition: background-color 0.2s;
-  //
-  //  &:hover {
-  //    background-color: #1d4ed8; // blue-700
-  //  }
-  //}
-
   &__date,
   &__time {
     font-weight: 400;
@@ -80,11 +66,6 @@
       color: white;
       cursor: pointer;
       transition: color 0.2s;
-
-      &:active,
-      &:focus {
-        color: #3b82f6;
-      }
     }
   }
 }

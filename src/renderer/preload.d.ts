@@ -1,6 +1,7 @@
 declare global {
   interface Window {
     ipc: {
+      log: any;
       cmp: any;
       corner: any;
       product: any;

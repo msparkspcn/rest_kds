@@ -49,6 +49,7 @@ function createTables() {
       price REAL,
       soldout_yn TEXT,
       use_yn TEXT,
+      sort_order REAL,
        PRIMARY KEY (cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd)
     );`,
 

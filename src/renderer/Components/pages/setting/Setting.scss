@@ -1,11 +1,12 @@
-/* 전체 화면을 커버하는 컨테이너 */
+@import "./src/renderer/styles/colors";
 .container {
   display: flex;
   height: 100vh;
   flex-direction: column;
   padding: 3%;
   align-items: center;
-  background-color: black;
+  //background-color: black;
+  background-color: white;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -20,7 +21,18 @@
   button {
     padding: 1% 15px;
     border-radius: 8px;
-    background-color: #f56565; /* red-500 */
+    &.update {
+      background-color: white;
+      border: 0.125rem solid $primary;
+      color:$primary;
+      font-size: 1rem;
+    }
+    &.master {
+      background-color: $primary;
+      color:white;
+      font-size: 1rem;
+      border: none;
+    }
 
     span {
       color: white;
@@ -49,10 +61,9 @@
     gap: 8px;
 
     span.title {
-      padding: 0px;
       border: 2px solid var(--primary);
       border-radius: 8px;
-      color: white;
+      color: $primary;
       font-size: 2rem;
       font-weight: bold;
     }
@@ -60,13 +71,15 @@
     .field {
       display: flex;
       justify-content: space-between;
-      margin-top: 0.25rem;
-      margin-bottom: 0.25rem;
+      margin-top: 0.1rem;
+      margin-bottom: 0.1rem;
+      height: 8%;
+      align-items: center;
       //background-color: red;
 
       span {
         font-size: 1.25rem;
-        color: white;
+        color: black;
       }
       .info-title {
         font-size: 1.5rem;
@@ -149,20 +162,21 @@
   padding-bottom: 16px;
 
   button {
-    width: 30%;
+    width: 50%;
     padding: 1.5%;
     font-size: 1.5rem;
     border-radius: 8px;
-    border: 2px solid #2d3748;
+    border: none;
     font-weight: bold;
     color: white;
 
     &.cancel {
-      background-color: #2d3748;
+      background-color: #E1E1E1;
+      color:#1C1C1C;
     }
 
     &.save {
-      background-color: #3b82f6;
+      background-color: $primary;
     }
   }
 }

@@ -11,6 +11,8 @@ import CallOrderDialog from '@Components/pages/main/CallOrderDialog';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import SoldOut from '@Components/pages/main/SoldOut';
 import { useWebSocket } from '@Components/hooks/useWebSocket';
+import Alert from '@Components/common/Alert';
+import { log } from '@Components/utils/logUtil';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -35,13 +37,23 @@ function Main(): JSX.Element {
   let systemType: number = 0;
 
   const { isConnected, messages } = useWebSocket();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (Object.keys(messages).length > 0) {
-      console.log('1.품절 처리', messages);
-      window.ipc.product.updateSoldout(messages.itemCd, messages.soldoutYn).then(() => {
-        console.log('완료');
-      });
+    if (Array.isArray(messages) && messages.length > 0) {
+      log('1.품절 처리:'+messages);
+      Promise.all(
+        messages.map((msg) =>
+          window.ipc.product.updateSoldout(msg.itemCd, msg.soldoutYn)
+        )
+      )
+        .then(() => {
+          console.log("모든 품절 처리 완료");
+        })
+        .catch((err) => {
+          console.error("품절 처리 중 오류 발생:", err);
+          setErrorMessage("품절 처리에 실패했습니다.\n다시 시도해주세요.")
+        });
     } else {
       console.log('빈 객체입니다');
     }
@@ -93,7 +105,7 @@ function Main(): JSX.Element {
     const params = {
       cmpCd: '90000001',
       brandCd: '9999',
-      storeCd: '000281',
+      storeCd: '000281'
     };
     api.getStoreSaleOpen(params).then((result) => {
       const { responseBody, responseCode, responseMessage } = result.data;
@@ -189,14 +201,9 @@ function Main(): JSX.Element {
     navigate('/setting', { replace: true });
   };
   const [isModalOpen, setModalOpen] = useState(false);
-  const onRestore = () => {
-    setModalOpen(true);
-  };
-  const onSoldOut = () => {
-    setSoldOutOpen(true);
-  };
 
   const onNextPage = () => {
+
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
@@ -449,7 +456,11 @@ function Main(): JSX.Element {
   return (
     <div className="layout-root">
       <div className="layout-content">
-        <Contents orderList={filterList} onRefresh={onRefresh} onSelectOrderHd={onSelectOrderHd} />
+        <Contents
+          orderList={filterList}
+          onRefresh={onRefresh}
+          onSelectOrderHd={onSelectOrderHd}
+        />
       </div>
       <div className="order-action-bar">
         <OrderActionBar
@@ -458,7 +469,7 @@ function Main(): JSX.Element {
           onOpenCallOrder={onOpenCallOrder}
           onCallOrder={handleCallOrder}
           onCompleteOrder={handleCompleteOrder}
-          onSoldOut={onSoldOut}
+          onSoldOut={()=>setSoldOutOpen(true)}
         />
       </div>
       <div className="footer-area">
@@ -468,11 +479,14 @@ function Main(): JSX.Element {
           totalPages={totalPages}
           onNextPage={onNextPage}
           onPrevPage={onPrevPage}
-          onRestore={onRestore}
+          onRestore={() => setModalOpen(true)}
         />
       </div>
       {passwordOpen && (
-        <InputPassword onClose={() => setPasswordOpen(false)} onCorrect={goSettingPage} />
+        <InputPassword
+          onClose={() => setPasswordOpen(false)}
+          onCorrect={goSettingPage}
+        />
       )}
       {callOrderOpen && (
         <CallOrderDialog
@@ -489,8 +503,26 @@ function Main(): JSX.Element {
           {...confirmProps}
         />
       )}
-      <History isOpen={isModalOpen} onClose={() => setModalOpen(false)} data={data} />
-      {isSoldOutOpen && <SoldOut isOpen={isSoldOutOpen} onClose={() => setSoldOutOpen(false)} />}
+
+      <History
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        data={data}
+      />
+      {isSoldOutOpen && (
+        <SoldOut
+          isOpen={isSoldOutOpen}
+          onClose={() => setSoldOutOpen(false)}
+        />
+      )}
+      {errorMessage && (
+        <Alert
+          title="알림"
+          message={errorMessage}
+          onClose={()=>{setErrorMessage(null)}}
+        />
+      )}
+
     </div>
   );
 }

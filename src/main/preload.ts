@@ -24,61 +24,46 @@ contextBridge.exposeInMainWorld('ipc', {
   quitApp: () => {
     ipcRenderer.send('app:quit');
   },
-
+  log: (message: any) => ipcRenderer.send('log-to-file', message),
   cmp: {
     getList: () => ipcRenderer.invoke('db:getCmpList'),
-    add: (cmp_cd: string, cmp_nm: string) => ipcRenderer.invoke('db:addCmp', cmp_cd, cmp_nm),
-    update: (cmp_nm: string, cmp_cd: string) => ipcRenderer.invoke('db:updateCmp', cmp_nm, cmp_cd),
+    add: (cmp_cd: string, cmp_nm: string) =>
+      ipcRenderer.invoke('db:addCmp', cmp_cd, cmp_nm),
+    update: (cmp_nm: string, cmp_cd: string) =>
+      ipcRenderer.invoke('db:updateCmp', cmp_nm, cmp_cd),
     delete: (cmp_cd: string) => ipcRenderer.invoke('db:deleteCmp', cmp_cd),
   },
   corner: {
     getList: (use_yn: string) => ipcRenderer.invoke('db:getCornerList', use_yn),
-    getList2: (cmp_cd: string, sales_org_cd: string, stor_cd: string, use_yn: string) =>
-      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd, stor_cd, use_yn),
-    add: (
-      cmp_cd: string,
-      sales_org_cd: string,
-      stor_cd: string,
-      corner_cd: string,
-      corner_nm: string,
-      use_yn: string,
+    getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string, use_yn: string) =>
+      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd,stor_cd, use_yn),
+    add: (  cmp_cd: string,
+            sales_org_cd: string,
+            stor_cd: string,
+            corner_cd: string,
+            corner_nm: string,
+            use_yn: string
     ) =>
-      ipcRenderer.invoke(
-        'db:addCorner',
-        cmp_cd,
-        sales_org_cd,
-        stor_cd,
-        corner_cd,
-        corner_nm,
-        use_yn,
-      ),
+      ipcRenderer.invoke('db:addCorner',
+        cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn)
   },
   product: {
     getList: (cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
       ipcRenderer.invoke('db:getProductList', cmp_cd, sales_org_cd, stor_cd, corner_cd),
     // getList: () => ipcRenderer.invoke('db:getProductList'),
-    add: (
-      cmp_cd: string,
-      sales_org_Cd: string,
-      stor_cd: string,
-      corner_cd: string,
-      item_cd: string,
-      item_nm: string,
-      price: number,
-      soldout_yn: string,
+    add: (  cmp_cd: string,
+            sales_org_Cd: string,
+            stor_cd: string,
+            corner_cd: string,
+            item_cd: string,
+            item_nm: string,
+            price: number,
+            soldout_yn: string,
+            use_yn: string,
+            sort_order: number
     ) =>
-      ipcRenderer.invoke(
-        'db:addProduct',
-        cmp_cd,
-        sales_org_Cd,
-        stor_cd,
-        corner_cd,
-        item_cd,
-        item_nm,
-        price,
-        soldout_yn,
-      ),
-    updateSoldout: (item_cd: string, soldout_yn: string) =>
-      ipcRenderer.invoke('db:updateSoldout', item_cd, soldout_yn),
-  },
+      ipcRenderer.invoke('db:addProduct',
+        cmp_cd, sales_org_Cd, stor_cd, corner_cd, item_cd, item_nm, price, soldout_yn, use_yn, sort_order),
+    updateSoldout: (item_cd: string, soldout_yn: string) => ipcRenderer.invoke('db:updateSoldout', item_cd, soldout_yn)
+  }
 });

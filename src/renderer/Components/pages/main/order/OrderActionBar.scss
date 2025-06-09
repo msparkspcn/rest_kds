@@ -1,3 +1,4 @@
+@import "./src/renderer/styles/colors";
 .order-action-bar-root {
   display: flex;
   flex-wrap: wrap;
@@ -21,38 +22,20 @@
   padding: 0.625rem 1rem;
   margin: 0.3rem;
   border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  color: white;
+  border: 0.125rem solid $primary;
+  color:$primary;
   outline: none;
   position: relative;
   z-index: 10;
 
-  &:hover {
-    background-color: #f3f4f6; // hover:bg-gray-100
-    color: #1d4ed8; // hover:text-blue-700
-  }
-
-  &:focus {
-    box-shadow: 0 0 0 2px #e5e7eb; // ring-gray-200
-  }
-
   &.btn-blue {
-    background-color: #3b82f6; // bg-blue-500
-  }
-
-  &.btn-orange {
-    background-color: #f97316; // bg-orange-400
+    color:$primary
   }
 
   &.dark {
     background-color: #1f2937;
     color: #9ca3af;
     border-color: #4b5563;
-
-    &:hover {
-      background-color: #374151;
-      color: white;
-    }
   }
 }
 
@@ -63,7 +46,7 @@
 
   .label {
     margin-left: 1rem;
-    color: white;
+    color: $primary;
     text-align: right;
     white-space: pre-line;
   }
@@ -80,23 +63,13 @@
     margin-left: 0.5rem;
     background-color: #d1d5db; // bg-gray-300
     border: 1px solid #e5e7eb;
-    color: black;
+    color: $primary;
     border-radius: 0.5rem;
-
-    &:hover {
-      background-color: #f3f4f6;
-      color: #1d4ed8;
-    }
 
     &.dark {
       background-color: #1f2937;
       color: #9ca3af;
       border-color: #4b5563;
-
-      &:hover {
-        background-color: #374151;
-        color: white;
-      }
     }
   }
   .selected-btn {
