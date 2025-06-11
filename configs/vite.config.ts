@@ -9,7 +9,7 @@ import React from '@vitejs/plugin-react';
 import TsConfigPaths from 'vite-tsconfig-paths';
 import commonjs from '@rollup/plugin-commonjs';
 import { port } from '../DevConfig.json';
-// eslint-disable-next-line no-console
+
 console.log(`${chalk.whiteBright.bold(' ✨ Start')} ${chalk.green.bold('Hacking...👨‍💻')}`);
 
 export default defineConfig({
