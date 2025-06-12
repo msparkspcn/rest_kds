@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Loading from '../../common/Loading';
 import * as api from '../../data/api/api';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { setAuthToken } from '../../data/api/api';
 import './Login.scss';
 import Alert from '@Components/common/Alert';
 import { log } from '@Components/utils/logUtil';
+import Keypad from '@Components/common/Keypad';
 
 const Login: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
@@ -23,7 +24,11 @@ const Login: React.FC = () => {
   const getStorePassword = useUserStore((state) => state.getPassword);
   const setStoreUserId = useUserStore((state) => state.setUserId);
   const setStorePassword = useUserStore((state) => state.setPassword);
+  const [focusedField, setFocusedField] = useState<'userId' | 'password'>('userId');
+  const userIdInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
+  console.log("Login Component Rendered");
   useEffect(() => {
     log("로그인 화면 진입")
     if(getUserId && getStorePassword) {
@@ -32,6 +37,20 @@ const Login: React.FC = () => {
       setIsChecked(true);
     }
   }, []);
+
+  const handleKeypadInput = (key: string) => {
+    const setField = focusedField === 'userId' ? setUserId : setPassword;
+    const value = focusedField === 'userId' ? userId : password;
+
+    if (key === '⌫') {
+      setField(value.slice(0, -1));
+    } else if (key === 'Clear') {
+      setField('');
+    } else {
+      setField(value + key);
+    }
+  };
+
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
@@ -113,7 +132,9 @@ const Login: React.FC = () => {
           <div className="input-box">
             <input
               type="text"
+              ref={userIdInputRef}
               value={userId}
+              onFocus={() => setFocusedField('userId')}
               onChange={(e) => setUserId(e.target.value)}
               placeholder={STRINGS.id}
               className="input"
@@ -122,7 +143,9 @@ const Login: React.FC = () => {
           <div className="input-box">
             <input
               type="password"
+              ref={passwordInputRef}
               value={password}
+              onFocus={() => setFocusedField('password')}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={STRINGS.password}
               className="input"
@@ -169,6 +192,9 @@ const Login: React.FC = () => {
           }}
         />
       )}
+      <div className="keypad-wrapper">
+        <Keypad onClick={handleKeypadInput} />
+      </div>
     </div>
   );
 };

@@ -1,0 +1,48 @@
+.keypad-container {
+  display: flex;
+  width: 80%;
+}
+
+.keypad-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.keypad-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+  height: 100%;
+}
+
+.keypad-row {
+  display: flex;
+  flex: 1;
+}
+
+.type-button {
+  flex: 1;
+  padding: 1rem;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  min-height: 1.5rem;
+}
+
+.type-button.selected {
+  background-color: #ccc;
+}
+
+.keypad-key {
+  flex: 1;
+  padding: 1rem;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  text-align: center;
+  min-height: 1.5rem;
+}
