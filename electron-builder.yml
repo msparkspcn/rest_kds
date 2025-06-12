@@ -7,11 +7,15 @@ artifactName: '${productName}-${version}.${ext}'
 asar: true
 
 files:
-  - '**/*'
+  - "app/dist/**/*"
+  - "node_modules/**/*"
   - 'package.json'
 
 extraResources:
   - './assets/**'
+
+extraMetaData:
+  main: "app/dist/main/main.js"
 
 directories:
   app: 'app'

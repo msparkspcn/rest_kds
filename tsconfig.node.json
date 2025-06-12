@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "rootDir": "./",
+    "outDir": "../../dist/main",
     "paths": {
       "@Assets/*": ["./assets/*"],
       "@Components/*": ["./src/renderer/Components/*"]

@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { app } from 'electron';
-import installExtension, {
-  REACT_DEVELOPER_TOOLS,
-  REDUX_DEVTOOLS,
-} from 'electron-devtools-installer';
+// import installExtension, {
+//   REACT_DEVELOPER_TOOLS,
+//   REDUX_DEVTOOLS,
+// } from 'electron-devtools-installer';
 import path from 'path';
 import os from 'os';
 import { port } from '../../DevConfig.json';
@@ -24,18 +24,17 @@ function getAssetsPath(fileName: string) {
   if (safeGetEnv('NODE_ENV') === 'production' && app.isPackaged === true) {
     return path.resolve(process.resourcesPath, 'assets', fileName);
   }
-  if (safeGetEnv('NODE_ENV') === 'production' && app.isPackaged === false) {
-    return path.resolve(__dirname, '../../../assets', fileName);
-  }
   return path.resolve(__dirname, '../../../assets', fileName);
 }
 
 function getHtmlPath(htmlFileName: string) {
-  if (safeGetEnv('NODE_ENV') === 'development') {
-    const url = `http://localhost:${port}`;
-    return url;
-  }
-  return `file://${path.resolve(__dirname, `../renderer/${htmlFileName}`)}`;
+  const dev = safeGetEnv('NODE_ENV') === 'development';
+  const result = dev
+    ? `http://localhost:${port}`
+    : `file://${path.join(__dirname, '../renderer', htmlFileName)}`;
+
+  console.log(`🌍 getHtmlPath (${dev ? 'dev' : 'prod'}) →`, result);
+  return result;
 }
 
 function getPreloadPath(Name: string) {
@@ -44,14 +43,27 @@ function getPreloadPath(Name: string) {
   }
   return path.resolve(__dirname, Name);
 }
+let installExtension: any;
+let REACT_DEVELOPER_TOOLS: any;
+let REDUX_DEVTOOLS: any;
+
+try {
+  const devToolsInstaller = require('electron-devtools-installer');
+  installExtension = devToolsInstaller.default ?? devToolsInstaller;
+  REACT_DEVELOPER_TOOLS = devToolsInstaller.REACT_DEVELOPER_TOOLS;
+  REDUX_DEVTOOLS = devToolsInstaller.REDUX_DEVTOOLS;
+} catch (err) {
+  console.error('Failed to load electron-devtools-installer:', err);
+}
 
 function installExtensions() {
+  if (!installExtension) return;
+
   const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS];
   extensions.forEach((Name) => {
-    installExtension(Name) // eslint-disable-next-line no-console
-      .then((name) => console.log(`${name} Extension Added`))
-      // eslint-disable-next-line no-console
-      .catch((err) => console.log('An error occurred: ', err));
+    installExtension(Name)
+      .then((name: string) => console.log(`${name} Extension Added`))
+      .catch((err: Error) => console.error('Extension error:', err));
   });
 }
 

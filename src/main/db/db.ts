@@ -1,8 +1,9 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import { app } from 'electron';
 
 // DB 파일 생성 경로 (Electron 앱 로컬 디렉터리 기준)
-const dbPath = path.join(__dirname, 'app.db');
+const dbPath = path.join(app.getPath('userData'), 'data.sqlite');
 
 // DB 인스턴스 생성
 const db = new Database(dbPath);

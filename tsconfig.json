@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "outDir": "../../dist/main",
+    "rootDir": ".",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

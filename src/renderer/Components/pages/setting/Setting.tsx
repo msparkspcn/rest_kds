@@ -8,6 +8,7 @@ import { getPlatform } from '@Components/utils/platform';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import packageJson from '../../../../../package.json';
 import { log } from '@Components/utils/logUtil';
+import Alert from '@Components/common/Alert';
 
 const Setting: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -33,6 +34,7 @@ const Setting: React.FC = () => {
   });
 
   const platform = getPlatform();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         log("세팅화면 진입")
@@ -47,9 +49,39 @@ const Setting: React.FC = () => {
         }
     }, []);
 
-  const updateVersion = () => {
-    console.log('업데이트 버전');
-    localStorage.clear();
+  const updateVersion = async () => {
+    const version = await window.ipc.getAppVersion();
+    console.log('앱 현재 버전:', version);
+    setConfirmProps({
+      title: '업데이트',
+      message: '최신 버전을 다운로드하고 설치하시겠습니까?',
+      onConfirm: async () => {
+        try {
+          const result = await window.ipc.checkForUpdates();
+          if (result.updateAvailable) {
+            const downloadResult = await window.ipc.downloadUpdate();
+            if (downloadResult.success) {
+              setConfirmProps({
+                title: '다운로드 완료',
+                message: '앱을 종료하고 업데이트를 설치하시겠습니까?',
+                onConfirm: async () => {
+                  await window.ipc.quitAndInstall();
+                },
+              });
+              setConfirmOpen(true);
+            } else {
+              setErrorMessage('업데이트 다운로드에 실패했습니다.');
+            }
+          } else {
+            setErrorMessage('최신 버전입니다.');
+          }
+        } catch (error) {
+          console.error('업데이트 오류:', error);
+          setErrorMessage('업데이트 중 오류가 발생했습니다.');
+        }
+      },
+    });
+    setConfirmOpen(true);
   };
 
   const getCmpList = async (cmpCd: string) => {
@@ -345,6 +377,13 @@ const Setting: React.FC = () => {
             confirmOpen={confirmOpen}
             onClose={() => setConfirmOpen(false)}
             {...confirmProps}
+          />
+        )}
+        {errorMessage && (
+          <Alert
+            title="알림"
+            message={errorMessage}
+            onClose={()=>{setErrorMessage(null)}}
           />
         )}
       </div>

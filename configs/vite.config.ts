@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { builtinModules } from 'module';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
@@ -13,20 +12,31 @@ import { port } from '../DevConfig.json';
 console.log(`${chalk.whiteBright.bold(' ✨ Start')} ${chalk.green.bold('Hacking...👨‍💻')}`);
 
 export default defineConfig({
-  base: './',
+  base: '',
   clearScreen: false,
   root: resolve('./src/renderer'),
   server: {
     port,
   },
   build: {
+    target: 'es2015',
     assetsDir: '',
-    outDir: resolve('./app/dist/renderer'),
+    outDir: resolve(__dirname,'../app/dist/renderer'),
+    emptyOutDir: true,
+    rollupOptions: {
+      input: resolve(__dirname, '../src/renderer/index.html'),
+      output: {
+        entryFileNames: 'main.js', // <- 이걸로 script src="./main.js"가 생성됨
+        chunkFileNames: '[name].js',
+        assetFileNames: '[name].[ext]',
+        format: 'iife', // CommonJS처럼 self-contained 방식으로
+      }
+    }
   },
   css: {
     preprocessorOptions: {
       scss: {
-        implementation: require('sass-embedded'),
+        api: 'legacy',
         includePaths: [
           resolve(__dirname, '..', 'src', 'renderer', 'styles'), // 👈 바로 이 폴더를 추가합니다.
         ],
@@ -50,7 +60,7 @@ export default defineConfig({
         css: {
           preprocessorOptions: {
             scss: {
-              implementation: require('sass-embedded'),
+              api: 'legacy',
               includePaths: [
                 resolve(__dirname, '..', 'src', 'renderer', 'styles'),
               ],
@@ -59,7 +69,7 @@ export default defineConfig({
         },
         build: {
           assetsDir: '',
-          outDir: resolve('./app/dist/main'),
+          outDir: resolve(__dirname, '../app/dist/main'),
           rollupOptions: {
             external: ['electron', 'better-sqlite3', ...builtinModules],
             // better-sqlite3 사용 관련 추가

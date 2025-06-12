@@ -25,6 +25,10 @@ contextBridge.exposeInMainWorld('ipc', {
     ipcRenderer.send('app:quit');
   },
   log: (message: any) => ipcRenderer.send('log-to-file', message),
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  quitAndInstall: () => ipcRenderer.invoke('quit-and-install'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   cmp: {
     getList: () => ipcRenderer.invoke('db:getCmpList'),
     add: (cmp_cd: string, cmp_nm: string) =>
