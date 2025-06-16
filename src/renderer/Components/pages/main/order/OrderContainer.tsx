@@ -3,7 +3,8 @@ import dayjs from 'dayjs';
 import './OrderContainer.scss';
 
 interface OrderItem {
-  itemNm: string;
+  // itemNm: string;
+  productNm: string;
   saleQty: number;
 }
 
@@ -36,7 +37,8 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
         setBackColor('bg-yellow');
       } else if (timeDiff <= -10) {
         // console.log("here")
-        setBackColor('bg-red');
+        // setBackColor('bg-red');
+        setBackColor('bg-white');
       }
       setDiff(timeDiff);
     }, 1000);
@@ -81,7 +83,7 @@ function RenderItem({ item, index }: RenderItemProps): JSX.Element {
   return (
     <div className="order-row">
       <div className="order-cell index">{index + 1}</div>
-      <div className="order-cell name">{item.itemNm}</div>
+      <div className="order-cell name">{item.productNm}</div>
       <div className="order-cell qty">{item.saleQty}</div>
     </div>
   );

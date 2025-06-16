@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import * as api from '@Components/data/api/api';
 import './SoldOut.scss';
 import numeral from 'numeral';
@@ -31,9 +31,9 @@ type Corner = {
 const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
   const [cornerList, setCornerList] = useState<Corner[]>([]);
   const [productList, setProductList] = useState<Product[]>([]);
+  const [originalProductList, setOriginalProductList] = useState<Product[]>([]); // 원본 리스트 추가
   const getUser = useUserStore((state) => state.getUser);
   const [selectedCorner, setSelectedCorner] = useState<Corner | undefined>(undefined);
-  const [changedProducts, setChangedProducts] = useState<Record<string, Product>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmProps, setConfirmProps] = useState({
@@ -84,35 +84,27 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
       corner.cornerCd,
     );
     console.log('상품 목록:', productList);
-    setProductList(productList)
+    setOriginalProductList(productList);  // 원본 저장
+    setProductList(productList);
   }
+
+  const changedProducts = useMemo(() => {
+    const changes: Record<string, Product> = {};
+    productList.forEach((item, index) => {
+      if (item.soldoutYn !== originalProductList[index]?.soldoutYn) {
+        changes[item.itemCd] = item;
+      }
+    });
+    return changes;
+  }, [productList, originalProductList]);
 
   const handleCheckboxChange = (index: number) => {
     setProductList((prevList) => {
-      const updatedList = prevList.map((item, i) =>
+      return prevList.map((item, i) =>
         i === index
-          ? {
-              ...item,
-              soldoutYn: item.soldoutYn === '1' ? '0' : '1',
-            }
-          : item,
+          ? { ...item, soldoutYn: item.soldoutYn === '1' ? '0' : '1' }
+          : item
       );
-      const targetProduct = updatedList[index]
-      setChangedProducts((prev) => {
-        const newChanges = { ...prev };
-        if (
-          newChanges[targetProduct.itemCd] &&
-          newChanges[targetProduct.itemCd].soldoutYn === targetProduct.soldoutYn
-        ) {
-          // 변경 후 원래 상태로 돌아갔다면 제거
-          delete newChanges[targetProduct.itemCd];
-        } else {
-          newChanges[targetProduct.itemCd] = targetProduct;
-        }
-        return newChanges;
-      });
-
-      return updatedList;
     });
   };
 
@@ -153,7 +145,7 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
       const { responseCode, responseMessage, responseBody } = result.data;
       if (responseCode === '200') {
         console.log('품절여부 변경 성공 responseBody:' + JSON.stringify(responseBody));
-        setChangedProducts({});
+        setOriginalProductList(productList);
         getLocalCornerList(selectedCorner.cmpCd, selectedCorner.salesOrgCd, selectedCorner.storCd)
           .then(() =>{console.log("코너 조회 완료!");});
       }

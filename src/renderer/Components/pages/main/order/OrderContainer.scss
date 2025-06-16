@@ -1,11 +1,14 @@
+@use "./src/renderer/styles/colors" as colors;
 .order-container {
   display: flex;
   flex-direction: column;
   background-color: #f0f0f0;
-  border: 1px solid #e5e7eb;
+  //border: 1px solid #e5e7eb;
+  border: 1px solid #9ca3af;
   height: 100%;
+  border-radius: 0.5rem;
   box-sizing: border-box;
-
+  overflow: hidden;
   &.bg-green {
     background-color: #16a34a;
   }
@@ -17,37 +20,38 @@
   &.bg-red {
     background-color: #dc2626;
   }
+  &.bg-white {
+    background-color: white;
+  }
 }
 
 .order-header {
-  display: flex;
-  width: 100%;
-  height: 2.5rem; // h-10
+  display: grid;
+  grid-template-columns: 3fr 4fr 3fr;
+  //border: 1px solid #9ca3af;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  overflow: hidden;
 
   .header-cell {
-    border: 1px solid #9ca3af; // border-gray-400
-    background-color: #6b7280; // bg-gray-500
-    padding: 0.25rem;
+    padding: 0.75rem;
+    background-color: colors.$primary;
     color: white;
+    font-weight: 500;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
+    font-size: 1rem;
 
     &.order-no {
-      flex: 3;
-      font-size: 1.5rem; // text-2xl
+      //font-size: 1.5rem;
       justify-content: flex-start;
     }
 
     &.inst-time {
-      flex: 4;
-      font-size: 1.25rem; // text-xl
       justify-content: center;
     }
-
     &.diff {
-      flex: 3;
-      font-size: 1.25rem;
-      justify-content: center;
+      justify-content: flex-end;
     }
   }
 }
@@ -55,8 +59,15 @@
 .order-items {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  //overflow-y: auto;
   max-height: 170px;
+  overflow-y: scroll; // 또는 auto
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }
 
 .order-item {
@@ -71,35 +82,32 @@
 }
 
 .order-row {
-  display: flex;
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 8fr 1fr;
 
   .order-cell {
-    border: 1px solid #9ca3af;
+    border-bottom: 1px solid #9ca3af;
+    border-right: 1px solid #9ca3af;
     padding: 0.5rem;
+    background-color: transparent;
+    color: #1C1C1C;
+    display: flex;
     align-items: center;
     justify-content: center;
-    box-sizing: border-box;
-    background-color: transparent;
-    color: #222;
-    &.index {
-      flex: 1;
-      text-align: center;
+
+    &:last-child {
+      border-right: none;
     }
 
     &.name {
-      flex: 8;
-      display: flex;
       justify-content: flex-start;
-      align-items: center;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     &.qty {
-      flex: 1;
-      text-align: right;
+      justify-content: flex-end;
     }
   }
 }

@@ -1,26 +1,25 @@
 .layout-root {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  height:100%;
+  //min-height: 100vh;
+  height: 100vh;
   align-items: center;
-  background-color: #d1d5db;
+  //background-color: #d1d5db;
+  background-color: #00000026;
+  overflow: hidden;
 }
 
 .layout-content {
-  display: flex;
-  flex-direction: column;
+  flex: 1 1 auto;
+  overflow-y: hidden;
+  //flex-direction: column;
   width: 100%;
-  flex: 1;
+  min-height: 0;
 }
 
-.order-action-bar {
-  flex: 0;
-  width: 100%;
-}
-
+.order-action-bar,
 .footer-area {
-  flex: 0;
+  flex-shrink: 0;
   width: 100%;
 }
 
