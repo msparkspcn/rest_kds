@@ -1,14 +1,10 @@
 .footer {
   display: flex;
-  flex-wrap: nowrap;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border-top: 1px solid #cbd5e1; // blue-gray-50
+  //width: 100%;
+  padding: 0 1rem;
   background-color: #000;
-  text-align: center;
   color: white;
 
   @media (min-width: 768px) {
@@ -16,14 +12,27 @@
   }
 
   &__date,
-  &__time {
-    font-weight: 400;
-    text-align: left;
-    transition: color 0.2s;
+  &__time,
+  &__pagination,
+  &__menu {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    list-style: none;      // ← 불릿 제거
+    padding-left: 0;        // ← 브라우저 기본 왼쪽 여백 제거
+    font-size: 1.125rem;
+    //margin: 0;
   }
 
   &__time {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  &__menu-item {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 1.5rem;
   }
 
   &__pagination {
@@ -31,6 +40,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
+    height: 100%;
 
     & > .footer__page {
       font-size: 1.875rem;
@@ -38,31 +48,25 @@
       width: 5.5rem;
       text-align: center;
       font-variant-numeric: tabular-nums;
+      line-height: 1; // ← 여백 줄이기
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
     }
 
     & > .footer__arrow {
       background-color: transparent;
       border: none;
-      width: 1.5rem;
-      height: 1.5rem;
+      width: 1.125rem;
+      height: 1.125rem;
       color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0; // 아이콘 기준 위치 보정
     }
   }
 
-  &__menu {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 3.5rem;
-    padding: 0 2.25rem;
-    list-style: none;
-    margin: 0;
 
-    &-item {
-      font-weight: 400;
-      color: white;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-  }
 }

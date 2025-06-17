@@ -165,27 +165,10 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
       const allChecked = prevList.every((item) => item.soldoutYn === "1");
       const newValue = allChecked ? "0" : "1";
 
-      const updatedList = prevList.map((item) => ({
+      return prevList.map((item) => ({
         ...item,
         soldoutYn: newValue,
       }));
-
-      setChangedProducts((prevChanges) => {
-        const newChanges = { ...prevChanges };
-
-        updatedList.forEach((item, index) => {
-          const originalItem = prevList[index]; // 원래 값
-          if (originalItem.soldoutYn !== item.soldoutYn) {
-            newChanges[item.itemCd] = item;
-          } else {
-            delete newChanges[item.itemCd];
-          }
-        });
-
-        return newChanges;
-      });
-
-      return updatedList;
     });
   };
 

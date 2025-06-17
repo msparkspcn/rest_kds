@@ -134,7 +134,7 @@
         background-color: #f1f1f1;
       }
       &.summary {
-        width: 39%;
+        width: 37%;
         th:nth-child(1),
         td:nth-child(1) {
           text-align: center;
@@ -162,7 +162,7 @@
       }
       &.detail {
         margin-left: auto;
-        width: 61%;
+        width: 63%;
         th:nth-child(1),
         td:nth-child(1) {
           text-align: center;
@@ -172,15 +172,15 @@
         th:nth-child(2),
         td:nth-child(2) {
           text-align: center;
-          width: 21%;
+          width: 24%;
         }
         th:nth-child(3) {
           text-align: center;
-          width: 45%;
+          width: 42%;
         }
         td:nth-child(3) {
           text-align: left;
-          width: 45%;
+          width: 42%;
         }
         th:nth-child(4) {
           text-align: center;

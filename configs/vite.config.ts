@@ -16,7 +16,14 @@ export default defineConfig({
   clearScreen: false,
   root: resolve('./src/renderer'),
   server: {
-    port,
+    port: port,
+    proxy: {
+      '/api': {
+        target: 'https://s9rest.ngrok.io',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     target: 'es2015',
