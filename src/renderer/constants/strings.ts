@@ -14,5 +14,6 @@ export const STRINGS = {
   complete_all: '전체완료',
   restore_recent: '직전복원',
   restore_search: '조회복원',
-  exit_app: '프로그램 종료 X',
+  exit_app: '프로그램 종료',
+  exit_app_msg: '프로그램을\n종료하시겠습니까?'
 };
