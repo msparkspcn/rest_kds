@@ -13,6 +13,7 @@ import SoldOut from '@Components/pages/main/SoldOut';
 import { useWebSocket } from '@Components/hooks/useWebSocket';
 import Alert from '@Components/common/Alert';
 import { log } from '@Components/utils/logUtil';
+import { STRINGS } from '../../../constants/strings';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -446,6 +447,20 @@ function Main(): JSX.Element {
     }
   };
 
+  const handleCompleteOrderAll = () => {
+    openDialog('주문 완료', `모든 주문을\n완료하시겠습니까?`, () => {
+      console.log('전체 주문 완료 실행');
+      // 완료 로직
+    });
+  }
+
+  const onExitApp = () => {
+    openDialog('종료', STRINGS.exit_app_msg, () => {
+      console.log('종료 버튼 클릭');
+      window.ipc.quitApp();
+    });
+  }
+
   const onSelectOrderHd = (orderNo: string) => {
     if (orderNo == selectedOrderNo) {
       setSelectedOrderNo('');
@@ -479,7 +494,9 @@ function Main(): JSX.Element {
           totalPages={totalPages}
           onNextPage={onNextPage}
           onPrevPage={onPrevPage}
+          onCompleteAll={handleCompleteOrderAll}
           onRestore={() => setModalOpen(true)}
+          onExitApp={onExitApp}
         />
       </div>
       {passwordOpen && (

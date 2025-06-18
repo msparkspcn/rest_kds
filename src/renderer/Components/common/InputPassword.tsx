@@ -54,12 +54,12 @@ const InputPassword: React.FC<InputPasswordProps> = ({ onClose, onCorrect }) => 
         <div className="password-header">
           <div className="spacer" />
           <h2>비밀번호 입력</h2>
-          <button className="close-button" onClick={onClose}>
-            ✕
-          </button>
+          <button className="close-button" onClick={onClose}>✕</button>
         </div>
 
-        {!isCorrect && <div className="error-message">비밀번호를 다시 확인해주세요.</div>}
+        {!isCorrect && (
+          <div className="error-message">비밀번호를 다시 확인해주세요.</div>
+        )}
 
         <div className="password-dots">
           {[0, 1, 2, 3].map((i) => (

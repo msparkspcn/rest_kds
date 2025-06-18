@@ -84,7 +84,6 @@
   position: relative;
   display: flex;
   align-items: center;
-  cursor: pointer;
 }
 
 .checkbox {
@@ -95,7 +94,6 @@
   border: 1px solid #cbd5e1;
   background-color: white;
   transition: all 0.2s;
-  cursor: pointer;
 
   &:checked {
     background-color: #1e293b;
@@ -125,7 +123,6 @@
   margin-left: 0.5rem;
   color: #475569;
   font-size: 0.875rem;
-  cursor: pointer;
 }
 
 .login-button {

@@ -33,7 +33,9 @@ interface FooterProps {
   totalPages: number;
   onNextPage: () => void;
   onPrevPage: () => void;
+  onCompleteAll: () => void;
   onRestore: () => void;
+  onExitApp: () => void;
 }
 
 const Footer: React.FC<FooterProps> = ({
@@ -42,7 +44,9 @@ const Footer: React.FC<FooterProps> = ({
   totalPages,
   onNextPage,
   onPrevPage,
+  onCompleteAll,
   onRestore,
+  onExitApp
 }) => {
   const [date, setDate] = useState(new Date());
   let clickCnt = 0;
@@ -103,30 +107,13 @@ const Footer: React.FC<FooterProps> = ({
         </button>
       </div>
 
-      <ul className="footer__menu">
-        <li>
-          <div className="footer__menu-item">{STRINGS.complete_all}</div>
-        </li>
-        <li>
-          <div className="footer__menu-item">{STRINGS.restore_recent}</div>
-        </li>
-        <li>
-          <div className="footer__menu-item" onClick={onRestore}>
-            {STRINGS.restore_search}
-          </div>
-        </li>
-        <li>
-          <div
-            className="footer__menu-item"
-            onClick={() => {
-              console.log('종료 버튼 클릭');
-              window.ipc.quitApp();
-            }}
-          >
-            {STRINGS.exit_app}
-          </div>
-        </li>
-      </ul>
+      <div className="footer__menu">
+        <div className="footer__menu-item" onClick={onCompleteAll}>{STRINGS.complete_all}</div>
+        <div className="footer__menu-item">{STRINGS.restore_recent}</div>
+        <div className="footer__menu-item" onClick={onRestore}>{STRINGS.restore_search}</div>
+        <div className="footer__menu-item exit" onClick={onExitApp}>{STRINGS.exit_app}</div>
+      </div>
+
     </footer>
   );
 };

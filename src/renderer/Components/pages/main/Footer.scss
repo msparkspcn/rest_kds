@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   //width: 100%;
-  padding: 0 1rem;
+  padding: 0.5rem 1rem;
   background-color: #000;
   color: white;
 
@@ -32,7 +32,7 @@
     display: flex;
     align-items: center;
     height: 100%;
-    padding: 0 1.5rem;
+    padding: 0 0 0 1.5rem;
   }
 
   &__pagination {
@@ -64,9 +64,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0; // 아이콘 기준 위치 보정
+      padding: 0;
     }
   }
-
 
 }
