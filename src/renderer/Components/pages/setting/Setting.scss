@@ -21,6 +21,7 @@
   button {
     padding: 1% 1rem;
     border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
     &.update {
       background-color: white;
       border: 0.125rem solid colors.$primary;
@@ -168,7 +169,7 @@
     border: none;
     font-weight: bold;
     color: white;
-
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
     &.cancel {
       background-color: #E1E1E1;
       color:#1C1C1C;
