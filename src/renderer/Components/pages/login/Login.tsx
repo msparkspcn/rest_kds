@@ -27,11 +27,13 @@ const Login: React.FC = () => {
   const [focusedField, setFocusedField] = useState<'userId' | 'password'>('userId');
   const userIdInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const getStoreAutoLogin = useUserStore((state) => state.getAutoLogin);
+  const setStoreAutoLogin = useUserStore((state) => state.setAutoLogin);
 
   console.log("Login Component Rendered");
   useEffect(() => {
     log("로그인 화면 진입")
-    if(getUserId && getStorePassword) {
+    if (getStoreAutoLogin()) {
       setUserId(getUserId);
       setPassword(getStorePassword);
       setIsChecked(true);
@@ -77,13 +79,11 @@ const Login: React.FC = () => {
           if (user && 'apiKey' in user) {
             setAuthToken(user.apiKey); // 이제 user 가 null 이 아닐 경우에만 실행
           }
-          if (isChecked) {
-            setStoreUserId(userId);
-            setStorePassword(password);
-          } else {
-            setStoreUserId(userId);
-            setStorePassword('');
-          }
+
+          setStoreUserId(userId);
+          setStorePassword(password);
+          setStoreAutoLogin(isChecked);
+
           navigate('/setting');
         } else {
           log("로그인 실패. 실패코드:"+responseCode)
