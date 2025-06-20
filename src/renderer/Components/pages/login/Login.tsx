@@ -65,6 +65,7 @@ const Login: React.FC = () => {
       userId: userId,
       password: password,
     };
+    setLoading(true)
     api
       .login(params)
       .then((result) => {

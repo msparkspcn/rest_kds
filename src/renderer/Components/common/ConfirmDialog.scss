@@ -1,3 +1,4 @@
+@use "./src/renderer/styles/colors" as colors;
 .dialog-layout {
   position: fixed;
   inset: 0;
@@ -9,29 +10,32 @@
 
   .dialog-content {
     background: white;
-    padding: 1rem;
-    //border-radius: 8px;
-    width: 29%;
-    height: 26%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    width: 33%;
+    height: 38%;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
   }
 
   .dialog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 2% 2%;
     position: relative;
+    border-bottom: 0.0625rem solid #9ca3af;
+    background-color: colors.$primary;
     h2 {
       flex:1;
       font-size: 1.75rem;
       font-weight: bold;
       margin: 0;
       text-align: center;
-      color: #1EB5EC;
+      color: white;
     }
     .close-button {
       width: 2rem;
@@ -40,7 +44,7 @@
       font-weight: bold;
       background: none;
       border: none;
-      color:#A7A7A7;
+      color:white;
     }
     .spacer {
       width: 2rem;
@@ -50,27 +54,38 @@
 
   .dialog-message {
     display: flex;
-    width: 100%;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-size:1.35rem;
-    font-weight: bold;
+    font-size:1.5rem;
+    padding-right: 2%;
+    padding-left: 2%;
+    height:100%;
+    line-height: 1.5;
   }
 
   .dialog-footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 10%;
+    padding-bottom: 2%;
+    padding-right: 2%;
+    padding-left: 2%;
 
     .confirm-button {
-      background-color: #1EB5EC;
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
       color: white;
+      background-color: colors.$primary;
       border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
+      border-radius: 0.5rem;
     }
   }
 }
+
+
+
 

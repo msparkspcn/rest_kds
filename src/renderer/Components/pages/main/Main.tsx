@@ -14,6 +14,7 @@ import { useWebSocket } from '@Components/hooks/useWebSocket';
 import Alert from '@Components/common/Alert';
 import { log } from '@Components/utils/logUtil';
 import { STRINGS } from '../../../constants/strings';
+import Loading from '@Components/common/Loading';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -39,10 +40,11 @@ function Main(): JSX.Element {
 
   const { isConnected, messages } = useWebSocket();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (Array.isArray(messages) && messages.length > 0) {
-      log('1.품절 처리:'+messages);
+      log('1.품절 처리:'+JSON.stringify(messages));
       Promise.all(
         messages.map((msg) =>
           window.ipc.product.updateSoldout(msg.itemCd, msg.soldoutYn)
@@ -62,27 +64,29 @@ function Main(): JSX.Element {
 
   useEffect(() => {
     console.log('### 시스템 구분 :: ', systemType);
-    if (systemType === 0) {
-      // EXPO
-      setFilterList(orderList);
-    } else if (systemType === 1) {
-      // Section
-      // 섹션별 아이템코드 추출
-      const sectionItemCdList = productList.map((item) => item.itemCd);
-
-      // 주문내역 필터링
-      const filterOrderArray = orderList
-        .map((order) => ({
-          ...order,
-          orderDtList: order.orderDtList.filter((product) =>
-            sectionItemCdList.includes(product.itemCd),
-          ),
-        }))
-        .filter((item) => item.orderDtList.some((order) => order.kdsState !== '9'));
-      console.log('### filter :: ', filterOrderArray);
-
-      setFilterList(filterOrderArray);
-    }
+    console.log("주문목록:"+orderList.length);
+    getOrderData("20250612");
+    // if (systemType === 0) {
+    //   // EXPO
+    //   setFilterList(orderList);
+    // } else if (systemType === 1) {
+    //   // Section
+    //   // 섹션별 아이템코드 추출
+    //   const sectionItemCdList = productList.map((item) => item.itemCd);
+    //
+    //   // 주문내역 필터링
+    //   const filterOrderArray = orderList
+    //     .map((order) => ({
+    //       ...order,
+    //       orderDtList: order.orderDtList.filter((product) =>
+    //         sectionItemCdList.includes(product.itemCd),
+    //       ),
+    //     }))
+    //     .filter((item) => item.orderDtList.some((order) => order.kdsState !== '9'));
+    //   console.log('### filter :: ', filterOrderArray);
+    //
+    //   setFilterList(filterOrderArray);
+    // }
   }, [orderList]);
 
   useEffect(() => {
@@ -132,16 +136,18 @@ function Main(): JSX.Element {
     };
 
     console.log('### 5-1 주문내역 수신');
+    setLoading(true);
     api
       .getOrderDataList(params)
       .then((result) => {
         const { responseBody, responseCode, responseMessage } = result.data;
         if (responseCode === '200') {
-          console.log(`### 5-1 주문내역 수신 완료 res:${JSON.stringify(responseBody)}`);
-          setOrderList(responseBody);
+          // console.log(`### 5-1 주문내역 수신 완료 res:${JSON.stringify(responseBody)}`);
+
           if (!arraysEqual(orderList, responseBody)) {
             console.log('### 5-1 주문내역 변경점이 있으므로 갱신');
             // playSound();
+            setOrderList(responseBody);
           }
           console.log(`페이징:${responseBody.length}`);
           // ITEMS_PER_PAGE)
@@ -160,7 +166,7 @@ function Main(): JSX.Element {
       })
       .finally(() => {
         console.log('### 5-1 완료');
-        // setLoading(false);
+        setLoading(false);
       });
   };
 
@@ -470,6 +476,7 @@ function Main(): JSX.Element {
   };
   return (
     <div className="layout-root">
+      {loading && <Loading />}
       <div className="layout-content">
         <Contents
           orderList={filterList}

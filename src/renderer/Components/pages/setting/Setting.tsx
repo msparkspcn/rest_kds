@@ -9,6 +9,7 @@ import ConfirmDialog from '@Components/common/ConfirmDialog';
 import packageJson from '../../../../../package.json';
 import { log } from '@Components/utils/logUtil';
 import Alert from '@Components/common/Alert';
+import Loading from '@Components/common/Loading';
 
 const Setting: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -52,9 +53,10 @@ const Setting: React.FC = () => {
   const updateVersion = async () => {
     const version = await window.ipc.getAppVersion();
     console.log('앱 현재 버전:', version);
+
     setConfirmProps({
       title: '업데이트',
-      message: '최신 버전을 다운로드하고 설치하시겠습니까?',
+      message: '최신 버전을 다운로드하고\n설치하시겠습니까?',
       onConfirm: async () => {
         try {
           const result = await window.ipc.checkForUpdates();
@@ -85,6 +87,7 @@ const Setting: React.FC = () => {
   };
 
   const getCmpList = async (cmpCd: string) => {
+    setLoading(true)
     const request = { cmpValue: cmpCd };
     try {
       const result = await api.getCmpList(request);
@@ -113,10 +116,12 @@ const Setting: React.FC = () => {
             }
           }
           else {
+            setLoading(false);
             window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
           }
         }
         catch(error) {
+          setLoading(false);
           window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
         }
     };
@@ -151,10 +156,12 @@ const Setting: React.FC = () => {
               }
             }
             else {
-                window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+              setLoading(false);
+              window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
             }
         })
           .catch(ex => {
+            setLoading(false);
             window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
           })
           .finally(() => {
@@ -202,12 +209,12 @@ const Setting: React.FC = () => {
           }
         }
         catch(error) {
+          setLoading(false);
           window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
         }
         finally {
           const cornerList = await window.ipc.corner.getList("1");
           console.log('코너 목록:', cornerList);
-            setLoading(false)
         }
     }
 
@@ -256,6 +263,7 @@ const Setting: React.FC = () => {
       const productList = await window.ipc.product.getList(
         cmpCd, salesOrgCd, storCd, '')
       console.log("상품 목록",JSON.stringify(productList))
+      setLoading(false);
     }
   };
 
@@ -327,7 +335,7 @@ const Setting: React.FC = () => {
   };
 
   if(loading) {
-        return <></>
+        return <Loading />
     }
     return (
       <div className="container">

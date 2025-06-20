@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import "./InputPassword.scss";
+import "../../common/InputPassword.scss";
 import { useUserStore } from '@Components/store/user';
 
 interface CallOrderProps {
@@ -62,31 +62,29 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
         <div className="password-header">
           <div className="spacer" />
           <h2>{title}</h2>
-          <button className="close-button" onClick={onClose}>
-            ✕
-          </button>
+          <button className="close-button" onClick={onClose}>✕</button>
         </div>
+        <div className="password-content">
+          {!isCorrect && <div className="error-message">{errorMsg}</div>}
 
-        {!isCorrect && <div className="error-message">{errorMsg}</div>}
+          <div className="order-no-box">{inputValue}</div>
 
-        <div className="order-no-box">{inputValue}</div>
-
-        <div className="keypad">
-          {keyArray.map((item, idx) => (
-            <button
-              key={idx}
-              className="key"
-              onClick={() => onKeypadPress(item.value)}
-              disabled={item.value === ''}
-            >
-              {item.value}
-            </button>
-          ))}
+          <div className="keypad">
+            {keyArray.map((item, idx) => (
+              <button
+                key={idx}
+                className="key"
+                onClick={() => onKeypadPress(item.value)}
+                disabled={item.value === ''}
+              >
+                {item.value}
+              </button>
+            ))}
+          </div>
         </div>
-
-        <button className="confirm-button" onClick={onPasswordCheck}>
-          호출
-        </button>
+        <div className="password-footer">
+          <button className="confirm-button" onClick={onPasswordCheck}>호출</button>
+        </div>
       </div>
     </div>
   );

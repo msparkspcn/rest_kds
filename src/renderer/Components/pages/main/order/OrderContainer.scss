@@ -3,8 +3,7 @@
   display: flex;
   flex-direction: column;
   background-color: #f0f0f0;
-  //border: 1px solid #e5e7eb;
-  border: 1px solid #9ca3af;
+  border: 0.0625rem solid #9ca3af;
   height: 100%;
   border-radius: 0.5rem;
   box-sizing: border-box;
@@ -28,7 +27,6 @@
 .order-header {
   display: grid;
   grid-template-columns: 3fr 4fr 3fr;
-  //border: 1px solid #9ca3af;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
   //overflow: hidden;
@@ -60,10 +58,10 @@
   display: flex;
   flex-direction: column;
   //overflow-y: auto;
-  max-height: 170px;
-  overflow-y: scroll; // 또는 auto
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  max-height: 11rem;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
@@ -86,8 +84,8 @@
   grid-template-columns: 1fr 8fr 1fr;
 
   .order-cell {
-    border-bottom: 1px solid #9ca3af;
-    border-right: 1px solid #9ca3af;
+    border-bottom: 0.0625rem solid #9ca3af;
+    border-right: 0.0625rem solid #9ca3af;
     padding: 0.5rem;
     background-color: transparent;
     color: #1C1C1C;

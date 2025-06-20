@@ -10,9 +10,9 @@
 
   .modal-content {
     background: white;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     width: 80%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     height: 80%;
@@ -22,7 +22,7 @@
       align-items: center;
       flex-shrink: 0;
       padding: 1% 2%;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 0.0625rem solid #ccc;
       background-color: colors.$primary;
 
       .modal-title {
@@ -57,7 +57,7 @@
       width: 100%;
       height: 100%;
       border-collapse: collapse;
-      border: 1px solid #e5e7eb;
+      border: 0.0625rem solid #e5e7eb;
       display: flex;
       flex-direction: column;
       table-layout: fixed;
@@ -82,8 +82,8 @@
       }
 
       th, td {
-        border: 1px solid #1818180F;
-        padding: 8px;
+        border: 0.0625rem solid #1818180F;
+        padding: 0.5rem;
         text-align: left;
         line-height: 1;
         height: 100%;
@@ -171,23 +171,13 @@
         background-color: colors.$primary;
         color: white;
         border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
         font-size: 1.25rem;
       }
 
       .pagination {
         font-size: 1.5rem;
-      }
-
-      .next-button {
-        flex: 0 0 15%;
-        background-color: #f56565;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        font-size: 1.25rem;
       }
     }
   }

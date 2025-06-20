@@ -56,35 +56,33 @@ const InputPassword: React.FC<InputPasswordProps> = ({ onClose, onCorrect }) => 
           <h2>비밀번호 입력</h2>
           <button className="close-button" onClick={onClose}>✕</button>
         </div>
+        <div className="password-content">
+          {!isCorrect && (<div className="error-message">비밀번호를 다시 확인해주세요.</div>)}
 
-        {!isCorrect && (
-          <div className="error-message">비밀번호를 다시 확인해주세요.</div>
-        )}
+          <div className="password-dots">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="dot-box">
+                {inputValue.length > i ? '•' : ''}
+              </div>
+            ))}
+          </div>
 
-        <div className="password-dots">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="dot-box">
-              {inputValue.length > i ? '•' : ''}
-            </div>
-          ))}
+          <div className="keypad">
+            {keyArray.map((item, idx) => (
+              <button
+                key={idx}
+                className="key"
+                onClick={() => onKeypadPress(item.value)}
+                disabled={item.value === ''}
+              >
+                {item.value}
+              </button>
+            ))}
+          </div>
         </div>
-
-        <div className="keypad">
-          {keyArray.map((item, idx) => (
-            <button
-              key={idx}
-              className="key"
-              onClick={() => onKeypadPress(item.value)}
-              disabled={item.value === ''}
-            >
-              {item.value}
-            </button>
-          ))}
+        <div className="password-footer">
+          <button className="confirm-button" onClick={onPasswordCheck}>확인</button>
         </div>
-
-        <button className="confirm-button" onClick={onPasswordCheck}>
-          확인
-        </button>
       </div>
     </div>
   );

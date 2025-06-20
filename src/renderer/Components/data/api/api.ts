@@ -62,32 +62,32 @@ export function setAuthToken(token: string) {
 }
 
 export function login(params: any) {
-  const request = `${host}/api/v1/login/`;
+  const request = `/api/v1/login/`;
   return post(request, params);
 }
 
 export function getCmpList(params: any) {
-  const request = `${host}/api/v1/company/list`;
+  const request = `/api/v1/company/list`;
   return post(request, params);
 }
 
 export function getSalesOrgList(params: any) {
-  const request = `${host}/api/v1/rest/list`;
+  const request = `/api/v1/rest/list`;
   return post(request, params);
 }
 
 export function getStorList(params: any) {
-  const request = `${host}/api/v1/store/list`;
+  const request = `/api/v1/store/list`;
   return post(request, params);
 }
 
 export function getCornerList(params: any) {
-  const request = `${host}/api/v1/corner/list`;
+  const request = `/api/v1/corner/list`;
   return post(request, params);
 }
 
 export function getProductList(params: any) {
-  const request = `${host}/api/v1/did/item`;
+  const request = `/api/v1/did/item`;
   return post(request, params);
 }
 
@@ -97,7 +97,7 @@ export function updateOrderCallState(params: any) {
 }
 
 export function updateSoldout(params: any) {
-  const request = `${host}/api/v1/item/soldout`;
+  const request = `/api/v1/item/soldout`;
   return post(request, params);
 }
 

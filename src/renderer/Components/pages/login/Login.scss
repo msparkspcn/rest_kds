@@ -63,14 +63,14 @@
 .input {
   background-color: white;
   color: #111827;
-  outline: 1px solid #d1d5db;
+  outline: 0.0625rem solid #d1d5db;
   &::placeholder {
     color: #9ca3af;
   }
 
   &:focus {
-    outline: 2px solid colors.$primary;
-    outline-offset: -2px;
+    outline: 0.125rem solid colors.$primary;
+    outline-offset: -0.125rem;
   }
 }
 
@@ -91,7 +91,7 @@
   height: 1.25rem;
   appearance: none;
   border-radius: 0.25rem;
-  border: 1px solid #cbd5e1;
+  border: 0.0625rem solid #cbd5e1;
   background-color: white;
   transition: all 0.2s;
 
@@ -129,8 +129,8 @@
   justify-content: center;
   padding: 1rem 0.75rem;
   color: white;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-
+  box-shadow: 0 0 0 0.0625rem rgba(0,0,0,0.05);
+  font-size: 1.5rem;
   &.active {
     background-color: colors.$primary;
   }
