@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './InputPassword.scss';
 import { useUserStore } from '@Components/store/user';
+import { log } from '@Components/utils/logUtil';
 
 interface InputPasswordProps {
   onClose: () => void;
@@ -31,7 +32,7 @@ const InputPassword: React.FC<InputPasswordProps> = ({ onClose, onCorrect }) => 
       setInputValue('');
       setIsCorrect(true);
     } else {
-      if (inputValue.length === 4) return;
+      // if (inputValue.length === 4) return;
       setInputValue((prev) => prev + value);
     }
   };
@@ -60,10 +61,8 @@ const InputPassword: React.FC<InputPasswordProps> = ({ onClose, onCorrect }) => 
           {!isCorrect && (<div className="error-message">비밀번호를 다시 확인해주세요.</div>)}
 
           <div className="password-dots">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="dot-box">
-                {inputValue.length > i ? '•' : ''}
-              </div>
+            {Array.from({ length: inputValue.length }, (_, i) => (
+              <div key={i} className="dot-box">•</div>
             ))}
           </div>
 

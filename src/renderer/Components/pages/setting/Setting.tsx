@@ -268,14 +268,25 @@ const Setting: React.FC = () => {
   };
 
   const onCancel = () => {
-    navigate(-1);
+    setConfirmProps({
+      title:'확인',
+      message:"로그아웃 하시겠습니까?",
+      onConfirm:()=>{
+        log("확인 버튼 클릭");
+        navigate('/', {
+          replace: true,
+          state: { fromSettings: true}
+        })
+      }}
+    );
+    setConfirmOpen(true);
   };
 
   const onSave = () => {
     log("저장 버튼 클릭 "+selectedCmpCd+","+selectedSalesOrgCd+","+selectedStorCd+","+selectedCornerCd);
     setConfirmProps({
       title:'확인',
-      message:"설정 정보를 저장하시겠어요?",
+      message:"설정 정보를 저장하시겠습니까?",
       onConfirm:()=>{
         log("확인 버튼 클릭");
         const user = useUserStore.getState().getUser();

@@ -9,6 +9,7 @@ import './Login.scss';
 import Alert from '@Components/common/Alert';
 import { log } from '@Components/utils/logUtil';
 import Keypad from '@Components/common/Keypad';
+import { useLocation } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [userId, setUserId] = useState<string>('');
@@ -21,22 +22,28 @@ const Login: React.FC = () => {
   const setUser = useUserStore((state) => state.setUser);
   const getUser = useUserStore((state) => state.getUser);
   const getUserId = useUserStore((state) => state.userId);
-  const getStorePassword = useUserStore((state) => state.getPassword);
+  const getStorePassword = useUserStore((state) => state.password);
   const setStoreUserId = useUserStore((state) => state.setUserId);
   const setStorePassword = useUserStore((state) => state.setPassword);
   const [focusedField, setFocusedField] = useState<'userId' | 'password'>('userId');
   const userIdInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
-  const getStoreAutoLogin = useUserStore((state) => state.getAutoLogin);
-  const setStoreAutoLogin = useUserStore((state) => state.setAutoLogin);
+  const getStoreAutoLogin = useUserStore((state) => state.autoLogin);
+  const location = useLocation();
 
-  console.log("Login Component Rendered");
+  const isFromSettings = location.state?.fromSettings === true;
+
+  console.log("1.0.0 Login Component Rendered");
   useEffect(() => {
-    log("로그인 화면 진입")
-    if (getStoreAutoLogin()) {
+    log("로그인 화면 진입. 자동 로그인 여부:"+getStoreAutoLogin+", id:"+getUserId+", pw:"+getStorePassword)
+    if (getUserId&&getStorePassword) {
+
       setUserId(getUserId);
       setPassword(getStorePassword);
       setIsChecked(true);
+      if(!isFromSettings) {
+        handleLoginClick(getUserId, getStorePassword);
+      }
     }
   }, []);
 
@@ -56,7 +63,8 @@ const Login: React.FC = () => {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
-  const handleLoginClick = () => {
+  const handleLoginClick = (userId:string, password:string) => {
+    log("자동 로그인 실시 userId:"+userId+", password:"+password+", isChecked:"+isChecked)
     if (userId.length === 0) {
       return;
     }
@@ -80,9 +88,13 @@ const Login: React.FC = () => {
             setAuthToken(user.apiKey); // 이제 user 가 null 이 아닐 경우에만 실행
           }
 
-          setStoreUserId(userId);
+          if(isChecked) {
+            setStoreUserId(userId);
+          }
+          else {
+            setStoreUserId('');
+          }
           setStorePassword(password);
-          setStoreAutoLogin(isChecked);
 
           navigate('/setting');
         } else {
@@ -126,7 +138,7 @@ const Login: React.FC = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleLoginClick();
+            handleLoginClick(userId, password);
           }}
           className="login-form"
         >
