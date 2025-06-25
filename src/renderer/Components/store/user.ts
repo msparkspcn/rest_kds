@@ -12,7 +12,7 @@ interface UserData {
   cornerNm: string | null;
   userId: string;
   userRoleType: string;
-  langSettng: string;
+  langSetting: string;
   userNm: string;
   empNo: string | null;
   useYn: string;

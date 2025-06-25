@@ -72,7 +72,8 @@ const Setting: React.FC = () => {
               });
               setConfirmOpen(true);
             } else {
-              setErrorMessage(downloadResult.error || '업데이트 다운로드에 실패했습니다.');
+              console.error('업데이트 오류:',downloadResult.error);
+              setErrorMessage('업데이트 다운로드에 실패했습니다.');
             }
           } else {
             setErrorMessage('최신 버전입니다.');

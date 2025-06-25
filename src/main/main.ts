@@ -137,12 +137,54 @@ ipcMain.handle('check-for-updates', async () => {
 
 ipcMain.handle('download-update', async () => {
   return new Promise((resolve) => {
+    if (progressBar) {
+      // 이미 다운로드 중이면 무시
+      resolve({ success: false, error: '이미 다운로드가 진행 중입니다.' });
+      return;
+    }
+
+    progressBar = new ProgressBar({
+      indeterminate: false,
+      title: '업데이트 다운로드',
+      text: '업데이트 준비 중...',
+      detail: '잠시만 기다려주세요...',
+      browserWindow: {
+        parent: mainWindow!,
+        modal: true,
+        closable: false,
+        minimizable: false,
+        maximizable: false,
+      },
+      maxValue: 100,
+    });
+
+    // 다운로드 진행 이벤트
+    autoUpdater.on('download-progress', (progressObj) => {
+      if (!progressBar || progressBar.isCompleted()) return;
+
+      const percent = Math.round(progressObj.percent);
+      progressBar.value = percent;
+      progressBar.detail = `다운로드 중... ${percent}% 완료 (${Math.round(progressObj.transferred / 1024)} KB / ${Math.round(progressObj.total / 1024)} KB)`;
+    });
+
     autoUpdater.once('update-downloaded', () => {
+      if (progressBar && !progressBar.isCompleted()) {
+        progressBar.setCompleted();
+        progressBar = null;
+      }
+
       resolve({ success: true });
     });
+
     autoUpdater.once('error', (err: Error) => {
+      if (progressBar) {
+        progressBar.detail = '다운로드 중 오류 발생';
+        progressBar.close();
+        progressBar = null;
+      }
       resolve({ success: false, error: err.message });
     });
+
     autoUpdater.downloadUpdate();
   });
 });

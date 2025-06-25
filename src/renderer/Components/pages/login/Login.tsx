@@ -28,14 +28,13 @@ const Login: React.FC = () => {
   const [focusedField, setFocusedField] = useState<'userId' | 'password'>('userId');
   const userIdInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
-  const getStoreAutoLogin = useUserStore((state) => state.autoLogin);
   const location = useLocation();
 
   const isFromSettings = location.state?.fromSettings === true;
 
   console.log("1.0.0 Login Component Rendered");
   useEffect(() => {
-    log("로그인 화면 진입. 자동 로그인 여부:"+getStoreAutoLogin+", id:"+getUserId+", pw:"+getStorePassword)
+    log("로그인 화면 진입. id:"+getUserId+", pw:"+getStorePassword)
     if (getUserId&&getStorePassword) {
 
       setUserId(getUserId);
@@ -44,6 +43,9 @@ const Login: React.FC = () => {
       if(!isFromSettings) {
         handleLoginClick(getUserId, getStorePassword);
       }
+    }
+    else if(!getUserId&&!getStorePassword) {
+      userIdInputRef.current?.focus();
     }
   }, []);
 
@@ -58,11 +60,18 @@ const Login: React.FC = () => {
     } else {
       setField(value + key);
     }
+
+    if (focusedField === 'userId') {
+      userIdInputRef.current?.focus();
+    } else if (focusedField === 'password') {
+      passwordInputRef.current?.focus();
+    }
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
+
   const handleLoginClick = (userId:string, password:string) => {
     log("자동 로그인 실시 userId:"+userId+", password:"+password+", isChecked:"+isChecked)
     if (userId.length === 0) {
