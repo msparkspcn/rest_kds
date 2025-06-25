@@ -72,7 +72,7 @@ const Setting: React.FC = () => {
               });
               setConfirmOpen(true);
             } else {
-              setErrorMessage('업데이트 다운로드에 실패했습니다.');
+              setErrorMessage(downloadResult.error || '업데이트 다운로드에 실패했습니다.');
             }
           } else {
             setErrorMessage('최신 버전입니다.');
@@ -205,6 +205,7 @@ const Setting: React.FC = () => {
             }
           }
           else {
+            setLoading(false);
             window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
           }
         }

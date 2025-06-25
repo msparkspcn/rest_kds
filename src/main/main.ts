@@ -1,6 +1,4 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
-// import { autoUpdater } from 'electron-updater';
-// import * as Store from 'electron-store';
 import { isDebug, getAssetsPath, getHtmlPath, getPreloadPath, installExtensions } from './utils';
 import './updater';
 import { createTables } from './db/db';
@@ -11,13 +9,15 @@ import path from 'path';
 const fs = require('fs');
 const log = require('electron-log');
 const { autoUpdater } = require('electron-updater');
+let mainWindow: BrowserWindow | null = null;
 console.log("main Started")
 
 autoUpdater.logger = log;
+log.transports.console.level = 'debug';
 log.transports.file.level = 'debug';
-
+autoUpdater.autoInstallOnAppQuit = false;
+autoUpdater.autoDownload =false;
 function setupDatabase() {
-  // 필요한 경우 테이블 생성 작업을 수행
   try {
     createTables();
   } catch (error) {
@@ -41,7 +41,7 @@ function clearPendingInstaller() {
 
 function createWindow() {
   console.log("createWindow called");
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     icon: getAssetsPath('icon.ico'),
     width: 1280,
     height: 800,
@@ -67,7 +67,7 @@ function createWindow() {
   mainWindow.webContents.openDevTools({ mode: 'detach' });
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-    console.error(`❌ Failed to load: ${validatedURL} (${errorCode}) - ${errorDescription}`);
+    console.error(`Failed to load: ${validatedURL} (${errorCode}) - ${errorDescription}`);
   });
 
   /* URLs OPEN IN DEFAULT BROWSER */
@@ -75,6 +75,9 @@ function createWindow() {
     shell.openExternal(data.url);
     return { action: 'deny' };
   });
+
+  mainWindow.on("closed", () => (mainWindow = null)); //창이 닫히면 변수 참조 해제(메모리 누수 방지)
+  mainWindow.focus(); //창 생성 후 즉시 포커스(백그라운드로 가는 것 방지)
 }
 
 /* IPC EVENTS EXAMPLE */
@@ -174,7 +177,7 @@ autoUpdater.on('update-available', () => {
 });
 
 
-autoUpdater.checkForUpdatesAndNotify();
+// autoUpdater.checkForUpdatesAndNotify();
 
 function isBlockmapNotFoundError(error: any): boolean {
   return error.message.includes('status 404') && error.message.includes('.blockmap');
@@ -193,10 +196,28 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+
+  if (process.argv.includes('--relaunch')) {
+    const relaunchLogPath = path.join(app.getPath('userData'), 'relaunch.log');
+    fs.appendFileSync(relaunchLogPath, `앱이 재실행됨 - ${new Date().toISOString()}\n`);
+  }
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
+//앱 종료 전 자원 정리
+app.on('before-quit', async () => {
+  console.log('before-quit: cleaning up...');
+  try {
+    await globalThis?.db?.close?.();
+    if (globalThis.server) {
+      await new Promise<void>((resolve) => {
+        globalThis.server.close(() => {
+          console.log('Server closed');
+          resolve();
+        });
+      });
+    }
+    console.log('before-quit: cleanup done.');
+  } catch (e) {
+    console.error('Error during cleanup:', e);
   }
 });
