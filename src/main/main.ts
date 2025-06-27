@@ -6,6 +6,8 @@ import { registerCmpIpc } from './db/cmp';
 import { registerCornerIpc } from './db/corner';
 import { registerProductIpc } from './db/product';
 import path from 'path';
+
+const ProgressBar = require('electron-progressbar');
 const fs = require('fs');
 const log = require('electron-log');
 const { autoUpdater } = require('electron-updater');
@@ -17,6 +19,8 @@ log.transports.console.level = 'debug';
 log.transports.file.level = 'debug';
 autoUpdater.autoInstallOnAppQuit = false;
 autoUpdater.autoDownload =false;
+let progressBar: ProgressBar | null = null;
+
 function setupDatabase() {
   try {
     createTables();
@@ -125,7 +129,13 @@ ipcMain.on('log-to-file', (event, log) => {
 ipcMain.handle('check-for-updates', async () => {
   try {
     const result = await autoUpdater.checkForUpdates();
-    return { updateAvailable: !!result?.updateInfo?.version };
+    const latestVersion = result?.updateInfo?.version;
+    const currentVersion = app.getVersion();
+    if (latestVersion && isVersionGreater(latestVersion, currentVersion)) {
+      return { updateAvailable: true, version: latestVersion };
+    } else {
+      return { updateAvailable: false, version: latestVersion };
+    }
   } catch (e) {
     let errorMessage = 'Unknown error';
     if (e instanceof Error) {
@@ -134,6 +144,17 @@ ipcMain.handle('check-for-updates', async () => {
     return { updateAvailable: false, error: errorMessage };
   }
 });
+
+function isVersionGreater(v1: string, v2: string): boolean {
+  const a = v1.split('.').map(Number);
+  const b = v2.split('.').map(Number);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if ((a[i] || 0) > (b[i] || 0)) return true;
+    if ((a[i] || 0) < (b[i] || 0)) return false;
+  }
+  return false;
+}
+
 
 ipcMain.handle('download-update', async () => {
   return new Promise((resolve) => {
