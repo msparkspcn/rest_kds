@@ -55,12 +55,33 @@ function createTables() {
     );`,
 
     `CREATE TABLE IF NOT EXISTS order_hd (
-      id INTEGER PRIMARY KEY AUTOINCREMENT
-
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cmp_cd TEXT NOT NULL,
+      sale_dt TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
+      stor_cd TEXT NOT NULL,
+      pos_no TEXT NOT NULL,
+      trade_no TEXT NOT NULL,
+      trade_div TEXT,
+      ord_time TEXT,
+      reg_date TEXT,
+      upd_date TEXT,
+      state TEXT,
+      corner_cd TEXT
     );`,
-    `CREATE TABLE IF NOT EXISTS order_dt (
-      id INTEGER PRIMARY KEY AUTOINCREMENT
 
+    `CREATE TABLE IF NOT EXISTS order_dt (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cmp_cd TEXT NOT NULL,
+      sale_dt TEXT NOT NULL,
+      stor_cd TEXT NOT NULL,
+      pos_no TEXT NOT NULL,
+      trade_no TEXT NOT NULL,
+      seq INTEGER NOT NULL,
+      ord_time TEXT,
+      item_div TEXT,
+      sale_qty INTEGER,
+      state TEXT
     );`,
     `CREATE TABLE IF NOT EXISTS sale_open (
       cmp_CD TEXT NOT NULL,

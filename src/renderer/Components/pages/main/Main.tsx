@@ -43,23 +43,44 @@ function Main(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (Array.isArray(messages) && messages.length > 0) {
-      log('1.품절 처리:'+JSON.stringify(messages));
-      Promise.all(
-        messages.map((msg) =>
-          window.ipc.product.updateSoldout(msg.itemCd, msg.soldoutYn)
-        )
-      )
-        .then(() => {
-          console.log("모든 품절 처리 완료");
-        })
-        .catch((err) => {
-          console.error("품절 처리 중 오류 발생:", err);
-          setErrorMessage("품절 처리에 실패했습니다.\n다시 시도해주세요.")
-        });
-    } else {
+    if (!Array.isArray(messages) || messages.length === 0) {
       console.log('빈 객체입니다');
+      return;
     }
+    log('0.message 길이:'+messages.length)
+    log('0.message:'+JSON.stringify(messages))
+
+    messages.forEach((msg) => {
+      switch (msg.type) {
+        case 'SOLDOUT':
+          log('1.품절 처리:' + JSON.stringify(msg.body));
+          // console.log('1.품절 처리:' + JSON.stringify(msg.body));
+
+          Promise.all(
+            msg.body.map((body) =>
+              window.ipc.product.updateSoldout(body.itemCd, body.soldoutYn)
+            )
+          )
+            .then(() => {
+              console.log('품절 처리 완료:');
+            })
+            .catch((err) => {
+              console.error('품절 처리 중 오류 발생:', err);
+              setErrorMessage('품절 처리에 실패했습니다.\n다시 시도해주세요.');
+            });
+          break;
+
+        case 'ORDER':
+          log('2.주문 처리')
+          break;
+
+        default:
+          console.warn('지원되지 않는 메시지 타입:', msg.type);
+          break;
+      }
+    });
+
+
   }, [messages]);
 
   useEffect(() => {

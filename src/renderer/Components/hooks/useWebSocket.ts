@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { useUserStore } from '@Components/store/user';
 
 const WS_URL = 'ws://10.120.44.88:8082/ws';
-
+type Message = {
+  type: string;
+  body: any; // 혹은 더 구체적인 타입으로 정의 가능
+};
 export const useWebSocket = () => {
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessagesInternal] = useState<Message[]>([]);
   const getUserId = useUserStore((state) => state.userId);
   const connect = () => {
     ws.current = new WebSocket(WS_URL);
@@ -17,19 +20,29 @@ export const useWebSocket = () => {
       setIsConnected(true);
 
       ws.current?.send(JSON.stringify({ type: 'subscribe', topic: 'item', userId: getUserId }));
+      ws.current?.send(JSON.stringify({ type: 'subscribe', topic: 'order', userId: getUserId }));
     };
 
     ws.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         // 예: topic 기반 메시지 필터링
-        if (data.type === 'SOLDOUT') {
+        console.log("no filtered data:"+JSON.stringify(data))
+
+        if (['SOLDOUT', 'ORDER'].includes(data.type)) {
           console.log(`SOLDOUT data:${JSON.stringify(data)}`);
-          setMessages(data.body);
+          setMessages(data.type, data.body);
         }
       } catch (err) {
         console.warn('[WebSocket] Message parse error:', event.data);
       }
+    };
+
+    const setMessages = (type:string, body: any) => {
+      setMessagesInternal((prev) => {
+        const filtered = prev.filter((msg) => msg.type !== type);
+        return [...filtered, { type, body }];
+      });
     };
 
     ws.current.onclose = () => {
