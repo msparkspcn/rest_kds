@@ -6,6 +6,7 @@ interface OrderItem {
   // itemNm: string;
   productNm: string;
   saleQty: number;
+  addedSeq:number;
 }
 
 interface OrderData {
@@ -83,7 +84,10 @@ function RenderItem({ item, index }: RenderItemProps): JSX.Element {
   return (
     <div className="order-row">
       <div className="order-cell index">{index + 1}</div>
-      <div className="order-cell name">{item.productNm}</div>
+      <div className="order-cell name">
+        {item.addedSeq !== 0 ? '↳' : ''}
+        {item.productNm}
+      </div>
       <div className="order-cell qty">{item.saleQty}</div>
     </div>
   );

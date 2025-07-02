@@ -23,9 +23,23 @@ declare global {
       product: {
         getList: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
         // getList: () => Promise<any>;
-        add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, item_cd:string, item_nm:string, price:string, soldout_yn:string, use_yn:string, sort_order: string)
+        add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, item_cd:string,
+              item_nm:string, price:string, soldout_yn:string, use_yn:string, sort_order: string)
           => Promise<void>;
         updateSoldout: (item_cd:string, soldout_yn: string) => Promise<void>;
+      };
+      order: {
+        getList: () => Promise<any>;
+        addOrderHd: (cmp_cd:string, sale_dt:string, sales_org_cd:string, stor_cd:string, pos_no:string,
+              trade_no:string, trade_div:string, org_time:string, com_time:string, reg_date:Date,
+              upd_date:Date, state:string, cornerCd:string)
+          => Promise<void>;
+        addOrderCorner: (cmp_cd:string, sale_dt:string, sales_org_cd:string, stor_cd:string, corner_cd:string,
+             order_no_c:string, state:string)
+          => Promise<void>;
+        addOrderDt: (cmp_cd:string, sale_dt:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string, trade_no:string, seq:string, item_plu_cd:string, item_nm:string,
+         item_div:string, sale_qty:number, order_no_c:string, set_menu_cd:string, trade_div:string, reg_date:Date, upd_date:date)
+                     => Promise<void>;
       }
     };
   }

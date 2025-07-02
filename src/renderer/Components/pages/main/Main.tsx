@@ -41,6 +41,15 @@ function Main(): JSX.Element {
   const { isConnected, messages } = useWebSocket();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const user = useUserStore((state) => state.user);
+
+  useEffect(() => {
+    console.log("user:"+JSON.stringify(user));
+    if(user!=null) {
+      getProductList(user.cmpCd, user.salesOrgCd, user.storCd)
+    }
+    // getProductList();
+  }, []);
 
   useEffect(() => {
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -125,6 +134,55 @@ function Main(): JSX.Element {
       }
     }
     return true;
+  };
+
+  const getProductList = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
+    console.log(`상품 조회:${cmpCd}, ${salesOrgCd}, ${storCd}`);
+    const params = {
+      cmpCd: cmpCd,
+      salesOrgCd: salesOrgCd,
+      storCd: storCd,
+      cornerCd: ''
+    };
+    try {
+      const result = await api.getProductList(params);
+      const { responseBody, responseCode, responseMessage } = result.data;
+
+      if (responseCode === '200') {
+        if(responseBody!=null) {
+          log("상품 조회 성공")
+          for (const product of responseBody) {
+            if(getPlatform()==='electron') {
+              const {cmpCd, salesOrgCd, storCd, cornerCd,
+                itemCd, itemNm, price, soldoutYn, useYn, sortOrder} = product;
+              console.log("product:"+JSON.stringify(product))
+              await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn, sortOrder)
+            }
+            else {
+              log("웹 환경입니다.")
+            }
+          }
+
+          log(`상품 수:${responseBody.length}`);
+        }
+
+        // setSaleDt(responseBody.saleDt);
+        // getOrderData(responseBody.saleDt);
+      }
+      else {
+        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+      }
+    }
+    catch(error) {
+      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
+    finally {
+      console.log('상품 insert 완료'+storCd);
+      const productList = await window.ipc.product.getList(
+        cmpCd, salesOrgCd, storCd, '')
+      console.log("상품 목록",JSON.stringify(productList))
+      setLoading(false);
+    }
   };
 
   const getStoreSaleOpen = () => {

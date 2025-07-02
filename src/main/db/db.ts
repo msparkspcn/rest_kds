@@ -64,25 +64,43 @@ function createTables() {
       trade_no TEXT NOT NULL,
       trade_div TEXT,
       ord_time TEXT,
+      com_time TEXT,
       reg_date TEXT,
       upd_date TEXT,
-      state TEXT,
-      corner_cd TEXT
+      state TEXT
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS order_corner (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cmp_cd TEXT NOT NULL,
+      sale_dt TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
+      stor_cd TEXT NOT NULL,
+      corner_cd TEXT NOT NULL,
+      order_no_c TEXT,
+      state TEXT
     );`,
 
     `CREATE TABLE IF NOT EXISTS order_dt (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       cmp_cd TEXT NOT NULL,
       sale_dt TEXT NOT NULL,
+      sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       pos_no TEXT NOT NULL,
       trade_no TEXT NOT NULL,
       seq INTEGER NOT NULL,
-      ord_time TEXT,
+      item_plu_cd TEXT,
+      item_nm TEXT,
       item_div TEXT,
       sale_qty INTEGER,
-      state TEXT
+      set_menu_cd TEXT,
+      reg_date TEXT,
+      upd_date TEXT,
+      trade_div TEXT,
+      corner_cd TEXT
     );`,
+
     `CREATE TABLE IF NOT EXISTS sale_open (
       cmp_CD TEXT NOT NULL,
       sales_org_cd TEXT NOT NULL,

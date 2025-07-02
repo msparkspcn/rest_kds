@@ -202,7 +202,6 @@ const Setting: React.FC = () => {
               );
               setSelectedStorCd(responseBody[0].storCd)
               setSelectedCornerCd(responseBody[0].cornerCd)
-              getProductList(cmpCd, salesOrgCd, responseBody[0].storCd)
             }
           }
           else {
@@ -217,57 +216,9 @@ const Setting: React.FC = () => {
         finally {
           const cornerList = await window.ipc.corner.getList("1");
           console.log('코너 목록:', cornerList);
+          setLoading(false);
         }
     }
-
-  const getProductList = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
-    console.log(`상품 조회:${cmpCd}, ${salesOrgCd}, ${storCd}`);
-    const params = {
-      cmpCd: cmpCd,
-      salesOrgCd: salesOrgCd,
-      storCd: storCd,
-      cornerCd: ''
-    };
-    try {
-      const result = await api.getProductList(params);
-      const { responseBody, responseCode, responseMessage } = result.data;
-
-      if (responseCode === '200') {
-        if(responseBody!=null) {
-          log("상품 조회 성공")
-          for (const product of responseBody) {
-            if(getPlatform()==='electron') {
-              const {cmpCd, salesOrgCd, storCd, cornerCd,
-                itemCd, itemNm, price, soldoutYn, useYn, sortOrder} = product;
-              console.log("product:"+JSON.stringify(product))
-              await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn, sortOrder)
-            }
-            else {
-              log("웹 환경입니다.")
-            }
-          }
-
-          log(`상품 수:${responseBody.length}`);
-        }
-
-        // setSaleDt(responseBody.saleDt);
-        // getOrderData(responseBody.saleDt);
-      }
-      else {
-        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-      }
-    }
-    catch(error) {
-      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
-    }
-    finally {
-      console.log('상품 insert 완료'+storCd);
-      const productList = await window.ipc.product.getList(
-        cmpCd, salesOrgCd, storCd, '')
-      console.log("상품 목록",JSON.stringify(productList))
-      setLoading(false);
-    }
-  };
 
   const onCancel = () => {
     setConfirmProps({
@@ -330,7 +281,7 @@ const Setting: React.FC = () => {
     // console.log("cornerList:"+JSON.stringify(cornerList))
     if (storCd) {
       setSelectedStorCd(storCd);
-      getProductList(selectedCmpCd, selectedSalesOrgCd, storCd);
+      setLoading(false);
     }
   };
   const loadCmpList = async () => {
