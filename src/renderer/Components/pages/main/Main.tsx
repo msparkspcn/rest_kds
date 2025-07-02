@@ -15,6 +15,8 @@ import Alert from '@Components/common/Alert';
 import { log } from '@Components/utils/logUtil';
 import { STRINGS } from '../../../constants/strings';
 import Loading from '@Components/common/Loading';
+import { getPlatform } from '@Components/utils/platform';
+import { useUserStore } from '@Components/store/user';
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -81,6 +83,46 @@ function Main(): JSX.Element {
 
         case 'ORDER':
           log('2.주문 처리')
+          Promise.all(
+            msg.body.map(async (body) => {
+                await window.ipc.order.addOrderHd(body.cmpCd, body.saleDt,
+                  body.salesOrgCd, body.storCd, body.posNo, body.tradeNo, body.tradeDiv,
+                  body.orgTime, body.comTime, body.regDate, body.updDate, body.state, body.cornerCd
+                );
+                await Promise.all(
+                  (body.corners || []).map(async (cn) => {
+                      await window.ipc.order.addOrderCorner(
+                        cn.cmpCd, cn.saleDt, cn.salesOrgCd, cn.storCd,
+                        cn.cornerCd, cn.orderNoC, cn.state
+                      );
+                    await Promise.all(
+                      (cn.details || []).map((dt) =>
+                        window.ipc.order.addOrderDt(
+                          dt.cmpCd, dt.saleDt, dt.salesOrgCd, dt.storCd,
+                          dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
+                          dt.seq, dt.itemPluCd, dt.itemNm, dt.itemDiv,
+                          dt.saleQty, dt.orderNoC, dt.setMenuCd, dt.tradeDiv,
+                          dt.regDate, dt.updDate
+                        )
+                      )
+                    );
+                    }
+                  )
+                );
+
+              }
+            )
+          )
+            .then(() => {
+              console.log('주문 처리 완료:');
+              const orderList = window.ipc.order.getOrderList(
+                "20250623", user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd);
+              // setFilterList(orderList);
+            })
+            .catch((err) => {
+              console.error('주문 처리 중 오류 발생:', err);
+              setErrorMessage('주문 처리에 실패했습니다.\n다시 시도해주세요.');
+            });
           break;
 
         default:
