@@ -60,10 +60,8 @@ const InputPassword: React.FC<InputPasswordProps> = ({ onClose, onCorrect }) => 
         <div className="password-content">
           {!isCorrect && (<div className="error-message">비밀번호를 다시 확인해주세요.</div>)}
 
-          <div className="password-dots">
-            {Array.from({ length: inputValue.length }, (_, i) => (
-              <div key={i} className="dot-box">•</div>
-            ))}
+          <div className="order-no-box">
+            {inputValue.length > 0 ? '•'.repeat(inputValue.length) : ''}
           </div>
 
           <div className="keypad">
