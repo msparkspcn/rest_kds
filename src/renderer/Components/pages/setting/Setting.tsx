@@ -11,11 +11,20 @@ import { log } from '@Components/utils/logUtil';
 import Alert from '@Components/common/Alert';
 import Loading from '@Components/common/Loading';
 
+type Corner = {
+  cmpCd: string;
+  salesOrgCd: string;
+  storCd: string;
+  cornerCd: string;
+  cornerNm: string;
+  useYn: string;
+}
+
 const Setting: React.FC = () => {
-    const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
     // const [saleOpen, setSaleOpen] = useState<boolean>(props.route.params.saleOpen);
     // const [appVersion, setAppVersion] = useState<string>("");
-    const user = useUserStore((state) => state.user);
+  const user = useUserStore((state) => state.user);
 
   const [cmpNmList, setCmpNmList] = useState<{ infoCd: string; infoNm: string }[]>([]);
   const [selectedCmpCd, setSelectedCmpCd] = useState<string>('');
@@ -24,7 +33,7 @@ const Setting: React.FC = () => {
   const [selectedCornerCd, setSelectedCornerCd] = useState<string>('');
   const [salesOrgNmList, setSalesOrgNmList] = useState<{ infoCd: string; infoNm: string }[]>([]);
   const [cornerNmList, setCornerNmList] = useState<{ infoCd: string; infoNm: string }[]>([]);
-  const [cornerList, setCornerList] = useState([]);
+  const [cornerList, setCornerList] = useState<Corner[]>([]);
   const navigate = useNavigate();
 
   const [confirmOpen, setConfirmOpen] = useState(false);

@@ -34,7 +34,7 @@ function Contents({ orderList, onRefresh, onSelectOrderHd }: ContentsProps): JSX
       <div className="order-grid">
         {paginatedOrders?.map((orderItem: any, index: number) => (
           <OrderContainer
-            key={orderItem.orderNo || index}
+            key={orderItem.saleSeq}
             item={orderItem}
             onSelectOrder={onSelectOrderHd}
           />

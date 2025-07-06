@@ -4,6 +4,7 @@ import './OrderContainer.scss';
 
 interface OrderItem {
   // itemNm: string;
+  saleSeq: number; //seq 로 변경 예정(saleSeq만으로는 key로 사용할 수 없음)
   productNm: string;
   saleQty: number;
   addedSeq:number;
@@ -52,7 +53,7 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
       <OrderHeader orderNo={item.orderNo} instTime={displayInstTime} diff={diff} />
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
-          <RenderItem key={index} item={orderItem} index={index} />
+          <RenderItem key={orderItem.saleSeq} item={orderItem} index={index} />
         ))}
       </div>
     </div>

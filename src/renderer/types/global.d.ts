@@ -8,6 +8,10 @@ declare global {
       set: (key: string, val: unknown) => void;
       get: (key: string) => unknown;
       quitApp: () => void;
+      getAppVersion(): Promise<string>;
+      checkForUpdates(): Promise<{ updateAvailable: boolean }>;
+      downloadUpdate(): Promise<{ success: boolean; error?: string }>;
+      quitAndInstall(): Promise<void>;
       cmp: {
         getList: () => Promise<any>;
         add: (cmp_cd: string, cmp_nm: string) => Promise<void>;

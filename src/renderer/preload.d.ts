@@ -13,6 +13,10 @@ declare global {
       get: (key: string) => unknown;
       quitApp: () => void;
       isElectron?: boolean;
+      getAppVersion(): Promise<string>;
+      checkForUpdates(): Promise<{ updateAvailable: boolean }>;
+      downloadUpdate(): Promise<{ success: boolean; error?: string }>;
+      quitAndInstall(): Promise<void>;
     };
   }
 }

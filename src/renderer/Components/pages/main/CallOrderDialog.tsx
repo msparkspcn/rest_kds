@@ -72,7 +72,7 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
           <div className="keypad">
             {keyArray.map((item, idx) => (
               <button
-                key={idx}
+                key={item.value}
                 className="key"
                 onClick={() => onKeypadPress(item.value)}
                 disabled={item.value === ''}
