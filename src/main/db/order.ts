@@ -7,22 +7,29 @@ type OrderHd = {
   cmpCd: string;
   salesOrgCd: string;
   storCd: string;
+  cornerCd: string;
   posNo: string;
   tradeNo: string;
-  tradeDiv: string;
   ordTime: string;
   comTime: string;
-  regDate: Date;
+  status: string;
+  orderNoC: string;
+  updUserId: string;
   updDate: Date;
-  state: string;
-  cornerCd: string;
-  orderCornerList: OrderCorner[];
+  orderDtList: OrderDt[];
 }
 
-type OrderCorner = {
-  cornerCd: string;
+type CompletedOrder = {
+  posNo: string;
   orderNoC: string;
-  orderDtList: OrderDt[];
+  ordTime: string;
+  comTime: string;
+  seq: number;
+  itemNm: string;
+  saleQty: number;
+  status: string;
+  itemDiv: string;
+  setMenuCd: string;
 }
 
 type OrderDt = {
@@ -30,18 +37,15 @@ type OrderDt = {
   cmpCd: string;
   salesOrgCd: string;
   storCd: string;
+  cornerCd: string;
   posNo: string;
   tradeNo: string;
   seq: number;
   itemPluCd: string;
   itemNm: string;
   itemDiv: string;
-  saleQty: number;
   setMenuCd:string;
-  regDate: Date;
-  updDate: Date;
-  tradeDiv: string;
-  cornerCd: string;
+  saleQty: number;
 }
 
 
@@ -50,59 +54,91 @@ export function registerOrderIpc() {
     async (e, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
     const rows = db.prepare(
       `SELECT
-      hd.sale_dt, hd.order_no, hd.ord_time, hd.state,dt.item_plu_cd, dt.item_nm,
-      dt.item_div, dt.sale_qty, cn.order_no_c, cn.state
+      hd.sale_dt, hd.ord_time, hd.status, hd.order_no_c, dt.seq, dt.item_plu_cd, dt.item_nm,
+      dt.item_div, dt.corner_cd, dt.sale_qty
       FROM order_hd hd
       JOIN order_dt dt
       ON hd.cmp_cd = dt.cmp_cd
       AND hd.sales_org_cd = dt.sales_org_cd
       AND hd.stor_cd = dt.stor_cd
+      AND hd.corner_cd = dt.corner_cd
       AND hd.sale_dt = dt.sale_dt
       AND hd.pos_no = dt.pos_no
-      JOIN order_corner cn
-      ON dt.cmp_cd = cn.cmp_cd
-      AND dt.sales_org_cd = cn.sales_org_cd
-      AND dt.stor_cd = cn.stor_cd
-      AND dt.corner_cd = cn.corner_cd
-      AND dt.sale_dt = cn.sale_dt
-      AND dt.pos_no = cn.pos_no
+      WHERE 1=1
       AND dt.sale_dt = ?
       AND dt.cmp_cd = ?
       AND dt.sales_org_cd = ?
       AND dt.stor_cd = ?
       AND dt.corner_cd = ?
-      AND cn.state != '9'
+      AND hd.status not in ('8','9')
       `
     ).all([sale_dt, cmp_cd, sales_org_cd, stor_cd,corner_cd]) as OrderHd[];
     return camelcaseKeys(rows, {deep: true})
     });
 
+  ipcMain.handle('db:getCompletedOrderList',
+    async(e,sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
+    const rows = db.prepare(
+      `SELECT
+      hd.pos_no, hd.order_no_c, hd.ord_time, hd.com_time, seq, item_plu_cd, item_nm, sale_qty, hd.status,
+      item_div, set_menu_cd
+      FROM order_hd hd
+      JOIN order_dt dt
+      ON dt.cmp_cd = hd.cmp_cd
+      AND dt.sales_org_cd = hd.sales_org_cd
+      AND dt.stor_cd = hd.stor_cd
+      AND dt.corner_cd = hd.corner_cd
+      AND dt.sale_dt = hd.sale_dt
+      AND dt.pos_no = hd.pos_no
+      AND dt.trade_no = hd.trade_no
+      WHERE 1=1
+      AND dt.sale_dt = ?
+      AND dt.cmp_cd = ?
+      AND dt.sales_org_cd = ?
+      AND dt.stor_cd = ?
+      AND dt.corner_cd = ?
+      AND cn.status = '9'
+      `
+    ).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd]) as CompletedOrder[];
+    return camelcaseKeys(rows, {deep: true})
+    });
+
   ipcMain.handle('db:addOrderHd', async (_e,
-   cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no, trade_div, org_time, com_time, reg_date, upd_date, state) => {
-    db.prepare(`INSERT INTO order_hd (cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no, trade_div, org_time, com_time, reg_date, upd_date, state)
-VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no)
+   sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no,
+   org_time, com_time, status, order_no_c, upd_user_id, upd_date) => {
+    db.prepare(`INSERT INTO order_hd
+(sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no,
+org_time, com_time, status, order_no_c, upd_user_id, upd_date)
+VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no)
 DO UPDATE SET
-    trade_div = excluded.trade_div,
+    org_time = excluded.org_time,
     com_time = excluded.com_time,
-    upd_date = excluded.upd_date,
-    state = excluded.state`)
-      .run(cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no, trade_div, org_time, com_time, reg_date, upd_date, state)
+    status = excluded.status,
+    order_no_c = excluded.order_no_c,
+    upd_user_id = excluded.upd_user_id,
+    upd_date = excluded.upd_date`)
+      .run(sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no,
+        org_time, com_time, status, order_no_c, upd_user_id, upd_date)
   });
 
   ipcMain.handle('db:addOrderDt', async (_e,
-   cmp_cd, sale_dt, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq, item_plu_cd, item_nm,
-   item_div, sale_qty, order_no_c, set_menu_cd, trade_div, reg_date, upd_date) => {
-    db.prepare(`INSERT INTO order_dt (cmp_cd, sale_dt, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq, item_plu_cd, item_nm, item_div, sale_qty, order_no_c, set_menu_cd, trade_div, reg_date, upd_date)
-VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (cmp_cd, sale_dt, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq)
+   sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq, item_plu_cd, item_nm,
+   item_div, set_menu_cd, sale_qty) => {
+    db.prepare(`INSERT INTO order_dt
+(sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq, item_plu_cd, item_nm,
+item_div, set_menu_cd, sale_qty)
+VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)
+ON CONFLICT (sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq)
 DO UPDATE SET
     sale_qty = excluded.sale_qty,
     trade_div = excluded.trade_div,
     upd_date = excluded.upd_date`)
-      .run(cmp_cd, sale_dt, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq, item_plu_cd, item_nm, item_div, sale_qty, order_no_c, set_menu_cd, trade_div, reg_date, upd_date)
+      .run(sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq, item_plu_cd, item_nm,
+        item_div, set_menu_cd, sale_qty)
   });
 
   // ipcMain.handle('db:updateOrderDt', async (_e,
-  //   cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no, trade_div,upd_date,state) => {
+  //   cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no, trade_div,upd_date,status) => {
   //   db.prepare('UPDATE order_hd SET soldout_yn = ? WHERE item_cd = ?').run(soldout_yn, item_cd);
   // })
 }

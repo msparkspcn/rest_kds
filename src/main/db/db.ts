@@ -67,7 +67,7 @@ function createTables() {
       com_time TEXT,
       reg_date TEXT,
       upd_date TEXT,
-      state TEXT
+      status TEXT
     );`,
 
     `CREATE TABLE IF NOT EXISTS order_corner (
@@ -77,8 +77,9 @@ function createTables() {
       sales_org_cd TEXT NOT NULL,
       stor_cd TEXT NOT NULL,
       corner_cd TEXT NOT NULL,
+      pos_no TEXT NOT NULL,
       order_no_c TEXT,
-      state TEXT
+      status TEXT
     );`,
 
     `CREATE TABLE IF NOT EXISTS order_dt (

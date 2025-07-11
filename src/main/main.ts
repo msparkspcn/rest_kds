@@ -49,7 +49,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     icon: getAssetsPath('icon.ico'),
     width: 1280,
-    height: 800,
+    height: 850,
     webPreferences: {
       devTools: true,
       preload: getPreloadPath('preload.js'), // 👈 Don't USE PRELOAD.JS IF YOUR USING NODE IN RENDERER PROCESS

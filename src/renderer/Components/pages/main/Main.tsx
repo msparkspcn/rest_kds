@@ -81,35 +81,24 @@ function Main(): JSX.Element {
             });
           break;
 
-        case 'ORDER':
+        case 'order':
           log('2.주문 처리')
           Promise.all(
             msg.body.map(async (body) => {
-                await window.ipc.order.addOrderHd(body.cmpCd, body.saleDt,
-                  body.salesOrgCd, body.storCd, body.posNo, body.tradeNo, body.tradeDiv,
-                  body.orgTime, body.comTime, body.regDate, body.updDate, body.state, body.cornerCd
+                await window.ipc.order.addOrderHd(body.saleDt, body.cmpCd,
+                  body.salesOrgCd, body.storCd, body.cornerCd, body.posNo, body.tradeNo,
+                  body.orgTime, body.comTime, body.status, body.orderNoC, body.updUserId, body.updDate
                 );
                 await Promise.all(
-                  (body.corners || []).map(async (cn) => {
-                      await window.ipc.order.addOrderCorner(
-                        cn.cmpCd, cn.saleDt, cn.salesOrgCd, cn.storCd,
-                        cn.cornerCd, cn.orderNoC, cn.state
-                      );
-                    await Promise.all(
-                      (cn.details || []).map((dt) =>
-                        window.ipc.order.addOrderDt(
-                          dt.cmpCd, dt.saleDt, dt.salesOrgCd, dt.storCd,
-                          dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
-                          dt.seq, dt.itemPluCd, dt.itemNm, dt.itemDiv,
-                          dt.saleQty, dt.orderNoC, dt.setMenuCd, dt.tradeDiv,
-                          dt.regDate, dt.updDate
-                        )
-                      )
-                    );
-                    }
+                  (body.details || []).map((dt) =>
+                    window.ipc.order.addOrderDt(
+                      dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
+                      dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
+                      dt.itemPluCd, dt.itemNm, dt.itemDiv,
+                      dt.setMenuCd, dt.saleQty
+                    )
                   )
                 );
-
               }
             )
           )
@@ -556,22 +545,28 @@ function Main(): JSX.Element {
     setConfirmProps({ title, message, onConfirm });
     setConfirmOpen(true);
   };
-  const handleCallOrder = () => {
-    if (selectedOrderNo != '') {
-      openDialog('주문 호출', `${selectedOrderNo}번 주문을\n호출하시겠습니까?`, () => {
-        console.log('주문 호출 실행');
-        // 호출 로직
+
+  const handleOrderAction = (title: string, messagePrefix: string, callback: () => void) => {
+    if (selectedOrderNo !== '') {
+      openDialog(title, `${selectedOrderNo}번 주문을\n${messagePrefix}하시겠습니까?`, () => {
+        console.log(`주문 ${messagePrefix} 실행`);
+        callback();
       });
+    } else {
+      setErrorMessage('주문 번호를 선택해주세요.');
     }
   };
 
+  const handleCallOrder = () => {
+    handleOrderAction('주문 호출', '호출', () => {
+      //호출 로직
+    });
+  };
+
   const handleCompleteOrder = () => {
-    if (selectedOrderNo != '') {
-      openDialog('주문 완료', `${selectedOrderNo}번 주문을\n완료하시겠습니까?`, () => {
-        console.log('주문 완료 실행');
-        // 완료 로직
-      });
-    }
+    handleOrderAction('주문 완료', '완료', () => {
+      //완료 로직
+    });
   };
 
   const handleCompleteOrderAll = () => {
@@ -662,7 +657,7 @@ function Main(): JSX.Element {
       )}
       {errorMessage && (
         <Alert
-          title="알림"
+          title={STRINGS.alert}
           message={errorMessage}
           onClose={()=>{setErrorMessage(null)}}
         />

@@ -30,30 +30,44 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
   const displayInstTime = dayjs(item.instTime, 'YYYYMMDDHHmmss').format('HH:mm:ss');
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const checkTimeDiff = () => {
       const timeDiff = dayjs(item.instTime, 'YYYY-MM-DDTHH:mm:ss', true).diff(dayjs(), 'minute');
-      // console.log("timeDiff:"+timeDiff)
+      console.log("timeDiff:"+timeDiff)
       if (timeDiff > -5) {
         setBackColor('bg-green');
       } else if (timeDiff <= -5 && timeDiff > -10) {
         setBackColor('bg-yellow');
-      } else if (timeDiff <= -10) {
-        // console.log("here")
-        // setBackColor('bg-red');
-        setBackColor('bg-white');
+      } else if (timeDiff <= -10 && timeDiff > -20) {
+        console.log("heree")
+        setBackColor('bg-red');
+        // setBackColor('bg-white');
+        // setBackColor('#fca5a5');
+      }
+      else if(timeDiff <= -28800) {
+        console.log("UNDER 28800")
+        setBackColor('bg-yellow');
+      }
+      else if(timeDiff <= -23300) {
+        setBackColor('bg-green');
+      }
+      else if(timeDiff <= -21000) {
+        setBackColor('bg-red');
       }
       setDiff(timeDiff);
-    }, 1000);
+    }
+    checkTimeDiff();
+
+    const interval = setInterval(checkTimeDiff, 60000);
 
     return () => clearInterval(interval);
-  });
+  },[]);
 
   return (
     <div className={`order-container ${backColor}`} onClick={() => onSelectOrder(item.orderNo)}>
       <OrderHeader orderNo={item.orderNo} instTime={displayInstTime} diff={diff} />
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
-          <RenderItem key={orderItem.saleSeq} item={orderItem} index={index} />
+          <RenderItem key={orderItem.saleSeq+orderItem.productNm} item={orderItem} index={index} /> //임시
         ))}
       </div>
     </div>

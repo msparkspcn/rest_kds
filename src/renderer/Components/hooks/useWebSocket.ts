@@ -28,9 +28,9 @@ export const useWebSocket = () => {
         const data = JSON.parse(event.data);
         // 예: topic 기반 메시지 필터링
         console.log("no filtered data:"+JSON.stringify(data))
-
-        if (['SOLDOUT', 'ORDER'].includes(data.type)) {
-          console.log(`SOLDOUT data:${JSON.stringify(data)}`);
+        //주문은 order
+        if (['SOLDOUT', 'order'].includes(data.type)) {
+          console.log(`SOLDOUT or order data:${JSON.stringify(data)}`);
           setMessages(data.type, data.body);
         }
       } catch (err) {
