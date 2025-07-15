@@ -98,12 +98,13 @@ const Login: React.FC = () => {
           }
 
           if(isChecked) {
-            setStoreUserId(userId);
+            setStorePassword(password);
           }
           else {
+            setStorePassword('');
             setStoreUserId('');
           }
-          setStorePassword(password);
+          setStoreUserId(userId);
 
           navigate('/setting');
         } else {
