@@ -91,8 +91,8 @@ export function getProductList(params: any) {
   return post(request, params);
 }
 
-export function updateOrderCallState(params: any) {
-  const request = `${host}/api/v1/kds/hd/call/state`;
+export function updateOrderStatus(params: any) {
+  const request = `/api/v1/order/corner/update`;
   return post(request, params);
 }
 

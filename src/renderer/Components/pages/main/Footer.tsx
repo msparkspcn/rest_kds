@@ -34,6 +34,7 @@ interface FooterProps {
   onNextPage: () => void;
   onPrevPage: () => void;
   onCompleteAll: () => void;
+  onRestoreRecent: () => void;
   onRestore: () => void;
   onExitApp: () => void;
 }
@@ -45,6 +46,7 @@ const Footer: React.FC<FooterProps> = ({
   onNextPage,
   onPrevPage,
   onCompleteAll,
+  onRestoreRecent,
   onRestore,
   onExitApp
 }) => {
@@ -109,7 +111,7 @@ const Footer: React.FC<FooterProps> = ({
 
       <div className="footer__menu">
         <div className="footer__menu-item" onClick={onCompleteAll}>{STRINGS.complete_all}</div>
-        <div className="footer__menu-item">{STRINGS.restore_recent}</div>
+        <div className="footer__menu-item" onClick={onRestoreRecent}>{STRINGS.restore_recent}</div>
         <div className="footer__menu-item" onClick={onRestore}>{STRINGS.restore_search}</div>
         <div className="footer__menu-item exit" onClick={onExitApp}>{STRINGS.exit_app}</div>
       </div>

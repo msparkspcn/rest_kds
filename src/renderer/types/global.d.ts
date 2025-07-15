@@ -33,7 +33,8 @@ declare global {
         updateSoldout: (item_cd:string, soldout_yn: string) => Promise<void>;
       };
       order: {
-        getList: () => Promise<any>;
+        getHd: () => Promise<any>;
+        getList: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
         addOrderHd: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, cornerCd:string, pos_no:string,
               trade_no:string, org_time:string, com_time:string, status:string, order_no_c:string, upd_user_id:string, upd_date:Date)
           => Promise<void>;
@@ -41,6 +42,13 @@ declare global {
                      trade_no:string, seq:string, item_plu_cd:string, item_nm:string,
          item_div:string, set_menu_cd:string, sale_qty:number)
                      => Promise<void>;
+        updateOrderStatus:
+          (status:string, sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
+                            corner_cd:string, pos_no:string, trade_no:string)
+                             => Promise<void>;
+        getOne: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
+                 cornerCd:string, pos_no:string, status: string)
+        => Promist<void>;
       }
     };
   }

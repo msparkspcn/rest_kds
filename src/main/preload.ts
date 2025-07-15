@@ -69,5 +69,13 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('db:addProduct',
         cmp_cd, sales_org_Cd, stor_cd, corner_cd, item_cd, item_nm, price, soldout_yn, use_yn, sort_order),
     updateSoldout: (item_cd: string, soldout_yn: string) => ipcRenderer.invoke('db:updateSoldout', item_cd, soldout_yn)
+  },
+
+  order: {
+    getHd: () => {
+      ipcRenderer.invoke('db:getHd');
+    },
+    getList: (sale_dt: string, cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
+      ipcRenderer.invoke('db:getOrderList', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd)
   }
 });

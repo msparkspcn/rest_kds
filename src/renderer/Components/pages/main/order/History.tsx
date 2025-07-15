@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './History.scss';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
+import * as api from '@Components/data/api/api';
+import { log } from '@Components/utils/logUtil';
 
 interface HistoryProps {
   isOpen: boolean; // 모달 열림 상태
@@ -64,11 +66,44 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
   const onRestore = () => {
     if (selectedOrder && selectedOrder.orderNo) {
       openDialog(
-        '주문 호출',
+        '주문 복원',
         selectedOrder.orderNo+'번 주문을\n복원하시겠습니까?',
         () => {
-          console.log('주문 복원 실행');
+          console.log('주문 복원 실행1');
           // 호출 로직
+          const request = {
+            cmpCd: "SLKR",
+            salesOrgCd: "8000",
+            storCd: "5000511",
+            cornerCd: "CIBA",
+            saleDt: '20250709',
+            posNo: '22',
+            tradeNo: '00001',
+            status: "2",    //조리시작
+          };
+
+          api.updateOrderStatus(request).then((result) => {
+            const { responseBody, responseCode, responseMessage } = result.data;
+            log("data:" + JSON.stringify(result.data))
+            if (responseCode === '200') {
+              if (responseBody != null) {
+                log("주문 완료 성공")
+                // window.ipc.order.updateOrderStatus(
+                //   "20250709", user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd,
+                //   "22", "00001", "5"
+                // ).then(() => {log("주문 상태 업데이트 완료")})
+              } else {
+                log("주문 완료 실패")
+              }
+            }
+          })
+            .catch(ex => {
+              window.alert("ErrorCode :: " + ex + "\n")
+            })
+            .finally(() => {
+              log("완료")
+              setConfirmOpen(false)
+            })
         }
       );
     }

@@ -50,6 +50,16 @@ type OrderDt = {
 
 
 export function registerOrderIpc() {
+  ipcMain.handle('db:getHd',
+    async (e) => {
+    const rows = db.prepare(
+      `SELECT *
+      FROM order_hd
+      `
+    ).all() as OrderHd[];
+      return camelcaseKeys(rows, {deep: true})
+    });
+
   ipcMain.handle('db:getOrderList',
     async (e, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
     const rows = db.prepare(
@@ -137,8 +147,18 @@ DO UPDATE SET
         item_div, set_menu_cd, sale_qty)
   });
 
-  // ipcMain.handle('db:updateOrderDt', async (_e,
-  //   cmp_cd, sale_dt, sales_org_cd, stor_cd, pos_no, trade_no, trade_div,upd_date,status) => {
-  //   db.prepare('UPDATE order_hd SET soldout_yn = ? WHERE item_cd = ?').run(soldout_yn, item_cd);
-  // })
+  ipcMain.handle('db:updateOrderStatus', async (_e,
+                                                status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no) => {
+    db.prepare(`UPDATE order_hd
+            SET status = ?
+            WHERE
+            sale_dt = ?
+            and cmp_cd = ?
+            and sales_org_cd = ?
+            and stor_cd = ?
+            and corner_cd = ?
+            and pos_no = ?
+            and trade_no = ?`)
+      .run(status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no);
+  })
 }
