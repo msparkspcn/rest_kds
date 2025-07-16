@@ -34,9 +34,10 @@ declare global {
       };
       order: {
         getHd: () => Promise<any>;
+        getDt: () => Promise<any>;
         getList: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
-        addOrderHd: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, cornerCd:string, pos_no:string,
-              trade_no:string, org_time:string, com_time:string, status:string, order_no_c:string, upd_user_id:string, upd_date:Date)
+        addOrderHd: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string,
+              trade_no:string, ord_time:string, com_time:string, status:string, order_no_c:string, upd_user_id:string, upd_date:Date)
           => Promise<void>;
         addOrderDt: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string,
                      trade_no:string, seq:string, item_plu_cd:string, item_nm:string,
@@ -47,7 +48,7 @@ declare global {
                             corner_cd:string, pos_no:string, trade_no:string)
                              => Promise<void>;
         getOne: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
-                 cornerCd:string, pos_no:string, status: string)
+                 corner_cd:string, pos_no:string, status: string)
         => Promist<void>;
       }
     };

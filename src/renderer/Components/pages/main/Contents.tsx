@@ -6,7 +6,7 @@ interface ContentsProps {
   orderList: string | any[];
   onRefresh: () => void;
   className?: string;
-  onSelectOrderHd: (orderNo: string) => void;
+  onSelectOrderHd: (orderNoC: string) => void;
 }
 interface OrderItem {
   itemNm: string;
@@ -34,7 +34,7 @@ function Contents({ orderList, onRefresh, onSelectOrderHd }: ContentsProps): JSX
       <div className="order-grid">
         {paginatedOrders?.map((orderItem: any, index: number) => (
           <OrderContainer
-            key={orderItem.saleSeq}
+            key={orderItem.orderNoC}
             item={orderItem}
             onSelectOrder={onSelectOrderHd}
           />

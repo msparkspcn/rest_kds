@@ -46,7 +46,8 @@ export function registerProductIpc() {
 
   ipcMain.handle('db:addProduct', async (_e,
    cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd, item_nm, price, soldout_yn, use_yn, sort_order) => {
-    db.prepare(`INSERT INTO product (cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd, item_nm, price, soldout_yn, use_yn, sort_order)
+    db.prepare(`INSERT INTO product (
+cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd, item_nm, price, soldout_yn, use_yn, sort_order)
  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd)
  DO UPDATE SET
       item_nm = excluded.item_nm,

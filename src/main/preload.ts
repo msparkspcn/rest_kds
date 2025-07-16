@@ -72,10 +72,24 @@ contextBridge.exposeInMainWorld('ipc', {
   },
 
   order: {
-    getHd: () => {
-      ipcRenderer.invoke('db:getHd');
-    },
+    getHd: () => ipcRenderer.invoke('db:getHd'),
+    getDt: () => ipcRenderer.invoke('db:getDt'),
     getList: (sale_dt: string, cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
-      ipcRenderer.invoke('db:getOrderList', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd)
+      ipcRenderer.invoke('db:getOrderList', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd),
+    addOrderHd: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string,
+                 trade_no:string, ord_time:string, com_time:string, status:string, order_no_c:string, upd_user_id:string, upd_date:Date) =>
+      ipcRenderer.invoke('db:addOrderHd',
+      sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no,
+      trade_no, ord_time, com_time, status, order_no_c, upd_user_id, upd_date),
+    addOrderDt: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string,
+                 trade_no:string, seq:string, item_plu_cd:string, item_nm:string,
+                 item_div:string, set_menu_cd:string, sale_qty:number) =>
+      ipcRenderer.invoke('db:addOrderDt',
+        sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no,
+        trade_no, seq, item_plu_cd, item_nm, item_div, set_menu_cd, sale_qty),
+    updateOrderStatus: (status:string, sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
+                        corner_cd:string, pos_no:string, trade_no:string) =>
+      ipcRenderer.invoke('db:updateOrderStatus',
+        status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no),
   }
 });

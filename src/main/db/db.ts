@@ -68,7 +68,8 @@ function createTables() {
       status TEXT,
       order_no_c TEXT,
       upd_user_id TEXT,
-      upd_date TEXT
+      upd_date TEXT,
+      UNIQUE(sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no)
     );`,
 
     `CREATE TABLE IF NOT EXISTS order_dt (
@@ -83,10 +84,10 @@ function createTables() {
       seq INTEGER NOT NULL,
       item_plu_cd TEXT,
       item_nm TEXT,
-      item_nm TEXT,
       item_div TEXT,
       set_menu_cd TEXT,
-      sale_qty INTEGER
+      sale_qty INTEGER,
+      UNIQUE(sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, seq)
     );`,
 
     `CREATE TABLE IF NOT EXISTS sale_open (

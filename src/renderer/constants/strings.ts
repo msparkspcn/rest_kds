@@ -16,5 +16,8 @@ export const STRINGS = {
   restore_search: '조회복원',
   exit_app: '프로그램 종료',
   exit_app_msg: '프로그램을\n종료하시겠습니까?',
-  alert: '알림'
+  alert: '알림',
+  status_pending:"2",
+  status_call:"3",
+  status_completed:"5",
 };
