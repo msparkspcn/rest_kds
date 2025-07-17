@@ -20,4 +20,5 @@ export const STRINGS = {
   status_pending:"2",
   status_call:"3",
   status_completed:"5",
+  restore:"복원",
 };

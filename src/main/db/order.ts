@@ -48,6 +48,11 @@ type OrderDt = {
   saleQty: number;
 }
 
+type RecentCompletedOrderHd = {
+  posNo: string;
+  tradeNo: string;
+}
+
 
 export function registerOrderIpc() {
   ipcMain.handle('db:getHd',
@@ -57,6 +62,7 @@ export function registerOrderIpc() {
       FROM order_hd
       `
     ).all() as OrderHd[];
+    console.log("rows from db:", rows);
       return camelcaseKeys(rows, {deep: true})
     });
 
@@ -83,8 +89,9 @@ export function registerOrderIpc() {
       AND sales_org_cd = ?
       AND stor_cd = ?
       AND corner_cd = ?
-      AND status not in ('8','9')
+      AND status not in ('5', '8','9')
       `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd,corner_cd]) as OrderHd[];
+      console.log("orderHdRows from db:", orderHdRows);
     const orderDtRows = db.prepare(
       `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no,
 seq, item_plu_cd,item_nm,item_div,set_menu_cd,sale_qty
@@ -96,6 +103,53 @@ seq, item_plu_cd,item_nm,item_div,set_menu_cd,sale_qty
       AND stor_cd = ?
       AND corner_cd = ?
       `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd,corner_cd]) as OrderDt[];
+      console.log("orderDtRows from db:", orderDtRows);
+    const orderHdList = camelcaseKeys(orderHdRows, { deep: true });
+      const orderDtList = camelcaseKeys(orderDtRows, { deep: true });
+
+      const result = orderHdList.map((hd) => {
+        const orderDtListForHd = orderDtList.filter(dt =>
+          dt.saleDt === hd.saleDt &&
+          dt.cmpCd === hd.cmpCd &&
+          dt.salesOrgCd === hd.salesOrgCd &&
+          dt.storCd === hd.storCd &&
+          dt.cornerCd === hd.cornerCd &&
+          dt.posNo === hd.posNo &&
+          dt.tradeNo === hd.tradeNo
+        );
+        return {
+          ...hd,
+          orderDtList: orderDtListForHd
+        };
+      });
+      return result;
+    });
+
+  ipcMain.handle('db:getCompletedOrderList',
+    async(e,sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
+      const orderHdRows = db.prepare(
+        `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no, ord_time, com_time, status,order_no_c
+      FROM order_hd
+      WHERE 1=1
+      AND sale_dt = ?
+      AND cmp_cd = ?
+      AND sales_org_cd = ?
+      AND stor_cd = ?
+      AND corner_cd = ?
+      AND status = '5'
+      `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd]) as OrderHd[];
+      const orderDtRows = db.prepare(
+        `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no,
+seq, item_plu_cd,item_nm,item_div,set_menu_cd,sale_qty
+      FROM order_dt
+      WHERE 1=1
+      AND sale_dt = ?
+      AND cmp_cd = ?
+      AND sales_org_cd = ?
+      AND stor_cd = ?
+      AND corner_cd = ?
+      `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd,corner_cd]) as OrderDt[];
+
       const orderHdList = camelcaseKeys(orderHdRows, { deep: true });
       const orderDtList = camelcaseKeys(orderDtRows, { deep: true });
 
@@ -114,35 +168,29 @@ seq, item_plu_cd,item_nm,item_div,set_menu_cd,sale_qty
           orderDtList: orderDtListForHd
         };
       });
-    return result;
+      return result;
     });
 
-  ipcMain.handle('db:getCompletedOrderList',
-    async(e,sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
+  ipcMain.handle('db:getRecentCompletedOrder',
+    async (_e, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
     const rows = db.prepare(
-      `SELECT
-      hd.pos_no, hd.order_no_c, hd.ord_time, hd.com_time, seq, item_plu_cd, item_nm, sale_qty, hd.status,
-      item_div, set_menu_cd
-      FROM order_hd hd
-      JOIN order_dt dt
-      ON dt.cmp_cd = hd.cmp_cd
-      AND dt.sales_org_cd = hd.sales_org_cd
-      AND dt.stor_cd = hd.stor_cd
-      AND dt.corner_cd = hd.corner_cd
-      AND dt.sale_dt = hd.sale_dt
-      AND dt.pos_no = hd.pos_no
-      AND dt.trade_no = hd.trade_no
-      WHERE 1=1
-      AND dt.sale_dt = ?
-      AND dt.cmp_cd = ?
-      AND dt.sales_org_cd = ?
-      AND dt.stor_cd = ?
-      AND dt.corner_cd = ?
-      AND cn.status = '9'
-      `
-    ).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd]) as CompletedOrder[];
+      `SELECT pos_no, trade_no
+FROM order_hd
+WHERE 1=1
+      AND sale_dt = ?
+      AND cmp_cd = ?
+      AND sales_org_cd = ?
+      AND stor_cd = ?
+      AND corner_cd = ?
+      AND status = '5'
+      AND com_time is not null
+      ORDER BY com_time DESC
+      LIMIT 1
+      `).get([sale_dt, cmp_cd, sales_org_cd, stor_cd,corner_cd]) as RecentCompletedOrderHd;
+    console.log("rows from db:", rows);
     return camelcaseKeys(rows, {deep: true})
-    });
+    }
+  )
 
   ipcMain.handle('db:addOrderHd', async (_e,
    sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no,
@@ -182,17 +230,39 @@ DO UPDATE SET
   });
 
   ipcMain.handle('db:updateOrderStatus', async (_e,
-    status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no) => {
-    db.prepare(`UPDATE order_hd
-            SET status = ?
-            WHERE
-            sale_dt = ?
-            and cmp_cd = ?
-            and sales_org_cd = ?
-            and stor_cd = ?
-            and corner_cd = ?
-            and pos_no = ?
-            and trade_no = ?`)
-      .run(status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no);
+    status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, com_time) => {
+    let stmt: any;
+    let params: any[];
+    if (com_time) {
+      stmt = db.prepare(`
+      UPDATE order_hd
+      SET status = ?, com_time = ?
+      WHERE sale_dt = ?
+        AND cmp_cd = ?
+        AND sales_org_cd = ?
+        AND stor_cd = ?
+        AND corner_cd = ?
+        AND pos_no = ?
+        AND trade_no = ?
+    `);
+      params = [status, com_time, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no];
+    } else {
+      stmt = db.prepare(`
+      UPDATE order_hd
+      SET status = ?
+      WHERE sale_dt = ?
+        AND cmp_cd = ?
+        AND sales_org_cd = ?
+        AND stor_cd = ?
+        AND corner_cd = ?
+        AND pos_no = ?
+        AND trade_no = ?
+    `);
+      params = [status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no];
+    }
+
+    stmt.run(...params);
+
+    return { success: true };
   })
 }

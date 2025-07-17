@@ -4,9 +4,8 @@ import './Contents.scss';
 
 interface ContentsProps {
   orderList: string | any[];
-  onRefresh: () => void;
   className?: string;
-  onSelectOrderHd: (orderNoC: string) => void;
+  onSelectOrderHd: (order: OrderData) => void;
 }
 interface OrderItem {
   itemNm: string;
@@ -14,16 +13,21 @@ interface OrderItem {
 }
 
 interface OrderData {
-  orderNo: string;
-  instTime: string;
+  cmpCd: string;
+  salesOrgCd: string;
+  storCd: string;
+  cornerCd: string;
+  posNo: string;
+  tradeNo: string;
+  orderNoC: string;
+  ordTime: string;
   orderDtList: OrderItem[];
 }
 
-function Contents({ orderList, onRefresh, onSelectOrderHd }: ContentsProps): JSX.Element {
+function Contents({ orderList, onSelectOrderHd }: ContentsProps): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const orderArray = Array.isArray(orderList) ? orderList : [];
-  const totalPages = Math.ceil(orderArray.length / ITEMS_PER_PAGE);
   const paginatedOrders = orderArray.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE,

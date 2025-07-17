@@ -83,7 +83,7 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
       corner.storCd,
       corner.cornerCd,
     );
-    console.log('상품 목록:', productList);
+    // console.log('상품 목록:', productList);
     setOriginalProductList(productList);  // 원본 저장
     setProductList(productList);
   }

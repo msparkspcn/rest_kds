@@ -17,6 +17,24 @@ import { STRINGS } from '../../../constants/strings';
 import Loading from '@Components/common/Loading';
 import { getPlatform } from '@Components/utils/platform';
 import { useUserStore } from '@Components/store/user';
+import dayjs from 'dayjs';
+
+interface OrderItem {
+  itemNm: string;
+  saleQty: number;
+}
+
+interface OrderData {
+  cmpCd: string;
+  salesOrgCd: string;
+  storCd: string;
+  cornerCd: string;
+  posNo: string;
+  tradeNo: string;
+  orderNoC: string;
+  ordTime: string;
+  orderDtList: OrderItem[];
+}
 
 function Main(): JSX.Element {
   const [orderCount, setOrderCount] = useState(0);
@@ -27,19 +45,16 @@ function Main(): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedOrderNo, setSelectedOrderNo] = useState<string | null>('');
   const [selectedOrder, setSelectedOrder] = useState<{} | null>('');
   const [saleDt, setSaleDt] = useState('');
   const [callOrderOpen, setCallOrderOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [productList, setProductList] = useState([]);
   const [confirmProps, setConfirmProps] = useState({
     title: '',
     message: '',
     onConfirm: () => {},
   });
   const [isSoldOutOpen, setSoldOutOpen] = useState(false);
-  let systemType: number = 0;
 
   const { isConnected, messages } = useWebSocket();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -48,9 +63,12 @@ function Main(): JSX.Element {
 
   useEffect(() => {
     console.log("user:"+JSON.stringify(user));
+    //최초 주문 수신 api 필요 getOrderList
     if(user!=null) {
       getProductList(user.cmpCd, user.salesOrgCd, user.storCd)
     }
+    getOrderData("20250708")
+    // getStoreSaleOpen()
     // getProductList();
   }, []);
 
@@ -60,7 +78,6 @@ function Main(): JSX.Element {
         console.log('빈 객체입니다');
         return;
       }
-      log('0.message 길이:'+messages.length)
       log('0.message:'+JSON.stringify(messages))
 
       for(const msg of messages) {
@@ -86,40 +103,49 @@ function Main(): JSX.Element {
             if(msg.body!=null) {
               try {
                 for (const body of msg.body) {
-                  await window.ipc.order.addOrderHd(
-                    body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
-                    body.corners?.[0]?.cornerCd ?? '',
-                    body.posNo, body.tradeNo,
-                    body.ordTime, body.comTime, body.status, body.corners?.[0]?.details?.[0]?.orderNoC ?? '',
-                    body.updUserId ?? 'SYSTEM',
-                    body.updDate ?? '' // null 처리
-                  );
-                  await Promise.all(
-                    (body.corners || []).flatMap((corner) =>
-                      (corner.details || []).map((dt) =>
-                        window.ipc.order.addOrderDt(
-                          dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
-                          dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
-                          dt.itemPluCd, dt.itemNm, dt.itemDiv,
-                          '', dt.saleQty
-                        )
+                  const corners = body.corners || [];
+                  for(const corner of corners) {
+                    const cornerCd = corner.cornerCd ?? '';
+                    const details = corner.details || [];
+                    // 주문 헤더 저장
+                    await window.ipc.order.addOrderHd(
+                      body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
+                      cornerCd,
+                      body.posNo, body.tradeNo,
+                      body.ordTime, body.comTime, body.status,
+                      details[0]?.orderNoC ?? '',
+                      body.updUserId ?? 'SYSTEM',
+                      body.updDate ?? ''
+                    );
+
+                    // 주문 상세 저장
+                    await Promise.all(details.map(dt =>
+                      window.ipc.order.addOrderDt(
+                        dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
+                        dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
+                        dt.itemPluCd, dt.itemNm, dt.itemDiv,
+                        '', dt.saleQty
                       )
                     ));
+
+                    handleOrderStatus(
+                      body.cmpCd,
+                      body.salesOrgCd,
+                      body.storCd,
+                      cornerCd,
+                      body.saleDt,
+                      body.posNo,
+                      body.tradeNo,
+                      STRINGS.status_pending);
+
+                    const orderHdList = await window.ipc.order.getList(
+                      body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,cornerCd);
+
+                    setOrderList(orderHdList);
+                    console.log('내부 db insert 완료 orderHd12:', orderHdList);
+                  }
+
                   console.log('주문 처리 완료');
-
-                  const orderHdList = await window.ipc.order.getList(
-                    body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,  body.corners?.[0]?.cornerCd ?? '');
-
-                  setOrderList(orderHdList);
-                  console.log('내부 db insert 완료 orderHd12:', orderHdList);
-
-                  handleOrderStatus(body.cmpCd, body.salesOrgCd,
-                    body.storCd,
-                    body.corners?.[0]?.cornerCd ?? '',
-                    body.saleDt,
-                    body.posNo,
-                    body.tradeNo,
-                    STRINGS.status_pending);
                 }
               }
               catch(err) {
@@ -139,7 +165,6 @@ function Main(): JSX.Element {
   }, [messages]);
 
   useEffect(() => {
-    console.log('### 시스템 구분 :: ', systemType);
     console.log("주문목록:"+orderList.length);
     // getOrderData("20250715");
     // if (systemType === 0) {
@@ -202,7 +227,7 @@ function Main(): JSX.Element {
             if(getPlatform()==='electron') {
               const {cmpCd, salesOrgCd, storCd, cornerCd,
                 itemCd, itemNm, price, soldoutYn, useYn, sortOrder} = product;
-              console.log("product:"+JSON.stringify(product))
+              // console.log("product:"+JSON.stringify(product))
               await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn, sortOrder)
             }
             else {
@@ -232,6 +257,7 @@ function Main(): JSX.Element {
     }
   };
 
+  //개점 정보 설정(신규 api 연동 필요)
   const getStoreSaleOpen = () => {
     const params = {
       cmpCd: '90000001',
@@ -250,77 +276,32 @@ function Main(): JSX.Element {
     });
   };
 
-  const getOrderData = (saleDt: string) => {
+  //api 연동
+  const getOrderList = () => {
+
+  }
+
+  const getOrderData = async(saleDt: string) => {
+    //주문정보 내부 쿼리 후 주문건수, 주문 set
     // const {cmpCd, brandCd, storeCd} = store;
-    console.log(`개점일:${saleDt}`);
-    const params = {
-      cmpCd: '90000001',
-      brandCd: '9999',
-      storeCd: '000281',
-      saleDt: saleDt,
-      state: '0',
-    };
+    console.log("getOrderData saleDt:" + saleDt + ", cmpCd:" + user.cmpCd
+      + ", storCd:" + user.storCd + ", cornerCd:" + user.cornerCd)
+    const orderHdList = await window.ipc.order.getList(
+      saleDt,
+      user.cmpCd,
+      user.salesOrgCd,
+      user.storCd,
+      user.cornerCd);
+    setOrderCount(orderHdList.length)
+    setOrderList(orderHdList);
 
-    console.log('### 5-1 주문내역 수신');
-    setLoading(true);
-    api
-      .getOrderDataList(params)
-      .then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
-        if (responseCode === '200') {
-          // console.log(`### 5-1 주문내역 수신 완료 res:${JSON.stringify(responseBody)}`);
+    console.log("주문목록1:"+JSON.stringify(orderHdList));
 
-          if (!arraysEqual(orderList, responseBody)) {
-            console.log('### 5-1 주문내역 변경점이 있으므로 갱신');
-            // playSound();
-            setOrderList(responseBody);
-          }
-          console.log(`페이징:${responseBody.length}`);
-          // ITEMS_PER_PAGE)
-          setOrderCount(responseBody.length);
-          console.log(`orderCnt:${responseBody.length}, ITEMS_PER_PAGE:${ITEMS_PER_PAGE}`);
-          if (responseBody.length / ITEMS_PER_PAGE > 0) {
-            console.log(`1이상 =${Math.ceil(responseBody.length / ITEMS_PER_PAGE)}`);
-            setTotalPages(Math.ceil(responseBody.length / ITEMS_PER_PAGE));
-          }
-        } else {
-          // Alert.alert("!", responseMessage);
-        }
-      })
-      .catch((e) => {
-        // Alert.alert("!", e.message);
-      })
-      .finally(() => {
-        console.log('### 5-1 완료');
-        setLoading(false);
-      });
-  };
 
-  const onRefresh = () => {
-    const params = {
-      cmpCd: '90000001',
-      brandCd: '9999',
-      storeCd: '000281',
-      saleDt: '20250715',
-    };
-    console.log('### refresh call() ###');
-    api
-      .getOrderDataList(params)
-      .then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
-        if (responseCode === '200') {
-          console.log('### refresh complete ###');
-          setOrderList(responseBody);
-        } else {
-          // Alert.alert("!", responseMessage);
-        }
-      })
-      .catch((e) => {
-        // Alert.alert("!", e.message);
-      })
-      .finally(() => {
-        // setLoading(false);
-      });
+    if (orderHdList.length / ITEMS_PER_PAGE > 0) {
+      console.log(`1이상 =${Math.ceil(orderHdList.length / ITEMS_PER_PAGE)}`);
+      setTotalPages(Math.ceil(orderHdList.length / ITEMS_PER_PAGE));
+    }
   };
 
   const onSetting = () => {
@@ -349,209 +330,6 @@ function Main(): JSX.Element {
     }
     console.log(`현재 페이지:${currentPage}`);
   };
-  const data =
-    [
-      {
-        "no": 1,
-        "pos": "91",
-        "orderNo": "9100001",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 2,
-        "pos": "91",
-        "orderNo": "9100002",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 3,
-        "pos": "91",
-        "orderNo": "9100003",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 4,
-        "pos": "91",
-        "orderNo": "9100004",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 5,
-        "pos": "91",
-        "orderNo": "9100005",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 6,
-        "pos": "91",
-        "orderNo": "9100006",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 7,
-        "pos": "91",
-        "orderNo": "9100007",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 8,
-        "pos": "91",
-        "orderNo": "9100008",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 9,
-        "pos": "91",
-        "orderNo": "9100009",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 10,
-        "pos": "91",
-        "orderNo": "9100010",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 11,
-        "pos": "91",
-        "orderNo": "9100011",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 12,
-        "pos": "91",
-        "orderNo": "9100012",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 13,
-        "pos": "91",
-        "orderNo": "9100013",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 14,
-        "pos": "91",
-        "orderNo": "9100014",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 15,
-        "pos": "91",
-        "orderNo": "9100015",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 16,
-        "pos": "91",
-        "orderNo": "9100016",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 17,
-        "pos": "91",
-        "orderNo": "9100017",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 18,
-        "pos": "91",
-        "orderNo": "9100018",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      },
-      {
-        "no": 19,
-        "pos": "91",
-        "orderNo": "9100019",
-        "orderDateTime": "11:58:17",
-        "completionDateTime": "12:01:58",
-        "seq": "01",
-        "menuName": "돈모밀국수",
-        "quantity": 1
-      },
-      {
-        "no": 20,
-        "pos": "91",
-        "orderNo": "9100020",
-        "orderDateTime": "11:56:28",
-        "completionDateTime": "11:58:28",
-        "seq": "01",
-        "menuName": "옛날돈까스",
-        "quantity": 1
-      }
-    ]
 
   const onOpenCallOrder = () => {
     setCallOrderOpen(true);
@@ -562,26 +340,39 @@ function Main(): JSX.Element {
     setConfirmOpen(true);
   };
 
-  const handleOrderAction = (title: string, messagePrefix: string, callback: () => void) => {
-    if (selectedOrderNo !== '') {
-      openDialog(title, `${selectedOrderNo}번 주문을\n${messagePrefix}하시겠습니까?`, () => {
-        console.log(`주문 ${messagePrefix} 실행`);
-        callback();
-      });
-    } else {
+  const handleOrder = (
+    title: string,
+    prefix: string,
+    status: string
+  ) => {
+    if (!selectedOrder.orderNoC) {
       setErrorMessage('주문 번호를 선택해주세요.');
+      return;
     }
-  };
-  type UpdateOrderRequest = {
-    cmpCd: string;
-    salesOrgCd: string;
-    storCd: string;
-    cornerCd: string;
-    saleDt: string;
-    posNo: string;
-    tradeNo: string;
-    status: string;
-  };
+    openDialog(
+      title,
+      `${selectedOrder.orderNoC}번 주문을\n${prefix}하시겠습니까?`,
+      async () => {
+        console.log(`주문 ${prefix} 실행`);
+        try {
+          await handleOrderStatus(
+            selectedOrder.cmpCd,
+            selectedOrder.salesOrgCd,
+            selectedOrder.storCd,
+            selectedOrder.cornerCd,
+            selectedOrder.saleDt,
+            selectedOrder.posNo,
+            selectedOrder.tradeNo,
+            status
+          );
+        } catch (error) {
+          log("주문 처리 중 오류:", error);
+        } finally {
+          setConfirmOpen(false);
+        }
+      }
+    );
+  }
 
   const handleOrderStatus = async (
     cmpCd:string,
@@ -607,16 +398,27 @@ function Main(): JSX.Element {
       const result = await api.updateOrderStatus(request);
       const { responseBody, responseCode, responseMessage } = result.data;
       log("data:" + JSON.stringify(result.data));
-
+      console.log("status:"+status)
       if (responseCode === '200') {
         if (responseBody != null) {
           // log(successLog);
 
           try {
-            await window.ipc.order.updateOrderStatus(
-              status, saleDt, cmpCd, salesOrgCd, storCd, cornerCd, posNo, tradeNo
-            );
+            if(status==STRINGS.status_completed) {
+              console.log("완료 상태")
+              const currentTime = dayjs().format('HHmmss');
+              await window.ipc.order.updateOrderStatus(
+                status, saleDt, cmpCd, salesOrgCd, storCd, cornerCd, posNo, tradeNo,currentTime
+              );
+            }
+            else {
+              await window.ipc.order.updateOrderStatus(
+                status, saleDt, cmpCd, salesOrgCd, storCd, cornerCd, posNo, tradeNo
+              );
+            }
+
             log("주문 상태 업데이트 완료");
+            getOrderData("20250708")
           } catch (error) {
             log("주문 상태 업데이트 실패: " + error);
           }
@@ -634,84 +436,12 @@ function Main(): JSX.Element {
 
 
   const handleCallOrder = async () => {
-    handleOrderAction('주문 호출', '호출', async () => {
-      const request = {
-        cmpCd: "SLKR",
-        salesOrgCd: "8000",
-        storCd: "5000511",
-        cornerCd: "CIBA",
-        saleDt: '20250709',
-        posNo: '22',
-        tradeNo: '00001',
-        status: "3",
-      };
-
-      try {
-        const result = await api.updateOrderStatus(request);
-        const { responseBody, responseCode, responseMessage } = result.data;
-        log("data:" + JSON.stringify(result.data))
-
-        if (responseCode === '200') {
-          if (responseBody != null) {
-            log("주문 호출 성공")
-            try {
-              await window.ipc.order.updateOrderStatus(
-                STRINGS.status_call, "20250709", "SLKR", "8000", "5000511", "CIBA",
-                "22", "00001"
-              );
-            } catch (error) {
-              log("주문 상태 업데이트 실패: " + error);
-            }
-
-          } else {
-            log("주문 호출 실패")
-          }
-        }
-      } catch (ex) {
-
-      } finally {
-        log("fina")
-        setConfirmOpen(false)
-      }
-    });
+    console.log("selectedOrder:"+JSON.stringify(selectedOrder))
+    handleOrder('주문 호출', '호출', STRINGS.status_call)
   };
 
   const handleCompleteOrder = () => {
-    handleOrderAction('주문 완료', '완료', () => {
-      const request = {
-        cmpCd: "SLKR",
-        salesOrgCd: "8000",
-        storCd: "5000511",
-        cornerCd: "CIBA",
-        saleDt: '20250709',
-        posNo: '22',
-        tradeNo: '00001',
-        status: "5",
-      };
-
-      api.updateOrderStatus(request).then((result) => {
-        const { responseBody, responseCode, responseMessage } = result.data;
-        log("data:" + JSON.stringify(result.data))
-        if (responseCode === '200') {
-          if (responseBody != null) {
-            log("주문 완료 성공")
-            window.ipc.order.updateOrderStatus(
-              "20250709", user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd,
-              "22", "00001", "5"
-            ).then(() => {log("주문 상태 업데이트 완료")})
-          } else {
-            log("주문 완료 실패")
-          }
-        }
-      })
-        .catch(ex => {
-          window.alert("ErrorCode :: " + ex + "\n")
-        })
-        .finally(() => {
-          log("완료")
-          setConfirmOpen(false)
-        })
-    });
+    handleOrder('주문 완료', '완료', STRINGS.status_completed)
   };
 
   const handleCompleteOrderAll = () => {
@@ -727,14 +457,7 @@ function Main(): JSX.Element {
       console.log('주문:', hd);
     };
     fetchHd().then(r => {});
-    // const orderList = window.ipc.order.getList(
-    //   "20250702", user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd);
-    // console.log('주문:', orderList);
-    // const order = window.ipc.order.getOne(
-    //   "20250702", user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd,
-    //   "22", "5"
-    // );
-    // console.log('직전 주문:', order);
+
   }
 
   const onExitApp = () => {
@@ -744,11 +467,11 @@ function Main(): JSX.Element {
     });
   }
 
-  const onSelectOrderHd = (orderNoC: string) => {
-    if (orderNoC == selectedOrderNo) {
-      setSelectedOrderNo('');
+  const onSelectOrderHd = (order: OrderData) => {
+    if (selectedOrder.orderNoC == order.orderNoC) {
+      setSelectedOrder({})
     } else {
-      setSelectedOrderNo(orderNoC); // 선택된 주문 번호 업데이트
+      setSelectedOrder(order)
     }
   };
   return (
@@ -757,14 +480,13 @@ function Main(): JSX.Element {
       <div className="layout-content">
         <Contents
           orderList={filterList}
-          onRefresh={onRefresh}
           onSelectOrderHd={onSelectOrderHd}
         />
       </div>
       <div className="order-action-bar">
         <OrderActionBar
           orderCnt={orderCount}
-          selectedOrderNo={selectedOrderNo}
+          selectedOrderNo={selectedOrder.orderNoC}
           onOpenCallOrder={onOpenCallOrder}
           onCallOrder={handleCallOrder}
           onCompleteOrder={handleCompleteOrder}
@@ -808,8 +530,10 @@ function Main(): JSX.Element {
 
       <History
         isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        data={data}
+        onClose={() => {
+          setModalOpen(false)
+          getOrderData("20250708")
+        }}
       />
       {isSoldOutOpen && (
         <SoldOut

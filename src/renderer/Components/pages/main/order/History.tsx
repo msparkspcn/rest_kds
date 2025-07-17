@@ -3,42 +3,32 @@ import './History.scss';
 import ConfirmDialog from '@Components/common/ConfirmDialog';
 import * as api from '@Components/data/api/api';
 import { log } from '@Components/utils/logUtil';
+import { useUserStore } from '@Components/store/user';
+import { STRINGS } from '../../../../constants/strings';
 
 interface HistoryProps {
-  isOpen: boolean; // 모달 열림 상태
-  onClose: () => void; // 모달 닫기 함수
-  data: Order[]; // 전달받는 데이터
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-type Order = {
-  no: number;
-  pos: string;
-  orderNo: string;
-  orderDateTime: string;
-  completionDateTime: string;
-  seq: string;
-  menuName: string;
-  quantity: number;
-};
-
-const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
+const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
   const ITEMS_PER_PAGE = 15;
-  const [selectedOrder, setSelectedOrder] = useState<Order>({
-    no: 0,
-    pos: '',
-    orderNo: '',
-    orderDateTime: '',
-    completionDateTime: '',
-    seq: '',
-    menuName: '',
-    quantity: 1,
-  });
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const [selectedOrder, setSelectedOrder] = useState({});
+  const [orderList, setOrderList] = useState([]);
+  const user = useUserStore((state) => state.user);
+  const totalDtCount = orderList.reduce((sum, hd) => sum + (hd.orderDtList?.length || 0), 0);
   const [currentPage, setCurrentPage] = useState(0);
-  const currentItems = data.slice(
+  const flatOrderRows = orderList.flatMap((hd) =>
+    hd.orderDtList.map((dt) => ({
+      hd,
+      dt,
+    }))
+  );
+  const currentItems = flatOrderRows.slice(
     currentPage * ITEMS_PER_PAGE,
     (currentPage + 1) * ITEMS_PER_PAGE
   );
+  const totalPages = Math.max(1, Math.ceil(flatOrderRows.length / ITEMS_PER_PAGE));
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmProps, setConfirmProps] = useState({
     title: '',
@@ -46,54 +36,71 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
     onConfirm: () => {},
   });
   useEffect(() => {
-    setSelectedOrder({
-      no:0,
-      pos:'',
-      orderNo:'',
-      orderDateTime:'',
-      completionDateTime:'',
-      seq:'',
-      menuName:'',
-      quantity:1
-    })
-  },[])
+    if(isOpen) {
+      getCompletedOrderList()
+    }
 
+  },[isOpen])
+
+  const getCompletedOrderList = async() => {
+    console.log("cmpCd:"+user.cmpCd+", storCd:"+user.storCd+", cornerCd:"+user.cornerCd)
+    const orderList = await window.ipc.order.getCompletedList(
+      '20250708', user?.cmpCd, user?.salesOrgCd, user?.storCd, "CIBA"
+    )
+    console.log("완료주문:"+JSON.stringify(orderList))
+    console.log("totalDtCount:"+totalDtCount)
+    if(orderList!=null) {
+      setOrderList(orderList);
+      setCurrentPage(0);
+    }
+
+  }
 
   const openDialog = (title: string, message: string, onConfirm: () => void) => {
     setConfirmProps({ title, message, onConfirm });
     setConfirmOpen(true);
   };
   const onRestore = () => {
-    if (selectedOrder && selectedOrder.orderNo) {
+    if (selectedOrder && selectedOrder.orderNoC) {
       openDialog(
         '주문 복원',
-        selectedOrder.orderNo+'번 주문을\n복원하시겠습니까?',
+        selectedOrder.orderNoC+'번 주문을\n복원하시겠습니까?',
         () => {
-          console.log('주문 복원 실행1');
+          console.log('주문 복원 실행 selectedOrder:'+JSON.stringify(selectedOrder));
           // 호출 로직
           const request = {
-            cmpCd: "SLKR",
-            salesOrgCd: "8000",
-            storCd: "5000511",
-            cornerCd: "CIBA",
-            saleDt: '20250709',
-            posNo: '22',
-            tradeNo: '00001',
-            status: "2",    //조리시작
+            cmpCd: selectedOrder.cmpCd,
+            salesOrgCd: selectedOrder.salesOrgCd,
+            storCd: selectedOrder.storCd,
+            cornerCd: selectedOrder.cornerCd,
+            saleDt: selectedOrder.saleDt,
+            posNo: selectedOrder.posCd,
+            tradeNo: selectedOrder.tradeNo,
+            status: STRINGS.status_pending,    //조리시작
           };
-
           api.updateOrderStatus(request).then((result) => {
             const { responseBody, responseCode, responseMessage } = result.data;
             log("data:" + JSON.stringify(result.data))
             if (responseCode === '200') {
               if (responseBody != null) {
-                log("주문 완료 성공")
-                // window.ipc.order.updateOrderStatus(
-                //   "20250709", user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd,
-                //   "22", "00001", "5"
-                // ).then(() => {log("주문 상태 업데이트 완료")})
+                log("주문 복원 성공")
+                window.ipc.order.updateOrderStatus(
+                  STRINGS.status_pending,
+                  selectedOrder.saleDt,
+                  selectedOrder.cmpCd,
+                  selectedOrder.salesOrgCd,
+                  selectedOrder.storCd,
+                  selectedOrder.cornerCd,
+                  selectedOrder.posNo,
+                  selectedOrder.tradeNo,
+                  ''
+                ).then(() => {
+                  log("주문 상태 업데이트 완료")
+                  getCompletedOrderList()
+                  setSelectedOrder({})
+                })
               } else {
-                log("주문 완료 실패")
+                log("주문 복원 실패")
               }
             }
           })
@@ -148,26 +155,41 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
               </tr>
             </thead>
             <tbody>
-            {currentItems.map((item,index) => (
-              <tr
-                key={item.orderNo}
-                className={`${selectedOrder.orderNo === item.orderNo ? 'selected':''}
-                ${index % 2 === 0 ? 'even-row' : 'odd-row'}
-                `}
-                onClick={() => {
-                  setSelectedOrder(data[index])
-                }}
-              >
-                <td>{item.no}</td>
-                <td>{item.pos}</td>
-                <td>{item.orderNo}</td>
-                <td>{item.orderDateTime}</td>
-                <td>{item.completionDateTime}</td>
-                <td>{item.seq}</td>
-                <td>{item.menuName}</td>
-                <td>{item.quantity}</td>
-              </tr>
-            ))}
+            {currentItems.map((row, index) => {
+              const { hd, dt } = row;
+              const globalIndex = currentPage * ITEMS_PER_PAGE + index + 1;
+              const isFirst = index === 0 || currentItems[index - 1].hd.orderNoC !== hd.orderNoC;
+
+              return (
+                <tr
+                  key={`${hd.orderNoC}-${dt.seq}`}
+                  className={`${selectedOrder.orderNoC === hd.orderNoC ? 'selected' : ''}
+          ${globalIndex % 2 === 0 ? 'even-row' : 'odd-row'}
+        `}
+                  onClick={() => setSelectedOrder(hd)}
+                >
+                  <td>{globalIndex}</td>
+                  {isFirst ? (
+                    <>
+                      <td>{hd.posNo}</td>
+                      <td>{hd.orderNoC}</td>
+                      <td>{hd.ordTime.slice(0, 2)}:{hd.ordTime.slice(2, 4)}:{hd.ordTime.slice(4, 6)}</td>
+                      <td>{hd.comTime.slice(0, 2)}:{hd.comTime.slice(2, 4)}:{hd.comTime.slice(4, 6)}</td>
+                    </>
+                  ) : (
+                    <>
+                      <td />
+                      <td />
+                      <td />
+                      <td />
+                    </>
+                  )}
+                  <td>{dt.seq}</td>
+                  <td>{dt.itemPluCd}</td>
+                  <td>{dt.saleQty}</td>
+                </tr>
+              );
+            })}
             </tbody>
           </table>
         </div>
@@ -198,7 +220,7 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose, data }) => {
             </button>
           </div>
           <button className="restore-button" onClick={onRestore}>
-            복원
+            {STRINGS.restore}
           </button>
         </div>
       </div>
