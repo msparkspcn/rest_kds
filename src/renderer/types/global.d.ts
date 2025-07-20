@@ -13,13 +13,17 @@ declare global {
       downloadUpdate(): Promise<{ success: boolean; error?: string }>;
       quitAndInstall(): Promise<void>;
       cmp: {
-        getList: () => Promise<any>;
+        getList: (cmp_cd: string) => Promise<any>;
         add: (cmp_cd: string, cmp_nm: string) => Promise<void>;
         update: (cmp_nm: string, cmp_cd: string) => Promise<void>;
         delete: (cmp_cd: string) => Promise<void>;
       };
+      salesorg: {
+        getList: (cmp_cd: string) => Promise<any>;
+        add: (cmp_cd: string, sales_org_cd: string, sales_org_nm: string) => Promise<void>;
+      }
       corner: {
-        getList: (use_yn: string) => Promise<any>;
+        getList: (cmp_cd: string, sales_org_cd: string) => Promise<any>;
         getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string, use_yn: string) => Promise<any>;
         add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, corner_nm:string, use_yn:string)
           => Promise<void>;

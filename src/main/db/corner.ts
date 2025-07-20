@@ -8,7 +8,6 @@ type Corner = {
   cornerNm: string;
   salesOrgCd: string;
   storCd: string;
-  useYn: string;
 };
 
 type CornerSummary = {
@@ -22,8 +21,13 @@ type CornerSummary = {
   soldoutCount: string;
 };
 export function registerCornerIpc() {
-  ipcMain.handle('db:getCornerList', async (e, use_yn) => {
-    const rows = db.prepare('SELECT * FROM corner where use_yn = ?').all([use_yn]) as Corner[];
+  ipcMain.handle('db:getCornerList', async (e, cmp_cd, sales_org_cd) => {
+    const rows = db.prepare(
+      `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm
+             FROM corner
+             WHERE 1=1
+             AND cmp_cd = ?
+             AND sales_org_cd = ?`).all([cmp_cd, sales_org_cd]) as Corner[];
     return camelcaseKeys(rows, { deep: true });
   });
 

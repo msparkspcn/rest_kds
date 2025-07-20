@@ -30,17 +30,22 @@ contextBridge.exposeInMainWorld('ipc', {
   quitAndInstall: () => ipcRenderer.invoke('quit-and-install'),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   cmp: {
-    getList: () => ipcRenderer.invoke('db:getCmpList'),
+    getList: (cmp_cd: string) => ipcRenderer.invoke('db:getCmpList', cmp_cd),
     add: (cmp_cd: string, cmp_nm: string) =>
       ipcRenderer.invoke('db:addCmp', cmp_cd, cmp_nm),
     update: (cmp_nm: string, cmp_cd: string) =>
       ipcRenderer.invoke('db:updateCmp', cmp_nm, cmp_cd),
     delete: (cmp_cd: string) => ipcRenderer.invoke('db:deleteCmp', cmp_cd),
   },
+  salesorg: {
+    getList: (cmp_cd: string) => ipcRenderer.invoke('db:getSalesorgList', cmp_cd),
+    add: (cmp_cd: string, sales_org_cd: string, sales_org_nm: string) =>
+      ipcRenderer.invoke('db:addSalesorg', cmp_cd, sales_org_cd, sales_org_nm),
+  },
   corner: {
-    getList: (use_yn: string) => ipcRenderer.invoke('db:getCornerList', use_yn),
-    getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string, use_yn: string) =>
-      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd,stor_cd, use_yn),
+    getList: (cmp_cd: string, sales_org_cd: string) => ipcRenderer.invoke('db:getCornerList', cmp_cd, sales_org_cd),
+    getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string) =>
+      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd, stor_cd),
     add: (  cmp_cd: string,
             sales_org_cd: string,
             stor_cd: string,

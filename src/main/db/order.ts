@@ -81,7 +81,8 @@ export function registerOrderIpc() {
     async (e,
            sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
     const orderHdRows = db.prepare(
-      `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no, ord_time, status,order_no_c
+      `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no,
+ord_time, status,order_no_c
       FROM order_hd
       WHERE 1=1
       AND sale_dt = ?
@@ -90,7 +91,7 @@ export function registerOrderIpc() {
       AND stor_cd = ?
       AND corner_cd = ?
       AND status not in ('5', '8','9')
-      `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd,corner_cd]) as OrderHd[];
+      `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd]) as OrderHd[];
       console.log("orderHdRows from db:", orderHdRows);
     const orderDtRows = db.prepare(
       `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no,

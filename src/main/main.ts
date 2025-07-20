@@ -7,6 +7,7 @@ import { registerCornerIpc } from './db/corner';
 import { registerProductIpc } from './db/product';
 import path from 'path';
 import { registerOrderIpc } from './db/order';
+import { registerSalesorgIpc } from './db/salesorg';
 
 const ProgressBar = require('electron-progressbar');
 const fs = require('fs');
@@ -251,6 +252,7 @@ app.whenReady().then(() => {
   setupDatabase();
   clearPendingInstaller();
   registerCmpIpc();
+  registerSalesorgIpc();
   registerCornerIpc();
   registerProductIpc();
   registerOrderIpc();

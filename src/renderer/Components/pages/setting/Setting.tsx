@@ -26,13 +26,14 @@ const Setting: React.FC = () => {
     // const [appVersion, setAppVersion] = useState<string>("");
   const user = useUserStore((state) => state.user);
 
-  const [cmpNmList, setCmpNmList] = useState<{ infoCd: string; infoNm: string }[]>([]);
+  const [cmpNmList, setCmpNmList] = useState<{ infoCd: string; infoNm: string }[] | null>(null);
+  const [salesOrgNmList, setSalesOrgNmList] = useState<{ infoCd: string; infoNm: string }[] | null>(null);
+  const [cornerNmList, setCornerNmList] = useState<{ infoCd: string; infoNm: string }[] | null>(null);
+
   const [selectedCmpCd, setSelectedCmpCd] = useState<string>('');
   const [selectedSalesOrgCd, setSelectedSalesOrgCd] = useState<string>('');
-  const [selectedStorCd, setSelectedStorCd] = useState<string>('');
+  const [selectedStorCd, setSelectedStorCd] = useState<string>(''); //사용자가 선택X
   const [selectedCornerCd, setSelectedCornerCd] = useState<string>('');
-  const [salesOrgNmList, setSalesOrgNmList] = useState<{ infoCd: string; infoNm: string }[]>([]);
-  const [cornerNmList, setCornerNmList] = useState<{ infoCd: string; infoNm: string }[]>([]);
   const [cornerList, setCornerList] = useState<Corner[]>([]);
   const navigate = useNavigate();
 
@@ -52,7 +53,7 @@ const Setting: React.FC = () => {
         // setAppVersion(Constants.expoConfig.version);
         if(user!=null) {
           if ("cmpCd" in user) {
-            console.log("cmpCd:"+user.cmpCd)
+            log("cmpCd:"+user.cmpCd)
             setSelectedCmpCd(user.cmpCd)
             getCmpList(user.cmpCd)
           }
@@ -61,7 +62,7 @@ const Setting: React.FC = () => {
 
   const updateVersion = async () => {
     const version = await window.ipc.getAppVersion();
-    console.log('앱 현재 버전:', version);
+    log('앱 현재 버전:'+version);
 
     setConfirmProps({
       title: '업데이트',
@@ -103,131 +104,186 @@ const Setting: React.FC = () => {
       const result = await api.getCmpList(request);
       const { responseCode, responseMessage, responseBody } = result.data;
 
-          if (responseCode === "200") {
-            if (responseBody != null) {
-              log("휴게소 운영업체 조회 성공")
-              for (const cmp of responseBody) {
-                const { cmpCd, cmpNm} = cmp;
-                console.log("cmpCd:"+cmpCd+", cmpNm:"+cmpNm)
-                if(platform==='electron') {
-                  await window.ipc.cmp.add(cmpCd, cmpNm);
-                } else {
-                  log("웹 환경입니다.")
-                }
-              }
-              log(`휴게소 운영업체 수:${responseBody.length}`);
-              setCmpNmList(
-                responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
-                  infoCd: cmpCd,
-                  infoNm: cmpNm,
-                }))
-              );
-              getSalesOrgList(cmpCd)
+      if (responseCode === "300") {
+        if (responseBody != null) {
+          log("휴게소 운영업체 조회 성공")
+          for (const cmp of responseBody) {
+            const { cmpCd, cmpNm} = cmp;
+            console.log("cmpCd:"+cmpCd+", cmpNm:"+cmpNm)
+            if(platform==='electron') {
+              await window.ipc.cmp.add(cmpCd, cmpNm);
+            } else {
+              log("웹 환경입니다.")
             }
           }
-          else {
-            setLoading(false);
-            window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-          }
+          log(`휴게소 운영업체 수:${responseBody.length}`);
+          setCmpNmList(
+            responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
+              infoCd: cmpCd,
+              infoNm: cmpNm,
+            }))
+          );
+          getSalesOrgList(cmpCd)
         }
-        catch(error) {
-          setLoading(false);
-          window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
-        }
-    };
+      }
+      else {
+        log("휴게소 운영업체 api 조회 실패. local db 조회")
+        const localCmpList = await window.ipc.cmp.getList(cmpCd);
 
-    const getSalesOrgList = (cmpCd: string) => {
-        // setLoading(true)
-        const request = {
-            cmpCd : cmpCd,
-            restValue : ""
+        if(localCmpList && localCmpList.length > 0) {
+          log("local db 조회 성공 localCmpList:"+JSON.stringify(localCmpList))
+          setCmpNmList(
+            localCmpList.map(({ cmp_cd, cmp_nm }: { cmp_cd: string; cmp_nm: string }) => ({
+              infoCd: cmp_cd,
+              infoNm: cmp_nm,
+            }))
+          );
+          getSalesOrgList(cmpCd);
         }
-        api.getSalesOrgList(request).then((result) => {
-            const {responseCode, responseMessage, responseBody} = result.data;
-            if (responseCode === "200") {
-              if(responseBody != null) {
-                log("휴게소 조회 성공")
-                setSalesOrgNmList(
-                  responseBody.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
-                    infoCd: salesOrgCd,
-                    infoNm: salesOrgNm,
-                  }))
-                );
-                log(`휴게소 수:${responseBody.length}`);
-                if(!(user) || user.salesOrgCd == "") {
-                  // getStorList(cmpCd, responseBody[0].salesOrgCd)
-                  getCornerList(cmpCd,responseBody[0].salesOrgCd)
-                  setSelectedSalesOrgCd(responseBody[0].salesOrgCd)
-                } else {
-                  // getStorList(cmpCd, user.salesOrgCd)
-                  getCornerList(cmpCd,user.salesOrgCd)
-                  setSelectedSalesOrgCd(user.salesOrgCd)
-                }
-              }
-            }
-            else {
-              setLoading(false);
-              window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
-            }
-        })
-          .catch(ex => {
-            setLoading(false);
-            window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(" + ex.message + ")");
-          })
-          .finally(() => {
-                // setLoading(false)
-          })
+        else {
+          setErrorMessage("휴게소 운영업체 조회에 실패했습니다.\n관리자에게 문의해주세요.")
+          setLoading(false);
+        }
+      }
     }
+    catch(error) {
+      setLoading(false);
+      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
+  };
 
-    const getCornerList = async (cmpCd: string, salesOrgCd: string) => {
-        // setLoading(true)
-        log("매장 조회")
-        const request = {
-            cmpCd : cmpCd,
-            salesOrgCd : salesOrgCd
-        }
-        try {
-          const result = await api.getCornerList(request);
-          const {responseCode, responseMessage, responseBody} = result.data;
-          if (responseCode === "200") {
-            if(responseBody!=null) {
-              log("매장 조회 성공")
-              for(const corner of responseBody) {
-                const { cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn } = corner;
-                if(platform==='electron') {
-                  console.log("cmpCd:"+cmpCd);
-                  await window.ipc.corner.add(cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn);
-                } else {
-                  log("웹 환경입니다.")
-                }
-              }
-              log(`매장 수:${responseBody.length}`);
-              setCornerList(responseBody);
-              setCornerNmList(
-                responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
-                  infoCd: cornerCd,
-                  infoNm: cornerNm
-                }))
-              );
-              setSelectedStorCd(responseBody[0].storCd)
-              setSelectedCornerCd(responseBody[0].cornerCd)
+  const getSalesOrgList = async (cmpCd: string) => {
+    const request = {
+        cmpCd : cmpCd,
+        restValue : ""
+    }
+    try {
+      const result = await api.getSalesOrgList(request);
+      const { responseCode, responseMessage, responseBody } = result.data;
+      if (responseCode === "300") {
+        if(responseBody != null) {
+          log("휴게소 조회 성공")
+          for (const salesorg of responseBody) {
+            const { cmpCd, salesOrgCd, salesOrgNm} = salesorg;
+            console.log("cmpCd:"+cmpCd+", salesOrgCd:"+salesOrgCd)
+            if(platform==='electron') {
+              await window.ipc.salesorg.add(cmpCd, salesOrgCd, salesOrgNm);
+            } else {
+              log("웹 환경입니다.")
             }
           }
-          else {
-            setLoading(false);
-            window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+          setSalesOrgNmList(
+            responseBody.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
+              infoCd: salesOrgCd,
+              infoNm: salesOrgNm,
+            }))
+          );
+          log(`휴게소 수:${responseBody.length}`);
+          if(!(user) || user.salesOrgCd == "") {
+            getCornerList(cmpCd,responseBody[0].salesOrgCd)
+            setSelectedSalesOrgCd(responseBody[0].salesOrgCd)
+          } else {
+            getCornerList(cmpCd,user.salesOrgCd)
+            setSelectedSalesOrgCd(user.salesOrgCd)
           }
         }
-        catch(error) {
-          setLoading(false);
-          window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+      }
+      else {
+        log("휴게소 api 조회 실패. local db 조회")
+        const localSaleorgList = await window.ipc.salesorg.getList(cmpCd);
+        log("local db 조회 결과:"+JSON.stringify(localSaleorgList))
+        if(localSaleorgList && localSaleorgList.length > 0) {
+          setSalesOrgNmList(
+            localSaleorgList.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
+              infoCd: salesOrgCd,
+              infoNm: salesOrgNm,
+            }))
+          );
+          if(!(user) || user.salesOrgCd == "") {
+            getCornerList(cmpCd,localSaleorgList[0].salesOrgCd)
+            setSelectedSalesOrgCd(localSaleorgList[0].salesOrgCd)
+          } else {
+            getCornerList(cmpCd,user.salesOrgCd)
+            setSelectedSalesOrgCd(user.salesOrgCd)
+          }
         }
-        finally {
-          const cornerList = await window.ipc.corner.getList("1");
-          console.log('코너 목록:', cornerList);
+        else {
+          setErrorMessage("휴게소 조회에 실패했습니다.\n관리자에게 문의해주세요.")
           setLoading(false);
         }
+      }
     }
+    catch(error) {
+      setLoading(false);
+      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
+  }
+
+  const getCornerList = async (cmpCd: string, salesOrgCd: string) => {
+    log("매장 조회")
+    const request = {
+        cmpCd : cmpCd,
+        salesOrgCd : salesOrgCd
+    }
+    try {
+      const result = await api.getCornerList(request);
+      const {responseCode, responseMessage, responseBody} = result.data;
+      if (responseCode === "300") {
+        if(responseBody!=null) {
+          log("매장 조회 성공")
+          for(const corner of responseBody) {
+            const { cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn } = corner;
+            if(platform==='electron') {
+              // console.log("cmpCd:"+cmpCd);
+              await window.ipc.corner.add(cmpCd, salesOrgCd, storCd, cornerCd, cornerNm, useYn);
+            } else {
+              log("웹 환경입니다.")
+            }
+          }
+          log(`매장 수:${responseBody.length}`);
+          setCornerList(responseBody);
+          setCornerNmList(
+            responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
+              infoCd: cornerCd,
+              infoNm: cornerNm
+            }))
+          );
+          setSelectedStorCd(responseBody[0].storCd)
+          setSelectedCornerCd(responseBody[0].cornerCd)
+        }
+      }
+      else {
+        log("코너 api 조회 실패. local db 조회")
+        const localCornerList = await window.ipc.corner.getList(cmpCd, salesOrgCd);
+        log("local db 조회 결과1:"+JSON.stringify(localCornerList))
+        if(localCornerList && localCornerList.length > 0) {
+          setCornerList(localCornerList);
+          setCornerNmList(
+            localCornerList.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
+              infoCd: cornerCd,
+              infoNm: cornerNm
+            }))
+          );
+          if(!(user) || user.cornerCd =="") {
+            setSelectedStorCd(localCornerList[0].storCd)
+            setSelectedCornerCd(localCornerList[0].cornerCd)
+          } else {
+            setSelectedStorCd(user.storCd)
+            setSelectedCornerCd(user.cornerCd)
+          }
+        }
+        else {
+          log("here")
+          setLoading(false);
+          setErrorMessage("매장 조회에 실패했습니다.\n관리자에게 문의해주세요.")
+        }
+      }
+    }
+    catch(error) {
+      setLoading(false);
+      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+    }
+  }
 
   const onCancel = () => {
     setConfirmProps({
@@ -307,9 +363,19 @@ const Setting: React.FC = () => {
     }
   };
 
-  if(loading) {
-        return <Loading />
-    }
+  if(errorMessage) {
+    return (
+      <Alert
+      title="알림"
+      message={errorMessage}
+      onClose={()=>{setErrorMessage(null)}}
+    />
+    )
+  } 
+  if (loading || cmpNmList === null || salesOrgNmList === null || cornerNmList === null) {
+    return <Loading />;
+  }
+  else {
     return (
       <div className="container">
         <div className="button-container">
@@ -360,15 +426,9 @@ const Setting: React.FC = () => {
             {...confirmProps}
           />
         )}
-        {errorMessage && (
-          <Alert
-            title="알림"
-            message={errorMessage}
-            onClose={()=>{setErrorMessage(null)}}
-          />
-        )}
       </div>
-  );
+    );
+  }
 };
 
 export default Setting;
