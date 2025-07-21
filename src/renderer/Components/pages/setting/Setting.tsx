@@ -100,6 +100,17 @@ const Setting: React.FC = () => {
     setConfirmOpen(true);
   };
 
+  const initCmpNmList = async (list: any[]) => {
+    log(`휴게소 운영업체 수:${list.length}`);
+    setCmpNmList(
+      list.map(({ cmpCd, cmpNm }) => ({
+        infoCd: cmpCd,
+        infoNm: cmpNm,
+      }))
+    );
+    await getSalesOrgList(list[0].cmpCd);
+  }
+
   const getCmpList = async (cmpCd: string) => {
     setLoading(true)
     const request = { cmpValue: cmpCd };
@@ -119,14 +130,7 @@ const Setting: React.FC = () => {
               log("웹 환경입니다.")
             }
           }
-          log(`휴게소 운영업체 수:${responseBody.length}`);
-          setCmpNmList(
-            responseBody.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
-              infoCd: cmpCd,
-              infoNm: cmpNm,
-            }))
-          );
-          await getSalesOrgList(cmpCd)
+          await initCmpNmList(responseBody);
         }
       }
       else {
@@ -135,13 +139,7 @@ const Setting: React.FC = () => {
 
         if(localCmpList && localCmpList.length > 0) {
           log("local db 조회 성공 localCmpList:"+JSON.stringify(localCmpList))
-          setCmpNmList(
-            localCmpList.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
-              infoCd: cmpCd,
-              infoNm: cmpNm,
-            }))
-          );
-          await getSalesOrgList(cmpCd);
+          await initCmpNmList(localCmpList)
         }
         else {
           showError("휴게소 운영업체 조회에 실패했습니다.\n관리자에게 문의해주세요.", () => getCmpList(cmpCd))
@@ -153,6 +151,19 @@ const Setting: React.FC = () => {
       setLoading(false);
       showError("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error,() => getCmpList(cmpCd));
     }
+  };
+
+  const initSalesOrgNmList = async (cmpCd: string, list: any[]) => {
+    log(`휴게소 수:${list.length}`);
+    setSalesOrgNmList(
+      list.map(({ salesOrgCd, salesOrgNm }) => ({
+        infoCd: salesOrgCd,
+        infoNm: salesOrgNm,
+      }))
+    );
+    const selectedCd = user?.salesOrgCd || list[0].salesOrgCd;
+    setSelectedSalesOrgCd(selectedCd);
+    await getCornerList(cmpCd, selectedCd);
   };
 
   const getSalesOrgList = async (cmpCd: string) => {
@@ -175,20 +186,7 @@ const Setting: React.FC = () => {
               log("웹 환경입니다.")
             }
           }
-          setSalesOrgNmList(
-            responseBody.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
-              infoCd: salesOrgCd,
-              infoNm: salesOrgNm,
-            }))
-          );
-          log(`휴게소 수:${responseBody.length}`);
-          if(!(user) || user.salesOrgCd == "") {
-            await getCornerList(cmpCd, responseBody[0].salesOrgCd)
-            setSelectedSalesOrgCd(responseBody[0].salesOrgCd)
-          } else {
-            await getCornerList(cmpCd, user.salesOrgCd)
-            setSelectedSalesOrgCd(user.salesOrgCd)
-          }
+        await initSalesOrgNmList(cmpCd, responseBody);
         }
       }
       else {
@@ -196,19 +194,7 @@ const Setting: React.FC = () => {
         const localSalesorgList = await window.ipc.salesorg.getList(cmpCd);
         log("local db 조회 결과:"+JSON.stringify(localSalesorgList))
         if(localSalesorgList && localSalesorgList.length > 0) {
-          setSalesOrgNmList(
-            localSalesorgList.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
-              infoCd: salesOrgCd,
-              infoNm: salesOrgNm,
-            }))
-          );
-          if(!(user) || user.salesOrgCd == "") {
-            await getCornerList(cmpCd, localSalesorgList[0].salesOrgCd)
-            setSelectedSalesOrgCd(localSalesorgList[0].salesOrgCd)
-          } else {
-            await getCornerList(cmpCd, user.salesOrgCd)
-            setSelectedSalesOrgCd(user.salesOrgCd)
-          }
+          await initSalesOrgNmList(cmpCd, localSalesorgList);
         }
         else {
           showError("휴게소 조회에 실패했습니다.\n관리자에게 문의해주세요.", () => getSalesOrgList(cmpCd))
@@ -220,6 +206,22 @@ const Setting: React.FC = () => {
       setLoading(false);
       showError("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error, () => getSalesOrgList(cmpCd));
     }
+  }
+
+  const initCornerNmList = (list: any[]) => {
+    log(`매장 수:${list.length}`);
+    setCornerList(list);
+    setCornerNmList(
+      list.map(({ cornerCd, cornerNm }) => ({
+        infoCd: cornerCd,
+        infoNm: cornerNm,
+      }))
+    );
+    const cornerCd = user?.cornerCd || list[0].cornerCd;
+    const storCd = user?.storCd || list[0].storCd;
+    setSelectedCornerCd(cornerCd);
+    setSelectedStorCd(storCd);
+    setLoading(false);
   }
 
   const getCornerList = async (cmpCd: string, salesOrgCd: string) => {
@@ -243,17 +245,6 @@ const Setting: React.FC = () => {
               log("웹 환경입니다.")
             }
           }
-          log(`매장 수:${responseBody.length}`);
-          setCornerList(responseBody);
-          setCornerNmList(
-            responseBody.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
-              infoCd: cornerCd,
-              infoNm: cornerNm
-            }))
-          );
-          setSelectedStorCd(responseBody[0].storCd)
-          setSelectedCornerCd(responseBody[0].cornerCd)
-          setLoading(false)
         }
       }
       else {
@@ -261,21 +252,7 @@ const Setting: React.FC = () => {
         const localCornerList = await window.ipc.corner.getList(cmpCd, salesOrgCd);
         log("local db 조회 결과1:"+JSON.stringify(localCornerList))
         if(localCornerList && localCornerList.length > 0) {
-          setCornerList(localCornerList);
-          setCornerNmList(
-            localCornerList.map(({ cornerCd, cornerNm }: { cornerCd: string; cornerNm: string }) => ({
-              infoCd: cornerCd,
-              infoNm: cornerNm
-            }))
-          );
-          if(!(user) || user.cornerCd =="") {
-            setSelectedStorCd(localCornerList[0].storCd)
-            setSelectedCornerCd(localCornerList[0].cornerCd)
-          } else {
-            setSelectedStorCd(user.storCd)
-            setSelectedCornerCd(user.cornerCd)
-          }
-          setLoading(false)
+          initCornerNmList(localCornerList);
         }
         else {
           log("here")
