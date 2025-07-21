@@ -1,13 +1,19 @@
 import { ipcMain } from 'electron';
 import { db } from './db';
+import camelcaseKeys from 'camelcase-keys';
 
+type Cmp = {
+  cmpCd: string;
+  cmpNm: string;
+}
 export function registerCmpIpc() {
   ipcMain.handle('db:getCmpList', async (e, cmp_cd) => {
-    return db.prepare(
+    const rows = db.prepare(
       `SELECT cmp_cd, cmp_nm
               FROM cmp
               where 1=1
-              AND cmp_cd = ?`).all([cmp_cd]);
+              AND cmp_cd = ?`).all([cmp_cd]) as Cmp[];
+    return camelcaseKeys(rows, { deep: true });
   });
 
   ipcMain.handle('db:addCmp', async (_e, cmp_cd, cmp_nm) => {

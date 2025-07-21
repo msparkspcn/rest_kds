@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useUserStore } from '@Components/store/user';
+import { log } from '@Components/utils/logUtil';
 
 const WS_URL = 'ws://10.120.44.88:8082/ws';
 type Message = {
   type: string;
-  body: any; // 혹은 더 구체적인 타입으로 정의 가능
+  body: any;
 };
 export const useWebSocket = () => {
   const ws = useRef<WebSocket | null>(null);
@@ -12,29 +13,47 @@ export const useWebSocket = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessagesInternal] = useState<Message[]>([]);
   const getUserId = useUserStore((state) => state.userId);
+  const user = useUserStore((state) => state.user);
+
   const connect = () => {
+    log("connect user:"+JSON.stringify(user));
     ws.current = new WebSocket(WS_URL);
 
     ws.current.onopen = () => {
-      console.log(`[WebSocket] connected userId:${getUserId}`);
+      log(`[WebSocket] connected userId:${getUserId}`);
       setIsConnected(true);
 
-      ws.current?.send(JSON.stringify({ type: 'subscribe', topic: 'item', userId: getUserId }));
-      ws.current?.send(JSON.stringify({ type: 'subscribe', topic: 'order', userId: getUserId }));
+      ws.current?.send(JSON.stringify({
+        type: 'subscribe',
+        topic: 'item',
+        userId: getUserId,
+        salesOrgCd: user?.salesOrgCd,
+        storCd: user?.storCd,
+        cornerCd: user?.cornerCd,
+        deviceType: 'KDS'
+      }));
+      ws.current?.send(JSON.stringify({
+        type: 'subscribe',
+        topic: 'order',
+        userId: getUserId,
+        salesOrgCd: user?.salesOrgCd,
+        storCd: user?.storCd,
+        cornerCd: user?.cornerCd,
+        deviceType: 'KDS'
+      }));
     };
 
     ws.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         // 예: topic 기반 메시지 필터링
-        console.log("no filtered data:"+JSON.stringify(data))
         //주문은 order
         if ('SOLDOUT'.includes(data.type)) {
-          console.log(`SOLDOUT data:${JSON.stringify(data)}`);
+          log(`SOLDOUT data:${JSON.stringify(data)}`);
           setMessages(data.type, data.body);
         }
         else if('order'.includes(data.type)) {
-          console.log(`order data:${JSON.stringify(data)}`);
+          log(`order data:${JSON.stringify(data)}`);
           setMessages(data.type, data.data);
         }
       } catch (err) {

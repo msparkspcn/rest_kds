@@ -45,7 +45,10 @@ const Setting: React.FC = () => {
   });
 
   const platform = getPlatform();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorDialog, setErrorDialog] = useState<{
+    message: string;
+    onRetry?: () => void;
+  } | null>(null);
 
     useEffect(() => {
         log("세팅화면 진입")
@@ -83,14 +86,14 @@ const Setting: React.FC = () => {
               setConfirmOpen(true);
             } else {
               console.error('업데이트 오류:',downloadResult.error);
-              setErrorMessage('업데이트 다운로드에 실패했습니다.');
+              showSimpleError('업데이트 다운로드에 실패했습니다.');
             }
           } else {
-            setErrorMessage('최신 버전입니다.');
+            showSimpleError('최신 버전입니다.');
           }
         } catch (error) {
           console.error('업데이트 오류:', error);
-          setErrorMessage('업데이트 중 오류가 발생했습니다.');
+          showSimpleError('업데이트 중 오류가 발생했습니다.');
         }
       },
     });
@@ -123,7 +126,7 @@ const Setting: React.FC = () => {
               infoNm: cmpNm,
             }))
           );
-          getSalesOrgList(cmpCd)
+          await getSalesOrgList(cmpCd)
         }
       }
       else {
@@ -133,22 +136,22 @@ const Setting: React.FC = () => {
         if(localCmpList && localCmpList.length > 0) {
           log("local db 조회 성공 localCmpList:"+JSON.stringify(localCmpList))
           setCmpNmList(
-            localCmpList.map(({ cmp_cd, cmp_nm }: { cmp_cd: string; cmp_nm: string }) => ({
-              infoCd: cmp_cd,
-              infoNm: cmp_nm,
+            localCmpList.map(({ cmpCd, cmpNm }: { cmpCd: string; cmpNm: string }) => ({
+              infoCd: cmpCd,
+              infoNm: cmpNm,
             }))
           );
-          getSalesOrgList(cmpCd);
+          await getSalesOrgList(cmpCd);
         }
         else {
-          setErrorMessage("휴게소 운영업체 조회에 실패했습니다.\n관리자에게 문의해주세요.")
+          showError("휴게소 운영업체 조회에 실패했습니다.\n관리자에게 문의해주세요.", () => getCmpList(cmpCd))
           setLoading(false);
         }
       }
     }
     catch(error) {
       setLoading(false);
-      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+      showError("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error,() => getCmpList(cmpCd));
     }
   };
 
@@ -180,42 +183,42 @@ const Setting: React.FC = () => {
           );
           log(`휴게소 수:${responseBody.length}`);
           if(!(user) || user.salesOrgCd == "") {
-            getCornerList(cmpCd,responseBody[0].salesOrgCd)
+            await getCornerList(cmpCd, responseBody[0].salesOrgCd)
             setSelectedSalesOrgCd(responseBody[0].salesOrgCd)
           } else {
-            getCornerList(cmpCd,user.salesOrgCd)
+            await getCornerList(cmpCd, user.salesOrgCd)
             setSelectedSalesOrgCd(user.salesOrgCd)
           }
         }
       }
       else {
         log("휴게소 api 조회 실패. local db 조회")
-        const localSaleorgList = await window.ipc.salesorg.getList(cmpCd);
-        log("local db 조회 결과:"+JSON.stringify(localSaleorgList))
-        if(localSaleorgList && localSaleorgList.length > 0) {
+        const localSalesorgList = await window.ipc.salesorg.getList(cmpCd);
+        log("local db 조회 결과:"+JSON.stringify(localSalesorgList))
+        if(localSalesorgList && localSalesorgList.length > 0) {
           setSalesOrgNmList(
-            localSaleorgList.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
+            localSalesorgList.map(({ salesOrgCd, salesOrgNm }: { salesOrgCd: string; salesOrgNm: string }) => ({
               infoCd: salesOrgCd,
               infoNm: salesOrgNm,
             }))
           );
           if(!(user) || user.salesOrgCd == "") {
-            getCornerList(cmpCd,localSaleorgList[0].salesOrgCd)
-            setSelectedSalesOrgCd(localSaleorgList[0].salesOrgCd)
+            await getCornerList(cmpCd, localSalesorgList[0].salesOrgCd)
+            setSelectedSalesOrgCd(localSalesorgList[0].salesOrgCd)
           } else {
-            getCornerList(cmpCd,user.salesOrgCd)
+            await getCornerList(cmpCd, user.salesOrgCd)
             setSelectedSalesOrgCd(user.salesOrgCd)
           }
         }
         else {
-          setErrorMessage("휴게소 조회에 실패했습니다.\n관리자에게 문의해주세요.")
+          showError("휴게소 조회에 실패했습니다.\n관리자에게 문의해주세요.", () => getSalesOrgList(cmpCd))
           setLoading(false);
         }
       }
     }
     catch(error) {
       setLoading(false);
-      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+      showError("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error, () => getSalesOrgList(cmpCd));
     }
   }
 
@@ -250,6 +253,7 @@ const Setting: React.FC = () => {
           );
           setSelectedStorCd(responseBody[0].storCd)
           setSelectedCornerCd(responseBody[0].cornerCd)
+          setLoading(false)
         }
       }
       else {
@@ -271,17 +275,18 @@ const Setting: React.FC = () => {
             setSelectedStorCd(user.storCd)
             setSelectedCornerCd(user.cornerCd)
           }
+          setLoading(false)
         }
         else {
           log("here")
           setLoading(false);
-          setErrorMessage("매장 조회에 실패했습니다.\n관리자에게 문의해주세요.")
+          showError("매장 조회에 실패했습니다.\n관리자에게 문의해주세요.", () => getCornerList(cmpCd, salesOrgCd))
         }
       }
     }
     catch(error) {
       setLoading(false);
-      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+      showError("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error, () => getCornerList(cmpCd, salesOrgCd))
     }
   }
 
@@ -363,15 +368,27 @@ const Setting: React.FC = () => {
     }
   };
 
-  if(errorMessage) {
+  const showError = (message: string, onRetry: () => void) => {
+    setErrorDialog({ message, onRetry });
+  };
+
+  const showSimpleError = (message: string) => {
+    setErrorDialog({ message }); // retry 없이
+  };
+
+  if(errorDialog) {
     return (
       <Alert
       title="알림"
-      message={errorMessage}
-      onClose={()=>{setErrorMessage(null)}}
+      message={errorDialog.message}
+      onClose={() => {
+        const retry = errorDialog.onRetry;
+        setErrorDialog(null);
+        if (retry) retry();
+      }}
     />
     )
-  } 
+  }
   if (loading || cmpNmList === null || salesOrgNmList === null || cornerNmList === null) {
     return <Loading />;
   }
