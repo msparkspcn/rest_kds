@@ -25,16 +25,7 @@ export const useWebSocket = () => {
 
       ws.current?.send(JSON.stringify({
         type: 'subscribe',
-        topic: 'item',
-        userId: getUserId,
-        salesOrgCd: user?.salesOrgCd,
-        storCd: user?.storCd,
-        cornerCd: user?.cornerCd,
-        deviceType: 'KDS'
-      }));
-      ws.current?.send(JSON.stringify({
-        type: 'subscribe',
-        topic: 'order',
+        topic: ['item','order'],
         userId: getUserId,
         salesOrgCd: user?.salesOrgCd,
         storCd: user?.storCd,
