@@ -53,7 +53,6 @@ function createTables() {
        PRIMARY KEY (cmp_cd, sales_org_cd, stor_cd, corner_cd, item_cd)
     );`,
     `CREATE TABLE IF NOT EXISTS order_hd (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
       sale_dt TEXT NOT NULL,
       cmp_cd TEXT NOT NULL,
       sales_org_cd TEXT NOT NULL,
@@ -70,7 +69,6 @@ function createTables() {
       PRIMARY KEY (sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no)
     );`,
     `CREATE TABLE IF NOT EXISTS order_dt (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
       sale_dt TEXT NOT NULL,
       cmp_cd TEXT NOT NULL,
       sales_org_cd TEXT NOT NULL,

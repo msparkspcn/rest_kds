@@ -118,7 +118,7 @@ const Setting: React.FC = () => {
       const result = await api.getCmpList(request);
       const { responseCode, responseMessage, responseBody } = result.data;
 
-      if (responseCode === "300") {
+      if (responseCode === "200") {
         if (responseBody != null) {
           log("휴게소 운영업체 조회 성공")
           for (const cmp of responseBody) {
@@ -174,7 +174,7 @@ const Setting: React.FC = () => {
     try {
       const result = await api.getSalesOrgList(request);
       const { responseCode, responseMessage, responseBody } = result.data;
-      if (responseCode === "300") {
+      if (responseCode === "200") {
         if(responseBody != null) {
           log("휴게소 조회 성공")
           for (const salesorg of responseBody) {
@@ -233,7 +233,7 @@ const Setting: React.FC = () => {
     try {
       const result = await api.getCornerList(request);
       const {responseCode, responseMessage, responseBody} = result.data;
-      if (responseCode === "300") {
+      if (responseCode === "200") {
         if(responseBody!=null) {
           log("매장 조회 성공")
           for(const corner of responseBody) {
@@ -245,6 +245,7 @@ const Setting: React.FC = () => {
               log("웹 환경입니다.")
             }
           }
+          initCornerNmList(responseBody)
         }
       }
       else {

@@ -106,7 +106,7 @@ function RenderItem({ item, index }: RenderItemProps): JSX.Element {
       <div className="order-cell index">{index + 1}</div>
       <div className="order-cell name">
         {item.itemDiv !== "0" ? '↳' : ''}
-        {item.itemPluCd}
+        {item.itemNm}
       </div>
       <div className="order-cell qty">{item.saleQty}</div>
     </div>

@@ -102,51 +102,47 @@ function Main(): JSX.Element {
             log('2.주문 처리' + JSON.stringify(msg.body))
             if(msg.body!=null) {
               try {
-                for (const body of msg.body) {
-                  const corners = body.corners || [];
-                  for(const corner of corners) {
-                    const cornerCd = corner.cornerCd ?? '';
-                    const details = corner.details || [];
-                    // 주문 헤더 저장
-                    await window.ipc.order.addOrderHd(
-                      body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
-                      cornerCd,
-                      body.posNo, body.tradeNo,
-                      body.ordTime, body.comTime, body.status,
-                      details[0]?.orderNoC ?? '',
-                      body.updUserId ?? 'SYSTEM',
-                      body.updDate ?? ''
-                    );
+                const body = msg.body;
+                const cornerCd = body.cornerCd ?? '';
+                const details = body.details || [];
 
-                    // 주문 상세 저장
-                    await Promise.all(details.map(dt =>
-                      window.ipc.order.addOrderDt(
-                        dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
-                        dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
-                        dt.itemPluCd, dt.itemNm, dt.itemDiv,
-                        '', dt.saleQty
-                      )
-                    ));
+                await window.ipc.order.addOrderHd(
+                  body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
+                  cornerCd,
+                  body.posNo, body.tradeNo,
+                  body.ordTime, body.comTime, body.status,
+                  body.orderNoC ?? '',
+                  body.updUserId ?? 'SYSTEM',
+                  body.updDate ?? ''
+                );
 
-                    handleOrderStatus(
-                      body.cmpCd,
-                      body.salesOrgCd,
-                      body.storCd,
-                      cornerCd,
-                      body.saleDt,
-                      body.posNo,
-                      body.tradeNo,
-                      STRINGS.status_pending);
+                // 주문 상세 저장
+                await Promise.all(details.map(dt =>
+                  window.ipc.order.addOrderDt(
+                    dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
+                    dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
+                    dt.itemPluCd, dt.itemNm, dt.itemDiv,
+                    '', dt.saleQty
+                  )
+                ));
 
-                    const orderHdList = await window.ipc.order.getList(
-                      body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,cornerCd);
+                handleOrderStatus(
+                  body.cmpCd,
+                  body.salesOrgCd,
+                  body.storCd,
+                  cornerCd,
+                  body.saleDt,
+                  body.posNo,
+                  body.tradeNo,
+                  STRINGS.status_pending);
 
-                    setOrderList(orderHdList);
-                    console.log('내부 db insert 완료 orderHd12:', orderHdList);
-                  }
+                const orderHdList = await window.ipc.order.getList(
+                  body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,cornerCd);
 
-                  console.log('주문 처리 완료');
-                }
+                setOrderList(orderHdList);
+
+                console.log('내부 db insert 완료 orderHd12:', orderHdList);
+                console.log('주문 처리 완료');
               }
               catch(err) {
                 console.error('주문 처리 중 오류 발생:', err);

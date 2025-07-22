@@ -45,7 +45,7 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
   const getCompletedOrderList = async() => {
     console.log("cmpCd:"+user.cmpCd+", storCd:"+user.storCd+", cornerCd:"+user.cornerCd)
     const orderList = await window.ipc.order.getCompletedList(
-      '20250708', user?.cmpCd, user?.salesOrgCd, user?.storCd, "CIBA"
+      '20250708', user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
     )
     console.log("완료주문:"+JSON.stringify(orderList))
     console.log("totalDtCount:"+totalDtCount)
