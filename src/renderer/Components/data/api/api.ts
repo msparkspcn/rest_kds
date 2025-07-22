@@ -101,6 +101,11 @@ export function updateSoldout(params: any) {
   return post(request, params);
 }
 
+export function getOpenDate(params: any) {
+  const request = `/api/v1/store/open-date`;
+  return post(request, params);
+}
+
 // export function getOrderDataList(params) {      //주문 조회(가칭)
 //     const request = host + "/order/getOrderDataList";
 //     return post(request, params);

@@ -8,6 +8,7 @@ type Corner = {
   cornerNm: string;
   salesOrgCd: string;
   storCd: string;
+  useYn: string;
 };
 
 type CornerSummary = {
@@ -23,7 +24,7 @@ type CornerSummary = {
 export function registerCornerIpc() {
   ipcMain.handle('db:getCornerList', async (e, cmp_cd, sales_org_cd) => {
     const rows = db.prepare(
-      `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm
+      `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, corner_nm, use_yn
              FROM corner
              WHERE 1=1
              AND cmp_cd = ?

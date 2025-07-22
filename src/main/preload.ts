@@ -44,8 +44,8 @@ contextBridge.exposeInMainWorld('ipc', {
   },
   corner: {
     getList: (cmp_cd: string, sales_org_cd: string) => ipcRenderer.invoke('db:getCornerList', cmp_cd, sales_org_cd),
-    getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string) =>
-      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd, stor_cd),
+    getList2: (cmp_cd:string, sales_org_cd:string, stor_cd:string, use_yn:string) =>
+      ipcRenderer.invoke('db:getCornerSummary', cmp_cd, sales_org_cd, stor_cd, use_yn),
     add: (  cmp_cd: string,
             sales_org_cd: string,
             stor_cd: string,
@@ -59,7 +59,6 @@ contextBridge.exposeInMainWorld('ipc', {
   product: {
     getList: (cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
       ipcRenderer.invoke('db:getProductList', cmp_cd, sales_org_cd, stor_cd, corner_cd),
-    // getList: () => ipcRenderer.invoke('db:getProductList'),
     add: (  cmp_cd: string,
             sales_org_Cd: string,
             stor_cd: string,
@@ -98,5 +97,14 @@ contextBridge.exposeInMainWorld('ipc', {
                         corner_cd:string, pos_no:string, trade_no:string, com_time:string) =>
       ipcRenderer.invoke('db:updateOrderStatus',
         status, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, trade_no, com_time),
+  },
+
+  saleOpen: {
+    getSaleOpen: (cmp_cd:string, sales_org_cd:string, stor_cd:string) =>
+      ipcRenderer.invoke('db:getSaleOpen',
+        cmp_cd, sales_org_cd, stor_cd),
+    add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, sale_dt:string) =>
+      ipcRenderer.invoke('db:addSaleOpen',
+        cmp_cd, sales_org_cd, stor_cd, sale_dt),
   }
 });

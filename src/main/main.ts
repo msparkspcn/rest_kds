@@ -8,6 +8,7 @@ import { registerProductIpc } from './db/product';
 import path from 'path';
 import { registerOrderIpc } from './db/order';
 import { registerSalesorgIpc } from './db/salesorg';
+import { registerSaleOpenIpc } from './db/saleOpen';
 
 const ProgressBar = require('electron-progressbar');
 const fs = require('fs');
@@ -256,6 +257,7 @@ app.whenReady().then(() => {
   registerCornerIpc();
   registerProductIpc();
   registerOrderIpc();
+  registerSaleOpenIpc();
   createWindow();
 
   app.on('activate', () => {

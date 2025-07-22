@@ -60,16 +60,14 @@ function Main(): JSX.Element {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const user = useUserStore((state) => state.user);
-
+  const platform = getPlatform();
   useEffect(() => {
     console.log("user:"+JSON.stringify(user));
     //최초 주문 수신 api 필요 getOrderList
     if(user!=null) {
+      getOpenDate(user.cmpCd, user.salesOrgCd, user.storCd)
       getProductList(user.cmpCd, user.salesOrgCd, user.storCd)
     }
-    getOrderData("20250708")
-    // getStoreSaleOpen()
-    // getProductList();
   }, []);
 
   useEffect(() => {
@@ -203,6 +201,49 @@ function Main(): JSX.Element {
     return true;
   };
 
+  const getOpenDate = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
+    log("개점일 조회")
+    const request = {
+      cmpCd : cmpCd,
+      salesOrgCd : salesOrgCd,
+      storCd : storCd,
+    }
+    try {
+      const result = await api.getOpenDate(request);
+      const {responseCode, responseMessage, responseBody} = result.data;
+      if (responseCode === "300") {
+        if(responseBody!=null) {
+          log("개점일:"+responseBody)
+
+          if(platform==='electron') {
+            // console.log("cmpCd:"+cmpCd);
+            await window.ipc.saleOpen.add(cmpCd, salesOrgCd, storCd, responseBody);
+            setSaleDt(responseBody)
+            getOrderData(responseBody)
+            log("개점일 등록완료")
+          } else {
+            log("웹 환경입니다.")
+          }
+        }
+      }
+      else {
+        log("개점일 조회 실패. local db 조회")
+        const saleOpen = await window.ipc.saleOpen.getSaleOpen(cmpCd, salesOrgCd, storCd);
+        log("개점일2:"+JSON.stringify(saleOpen))
+        if(saleOpen) {
+          // log("개점일2:"+saleOpen)
+          setSaleDt(saleOpen.saleDt)
+          getOrderData(saleOpen.saleDt)
+        }
+        else {
+          log("개점일 조회 실패(최종)")
+        }
+      }
+    } catch (e) {
+
+    }
+    setLoading(false);
+  }
 
   const getProductList = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
     console.log(`상품 조회:${cmpCd}, ${salesOrgCd}, ${storCd}`);
@@ -224,7 +265,9 @@ function Main(): JSX.Element {
               const {cmpCd, salesOrgCd, storCd, cornerCd,
                 itemCd, itemNm, price, soldoutYn, useYn, sortOrder} = product;
               // console.log("product:"+JSON.stringify(product))
-              await window.ipc.product.add(cmpCd, salesOrgCd, storCd, cornerCd, itemCd, itemNm, price, soldoutYn, useYn, sortOrder)
+              await window.ipc.product.add(
+                cmpCd, salesOrgCd, storCd, cornerCd,
+                itemCd, itemNm, price, soldoutYn, useYn, sortOrder)
             }
             else {
               log("웹 환경입니다.")
@@ -252,30 +295,6 @@ function Main(): JSX.Element {
       setLoading(false);
     }
   };
-
-  //개점 정보 설정(신규 api 연동 필요)
-  const getStoreSaleOpen = () => {
-    const params = {
-      cmpCd: '90000001',
-      brandCd: '9999',
-      storeCd: '000281'
-    };
-    api.getStoreSaleOpen(params).then((result) => {
-      const { responseBody, responseCode, responseMessage } = result.data;
-      if (responseCode === '200') {
-        console.log(`### 개점정보 res:${responseBody.saleDt}`);
-        setSaleDt(responseBody.saleDt);
-        getOrderData(responseBody.saleDt);
-      } else {
-        console.log('### 개점정보 수신 실패');
-      }
-    });
-  };
-
-  //api 연동
-  const getOrderList = () => {
-
-  }
 
   const getOrderData = async(saleDt: string) => {
     //주문정보 내부 쿼리 후 주문건수, 주문 set
@@ -401,10 +420,9 @@ function Main(): JSX.Element {
 
           try {
             if(status==STRINGS.status_completed) {
-              console.log("완료 상태")
               const currentTime = dayjs().format('HHmmss');
               await window.ipc.order.updateOrderStatus(
-                status, saleDt, cmpCd, salesOrgCd, storCd, cornerCd, posNo, tradeNo,currentTime
+                status, saleDt, cmpCd, salesOrgCd, storCd, cornerCd, posNo, tradeNo, currentTime
               );
             }
             else {
@@ -414,7 +432,7 @@ function Main(): JSX.Element {
             }
 
             log("주문 상태 업데이트 완료");
-            getOrderData("20250708")
+            getOrderData(saleDt)
           } catch (error) {
             log("주문 상태 업데이트 실패: " + error);
           }
@@ -427,6 +445,8 @@ function Main(): JSX.Element {
       }
     } catch (ex) {
       window.alert("ErrorCode :: " + ex + "\n");
+    } finally {
+      setSelectedOrder({})
     }
   }
 

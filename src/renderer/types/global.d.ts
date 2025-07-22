@@ -30,7 +30,6 @@ declare global {
       };
       product: {
         getList: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
-        // getList: () => Promise<any>;
         add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, item_cd:string,
               item_nm:string, price:string, soldout_yn:string, use_yn:string, sort_order: string)
           => Promise<void>;
@@ -55,6 +54,10 @@ declare global {
         getOne: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
                  corner_cd:string, pos_no:string, status: string)
         => Promist<void>;
+      }
+      saleOpen: {
+        getSaleOpen: (cmp_cd:string, sales_org_cd:string, stor_cd:string) => Promise<any>;
+        add: (cmp_cd:string, sales_org_cd:string, stor_cd:string, sale_dt:string) => Promise<any>;
       }
     };
   }

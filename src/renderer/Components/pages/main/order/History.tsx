@@ -7,11 +7,12 @@ import { useUserStore } from '@Components/store/user';
 import { STRINGS } from '../../../../constants/strings';
 
 interface HistoryProps {
+  saleDt: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
+const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
   const ITEMS_PER_PAGE = 15;
   const [selectedOrder, setSelectedOrder] = useState({});
   const [orderList, setOrderList] = useState([]);
@@ -45,7 +46,7 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
   const getCompletedOrderList = async() => {
     console.log("cmpCd:"+user.cmpCd+", storCd:"+user.storCd+", cornerCd:"+user.cornerCd)
     const orderList = await window.ipc.order.getCompletedList(
-      '20250708', user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
+      saleDt, user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
     )
     console.log("완료주문:"+JSON.stringify(orderList))
     console.log("totalDtCount:"+totalDtCount)
@@ -129,6 +130,14 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
     }
     console.log(`현재 페이지:${currentPage}`);
   };
+
+  const formatTime = (timeStr?: string) => {
+    return timeStr?.length === 6
+      ? `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}:${timeStr.slice(4, 6)}`
+      : '--:--:--';
+  };
+
+
   if (!isOpen) return null; // 모달이 열리지 않으면 아무것도 렌더링하지 않음
   console.log('History');
   return (
@@ -173,8 +182,8 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
                     <>
                       <td>{hd.posNo}</td>
                       <td>{hd.orderNoC}</td>
-                      <td>{hd.ordTime.slice(0, 2)}:{hd.ordTime.slice(2, 4)}:{hd.ordTime.slice(4, 6)}</td>
-                      <td>{hd.comTime.slice(0, 2)}:{hd.comTime.slice(2, 4)}:{hd.comTime.slice(4, 6)}</td>
+                      <td>{formatTime(hd.ordTime)}</td>
+                      <td>{formatTime(hd.comTime)}</td>
                     </>
                   ) : (
                     <>
@@ -185,7 +194,7 @@ const History: React.FC<HistoryProps> = ({ isOpen, onClose }) => {
                     </>
                   )}
                   <td>{dt.seq}</td>
-                  <td>{dt.itemPluCd}</td>
+                  <td>{dt.itemNm}</td>
                   <td>{dt.saleQty}</td>
                 </tr>
               );
