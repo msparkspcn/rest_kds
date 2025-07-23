@@ -49,8 +49,15 @@ type OrderDt = {
 }
 
 type RecentCompletedOrderHd = {
+  saleDt: string;
+  cmpCd: string;
+  salesOrgCd: string;
+  storCd: string;
+  cornerCd: string;
   posNo: string;
   tradeNo: string;
+  status: string;
+  orderNoC: string;
 }
 
 
@@ -175,7 +182,7 @@ seq, item_plu_cd,item_nm,item_div,set_menu_cd,sale_qty
   ipcMain.handle('db:getRecentCompletedOrder',
     async (_e, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
     const rows = db.prepare(
-      `SELECT pos_no, trade_no
+      `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, sale_dt, pos_no, trade_no, status, order_no_c
 FROM order_hd
 WHERE 1=1
       AND sale_dt = ?

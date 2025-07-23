@@ -523,14 +523,24 @@ function Main(): JSX.Element {
     });
   }
 
-  const handleRestoreRecent = () => {
-    const fetchHd = async () => {
-      const hd = await window.ipc.order.getHd(); // ✅ await
-      console.log('주문:', hd);
-    };
-    fetchHd().then(r => {});
-
-  }
+  const handleRestoreRecent = async () => {
+    const recentCompletedOrder = await window.ipc.order.getRecentCompletedOrder(
+      saleDt, user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
+    ); // ✅ await
+    console.log('주문:', recentCompletedOrder);
+    // setSelectedOrder(recentCompletedOrder)
+    // handleOrder('직전 복원','복원', STRINGS.status_pending)
+    await handleOrderStatus(
+      recentCompletedOrder.cmpCd,
+      recentCompletedOrder.salesOrgCd,
+      recentCompletedOrder.storCd,
+      recentCompletedOrder.cornerCd,
+      recentCompletedOrder.saleDt,
+      recentCompletedOrder.posNo,
+      recentCompletedOrder.tradeNo,
+      STRINGS.status_pending
+    )
+  };
 
   const onExitApp = () => {
     openDialog('종료', STRINGS.exit_app_msg, () => {
