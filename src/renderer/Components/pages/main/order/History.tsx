@@ -75,7 +75,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
             storCd: selectedOrder.storCd,
             cornerCd: selectedOrder.cornerCd,
             saleDt: selectedOrder.saleDt,
-            posNo: selectedOrder.posCd,
+            posNo: selectedOrder.posNo,
             tradeNo: selectedOrder.tradeNo,
             status: STRINGS.status_pending,    //조리시작
           };

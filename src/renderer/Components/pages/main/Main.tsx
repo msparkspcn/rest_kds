@@ -201,6 +201,62 @@ function Main(): JSX.Element {
     return true;
   };
 
+  const getOrderList = async (
+    cmpCd: string,
+    salesOrgCd: string,
+    storCd: string,
+    cornerCd: string,
+    saleDt: string,
+    ) => {
+    const request = {
+      cmpCd : cmpCd,
+      salesOrgCd : salesOrgCd,
+      storCd : storCd,
+      cornerCd : cornerCd,
+      searchDt : saleDt,
+    }
+    try {
+      const result = await api.getOrderList(request);
+      const {responseCode, responseMessage, responseBody} = result.data;
+      if(responseCode === "200") {
+        if(responseBody!=null) {
+          log("주문목록:"+JSON.stringify(responseBody))
+          for(const body of responseBody) {
+            const details = body.details || [];
+            if(platform==='electron') {
+
+              await window.ipc.order.addOrderHd(
+                body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
+                body.cornerCd,
+                body.posNo, body.tradeNo,
+                body.ordTime, body.comTime, body.status,
+                body.orderNoC ?? '',
+                body.updUserId ?? 'SYSTEM',
+                body.updDate ?? ''
+              );
+
+              await Promise.all(details.map(dt =>
+                window.ipc.order.addOrderDt(
+                  dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
+                  dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
+                  dt.itemPluCd, dt.itemNm, dt.itemDiv,
+                  '', dt.saleQty
+                )
+              ));
+            } else {
+              log("웹 환경입니다.")
+            }
+          }
+          log("주문목록 등록완료")
+          getOrderData(saleDt)
+        }
+      }
+    }
+    catch {
+
+    }
+  }
+
   const getOpenDate = async (cmpCd: string, salesOrgCd: string, storCd: string) => {
     log("개점일 조회")
     const request = {
@@ -211,15 +267,15 @@ function Main(): JSX.Element {
     try {
       const result = await api.getOpenDate(request);
       const {responseCode, responseMessage, responseBody} = result.data;
-      if (responseCode === "300") {
+      if (responseCode === "200") {
         if(responseBody!=null) {
           log("개점일:"+responseBody)
 
           if(platform==='electron') {
             // console.log("cmpCd:"+cmpCd);
-            await window.ipc.saleOpen.add(cmpCd, salesOrgCd, storCd, responseBody);
-            setSaleDt(responseBody)
-            getOrderData(responseBody)
+            await window.ipc.saleOpen.add(cmpCd, salesOrgCd, storCd, responseBody.openDt);
+            setSaleDt(responseBody.openDt)
+            getOrderList(cmpCd, salesOrgCd, storCd, user?.cornerCd, responseBody.openDt)
             log("개점일 등록완료")
           } else {
             log("웹 환경입니다.")
@@ -545,10 +601,11 @@ function Main(): JSX.Element {
       )}
 
       <History
+        saleDt={saleDt}
         isOpen={isModalOpen}
         onClose={() => {
           setModalOpen(false)
-          getOrderData("20250708")
+          getOrderData(saleDt)
         }}
       />
       {isSoldOutOpen && (
