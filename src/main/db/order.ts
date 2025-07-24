@@ -19,19 +19,6 @@ type OrderHd = {
   orderDtList: OrderDt[];
 }
 
-type CompletedOrder = {
-  posNo: string;
-  orderNoC: string;
-  ordTime: string;
-  comTime: string;
-  seq: number;
-  itemNm: string;
-  saleQty: number;
-  status: string;
-  itemDiv: string;
-  setMenuCd: string;
-}
-
 type OrderDt = {
   saleDt: string;
   cmpCd: string;

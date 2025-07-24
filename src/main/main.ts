@@ -183,7 +183,7 @@ ipcMain.handle('download-update', async () => {
     });
 
     // 다운로드 진행 이벤트
-    autoUpdater.on('download-progress', (progressObj) => {
+    autoUpdater.on('download-progress', (progressObj: { percent: number; transferred: number; total: number; }) => {
       if (!progressBar || progressBar.isCompleted()) return;
 
       const percent = Math.round(progressObj.percent);

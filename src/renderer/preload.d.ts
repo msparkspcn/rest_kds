@@ -1,6 +1,9 @@
 declare global {
   interface Window {
     ipc: {
+      salesorg: any;
+      saleOpen: any;
+      order: any;
       log: any;
       cmp: any;
       corner: any;

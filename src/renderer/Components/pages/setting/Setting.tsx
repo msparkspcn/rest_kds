@@ -107,7 +107,7 @@ const Setting: React.FC = () => {
         infoNm: cmpNm,
       }))
     );
-    setSelectedCmpCd(user.cmpCd)
+    setSelectedCmpCd(user!.cmpCd)
     await getSalesOrgList(list[0].cmpCd);
   }
 
@@ -332,19 +332,6 @@ const Setting: React.FC = () => {
       setLoading(false);
     }
   };
-  const loadCmpList = async () => {
-    console.log('마스터 수신');
-    try {
-      if (platform === 'electron') {
-        const cmpList = await window.ipc.cmp.getList();
-        console.log('회사 목록:', cmpList); // 👈 여기서 로그
-      } else {
-        console.log('not electron');
-      }
-    } catch (err) {
-      console.error('에러 발생:', err);
-    }
-  };
 
   const showError = (message: string, onRetry: () => void) => {
     setErrorDialog({ message, onRetry });
@@ -375,7 +362,7 @@ const Setting: React.FC = () => {
       <div className="container">
         <div className="button-container">
           <button className="update" onClick={updateVersion}>업데이트</button>
-          <button className="master" onClick={() => getCmpList(user.cmpCd)}>마스터수신</button>
+          <button className="master" onClick={() => getCmpList(user!.cmpCd)}>마스터수신</button>
         </div>
         <div className="info-section">
           <div className="info-left">

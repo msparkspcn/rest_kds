@@ -22,6 +22,7 @@ interface OrderData {
   tradeNo: string;
   orderNoC: string;
   ordTime: string;
+  saleDt: string;
   orderDtList: OrderItem[];
 }
 

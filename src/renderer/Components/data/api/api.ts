@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 // export const host = process.env.REACT_APP_API_URL;
 export const host = 'https://s9rest.ngrok.io';

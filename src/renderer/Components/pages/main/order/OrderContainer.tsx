@@ -4,7 +4,7 @@ import './OrderContainer.scss';
 
 interface OrderItem {
   // itemNm: string;
-  seq: number; //seq 로 변경 예정(saleSeq만으로는 key로 사용할 수 없음)
+  seq: number;
   itemNm: string;
   saleQty: number;
   itemDiv:string;
@@ -20,21 +20,24 @@ interface OrderData {
   tradeNo: string;
   orderNoC: string;
   ordTime: string;
+  saleDt: string;
   orderDtList: OrderItem[];
 }
 
 interface OrderContainerProps {
   item: OrderData;
   onSelectOrder: (order: OrderData) => void;
+  selectedOrderNo: string | null;
 }
 
-function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Element {
+function OrderContainer({ item, onSelectOrder, selectedOrderNo }: OrderContainerProps): JSX.Element {
   const [backColor, setBackColor] = useState('bg-green-600');
   const [diff, setDiff] = useState(0);
 
   // console.log(`item:${JSON.stringify(item)}`);
+  const filteredTime = item.ordTime ?? "222222"
 
-  const displayInstTime = `${item.ordTime.slice(0, 2)}:${item.ordTime.slice(2, 4)}:${item.ordTime.slice(4, 6)}`;
+  const displayInstTime = `${filteredTime.slice(0, 2)}:${filteredTime.slice(2, 4)}:${filteredTime.slice(4, 6)}`;
 
   useEffect(() => {
     const checkTimeDiff = () => {

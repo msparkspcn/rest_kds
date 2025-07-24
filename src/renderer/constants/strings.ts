@@ -21,4 +21,5 @@ export const STRINGS = {
   status_call:"3",
   status_completed:"5",
   restore:"복원",
+  no_order_msg:"완료할 주문이 없습니다.",
 };

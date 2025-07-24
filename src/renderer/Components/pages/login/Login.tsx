@@ -41,7 +41,7 @@ const Login: React.FC = () => {
       setPassword(getStorePassword);
       setIsChecked(true);
       if(!isFromSettings) {
-        handleLoginClick(getUserId, getStorePassword);
+        handleLoginClick(getUserId, getStorePassword, true);
       }
     }
     else if(!getUserId&&!getStorePassword) {
@@ -72,8 +72,8 @@ const Login: React.FC = () => {
     setIsChecked(e.target.checked); // Update the state based on checkbox value
   };
 
-  const handleLoginClick = (userId:string, password:string) => {
-    log("자동 로그인 실시 userId:"+userId+", password:"+password+", isChecked:"+isChecked)
+  const handleLoginClick = (userId:string, password:string, isChecked:boolean) => {
+    log("로그인 실시 userId:"+userId+", password:"+password+", isChecked:"+isChecked)
     if (userId.length === 0) {
       return;
     }
@@ -120,23 +120,6 @@ const Login: React.FC = () => {
       });
   };
 
-  const getStoreSaleOpen = () => {
-    const params = {
-      cmpCd: '90000001',
-      brandCd: '9999',
-      storeCd: '000281'
-    };
-    api.getStoreSaleOpen(params).then((result) => {
-      const { responseBody, responseCode, responseMessage } = result.data;
-      if (responseCode === '200') {
-        console.log(`### 개점정보 res:${responseBody.saleDt}`);
-      } else {
-        setDialogMessage(responseMessage);
-        console.log('### 개점정보 수신 실패');
-      }
-    });
-  };
-
   return (
     <div className="login-container">
       {loading && <Loading />}
@@ -148,7 +131,7 @@ const Login: React.FC = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleLoginClick(userId, password);
+            handleLoginClick(userId, password, isChecked);
           }}
           className="login-form"
         >

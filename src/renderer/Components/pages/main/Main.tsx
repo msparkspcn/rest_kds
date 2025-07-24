@@ -18,6 +18,7 @@ import Loading from '@Components/common/Loading';
 import { getPlatform } from '@Components/utils/platform';
 import { useUserStore } from '@Components/store/user';
 import dayjs from 'dayjs';
+import { OrderDt } from '../../../../types/types';
 
 interface OrderItem {
   itemNm: string;
@@ -33,6 +34,7 @@ interface OrderData {
   tradeNo: string;
   orderNoC: string;
   ordTime: string;
+  saleDt: string;
   orderDtList: OrderItem[];
 }
 
@@ -45,8 +47,8 @@ function Main(): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedOrder, setSelectedOrder] = useState<{} | null>('');
-  const [saleDt, setSaleDt] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
+  const [saleDt, setSaleDt] = useState<string>('');
   const [callOrderOpen, setCallOrderOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmProps, setConfirmProps] = useState({
@@ -55,8 +57,8 @@ function Main(): JSX.Element {
     onConfirm: () => {},
   });
   const [isSoldOutOpen, setSoldOutOpen] = useState(false);
-
-  const { isConnected, messages } = useWebSocket();
+  const [isModalOpen, setModalOpen] = useState(false);
+  const { messages } = useWebSocket();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const user = useUserStore((state) => state.user);
@@ -65,8 +67,8 @@ function Main(): JSX.Element {
     console.log("user:"+JSON.stringify(user));
     //최초 주문 수신 api 필요 getOrderList
     if(user!=null) {
-      getOpenDate(user.cmpCd, user.salesOrgCd, user.storCd)
-      getProductList(user.cmpCd, user.salesOrgCd, user.storCd)
+      getOpenDate(user.cmpCd, user.salesOrgCd, user.storCd!!)
+      getProductList(user.cmpCd, user.salesOrgCd, user.storCd!!)
     }
   }, []);
 
@@ -85,7 +87,7 @@ function Main(): JSX.Element {
             // console.log('1.품절 처리:' + JSON.stringify(msg.body));
             try {
               await Promise.all(
-                msg.body.map((body) =>
+                msg.body.map((body: { itemCd: string; soldoutYn: string; }) =>
                   window.ipc.product.updateSoldout(body.itemCd, body.soldoutYn)
                 )
               )
@@ -115,14 +117,25 @@ function Main(): JSX.Element {
                 );
 
                 // 주문 상세 저장
-                await Promise.all(details.map(dt =>
-                  window.ipc.order.addOrderDt(
-                    dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
-                    dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
-                    dt.itemPluCd, dt.itemNm, dt.itemDiv,
-                    '', dt.saleQty
+                await Promise.all(
+                  details.map((dt: OrderDt) =>
+                    window.ipc.order.addOrderDt(
+                      dt.saleDt,
+                      dt.cmpCd,
+                      dt.salesOrgCd,
+                      dt.storCd,
+                      dt.cornerCd,
+                      dt.posNo,
+                      dt.tradeNo,
+                      dt.seq,
+                      dt.itemPluCd,
+                      dt.itemNm,
+                      dt.itemDiv,
+                      '',
+                      dt.saleQty
+                    )
                   )
-                ));
+                );
 
                 handleOrderStatus(
                   body.cmpCd,
@@ -159,47 +172,11 @@ function Main(): JSX.Element {
   }, [messages]);
 
   useEffect(() => {
-    console.log("주문목록:"+orderList.length);
-    // getOrderData("20250715");
-    // if (systemType === 0) {
-    //   // EXPO
-    //   setFilterList(orderList);
-    // } else if (systemType === 1) {
-    //   // Section
-    //   // 섹션별 아이템코드 추출
-    //   const sectionItemCdList = productList.map((item) => item.itemCd);
-    //
-    //   // 주문내역 필터링
-    //   const filterOrderArray = orderList
-    //     .map((order) => ({
-    //       ...order,
-    //       orderDtList: order.orderDtList.filter((product) =>
-    //         sectionItemCdList.includes(product.itemCd),
-    //       ),
-    //     }))
-    //     .filter((item) => item.orderDtList.some((order) => order.kdsState !== '9'));
-    //   console.log('### filter :: ', filterOrderArray);
-    //
-    //   setFilterList(filterOrderArray);
-    // }
-  }, [orderList]);
-
-  useEffect(() => {
     console.log(`페이지 변경:${currentPage}`);
     const startIndex = currentPage * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     setFilterList(orderList.slice(startIndex, endIndex));
   }, [orderList, currentPage]);
-
-  const arraysEqual = (arr1: string | any[], arr2: string | any[]) => {
-    if (arr1.length === 0 && arr2.length > 0) return false;
-    if (arr1.length < arr2.length) {
-      for (let i = 0; i < arr1.length; i += 1) {
-        if (arr1[i].orderNo !== arr2[i].orderNo) return false;
-      }
-    }
-    return true;
-  };
 
   const getOrderList = async (
     cmpCd: string,
@@ -235,14 +212,16 @@ function Main(): JSX.Element {
                 body.updDate ?? ''
               );
 
-              await Promise.all(details.map(dt =>
-                window.ipc.order.addOrderDt(
-                  dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
-                  dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
-                  dt.itemPluCd, dt.itemNm, dt.itemDiv,
-                  '', dt.saleQty
+              await Promise.all(
+                details.map((dt:OrderDt) =>
+                  window.ipc.order.addOrderDt(
+                    dt.saleDt, dt.cmpCd, dt.salesOrgCd, dt.storCd,
+                    dt.cornerCd, dt.posNo, dt.tradeNo, dt.seq,
+                    dt.itemPluCd, dt.itemNm, dt.itemDiv,
+                    '', dt.saleQty
+                  )
                 )
-              ));
+              )
             } else {
               log("웹 환경입니다.")
             }
@@ -275,7 +254,7 @@ function Main(): JSX.Element {
             // console.log("cmpCd:"+cmpCd);
             await window.ipc.saleOpen.add(cmpCd, salesOrgCd, storCd, responseBody.openDt);
             setSaleDt(responseBody.openDt)
-            getOrderList(cmpCd, salesOrgCd, storCd, user?.cornerCd, responseBody.openDt)
+            getOrderList(cmpCd, salesOrgCd, storCd, user!.cornerCd!!, responseBody.openDt)
             log("개점일 등록완료")
           } else {
             log("웹 환경입니다.")
@@ -359,10 +338,10 @@ function Main(): JSX.Element {
       + ", storCd:" + user.storCd + ", cornerCd:" + user.cornerCd)
     const orderHdList = await window.ipc.order.getList(
       saleDt,
-      user.cmpCd,
-      user.salesOrgCd,
-      user.storCd,
-      user.cornerCd);
+      user!.cmpCd,
+      user!.salesOrgCd,
+      user!.storCd,
+      user!.cornerCd);
     setOrderCount(orderHdList.length)
     setOrderList(orderHdList);
 
@@ -385,7 +364,7 @@ function Main(): JSX.Element {
     setPasswordOpen(false);
     navigate('/setting', { replace: true });
   };
-  const [isModalOpen, setModalOpen] = useState(false);
+
 
   const onNextPage = () => {
 
@@ -416,7 +395,7 @@ function Main(): JSX.Element {
     prefix: string,
     status: string
   ) => {
-    if (!selectedOrder.orderNoC) {
+    if (!selectedOrder || !selectedOrder.orderNoC) {
       setErrorMessage('주문 번호를 선택해주세요.');
       return;
     }
@@ -437,7 +416,7 @@ function Main(): JSX.Element {
             status
           );
         } catch (error) {
-          log("주문 처리 중 오류:", error);
+          log("주문 처리 중 오류:"+error);
         } finally {
           setConfirmOpen(false);
         }
@@ -501,7 +480,7 @@ function Main(): JSX.Element {
     } catch (ex) {
       window.alert("ErrorCode :: " + ex + "\n");
     } finally {
-      setSelectedOrder({})
+      setSelectedOrder(null)
     }
   }
 
@@ -516,6 +495,10 @@ function Main(): JSX.Element {
   };
 
   const handleCompleteOrderAll = () => {
+    if(orderCount==0) {
+      setErrorMessage(STRINGS.no_order_msg);
+      return;
+    }
     openDialog('주문 완료', `모든 주문을\n완료하시겠습니까?`, async () => {
       try {
         const unCompletedList = await window.ipc.order.getUnCompletedList(
@@ -587,8 +570,9 @@ function Main(): JSX.Element {
   }
 
   const onSelectOrderHd = (order: OrderData) => {
-    if (selectedOrder.orderNoC == order.orderNoC) {
-      setSelectedOrder({})
+    if (selectedOrder && selectedOrder.orderNoC == order.orderNoC) {
+      log("order:"+order)
+      setSelectedOrder(null)
     } else {
       setSelectedOrder(order)
     }
@@ -600,13 +584,13 @@ function Main(): JSX.Element {
         <Contents
           orderList={filterList}
           onSelectOrderHd={onSelectOrderHd}
-          selectedOrderNo={selectedOrder.orderNoC}
+          selectedOrderNo={selectedOrder?.orderNoC || null}
         />
       </div>
       <div className="order-action-bar">
         <OrderActionBar
           orderCnt={orderCount}
-          selectedOrderNo={selectedOrder.orderNoC}
+          selectedOrderNo={selectedOrder?.orderNoC || null}
           onOpenCallOrder={onOpenCallOrder}
           onCallOrder={handleCallOrder}
           onCompleteOrder={handleCompleteOrder}
