@@ -40,6 +40,13 @@ declare global {
         getDt: () => Promise<any>;
         getList: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
         getCompletedList: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
+        getUnCompletedList: (
+          sale_dt:string,
+          cmp_cd:string,
+          sales_org_cd:string,
+          stor_cd:string,
+          corner_cd:string
+        ) => Promise<any>;
         getRecentCompletedOrder: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
         addOrderHd: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string,
               trade_no:string, ord_time:string, com_time:string, status:string, order_no_c:string, upd_user_id:string, upd_date:Date)
@@ -49,9 +56,17 @@ declare global {
          item_div:string, set_menu_cd:string, sale_qty:number)
                      => Promise<void>;
         updateOrderStatus:
-          (status:string, sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
-                            corner_cd:string, pos_no:string, trade_no:string, com_time:string)
-                             => Promise<void>;
+          (status:string,
+           sale_dt:string,
+           cmp_cd:string,
+           sales_org_cd:string,
+           stor_cd:string,
+           corner_cd:string,
+           pos_no:string,
+           trade_no:string,
+           com_time:string
+          ) => Promise<void>;
+
         getOne: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string,
                  corner_cd:string, pos_no:string, status: string)
         => Promist<void>;

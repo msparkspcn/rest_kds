@@ -60,6 +60,17 @@ type RecentCompletedOrderHd = {
   orderNoC: string;
 }
 
+type OrderParams = {
+  cmpCd: string;
+  cornerCd: string;
+  posNo: string;
+  saleDt: string;
+  salesOrgCd: string;
+  status: string;
+  storCd: string;
+  tradeNo: string;
+}
+
 
 export function registerOrderIpc() {
   ipcMain.handle('db:getHd',
@@ -80,6 +91,24 @@ export function registerOrderIpc() {
       FROM order_dt
       `
       ).all() as OrderDt[];
+      console.log("rows from db:", rows);
+      return camelcaseKeys(rows, {deep: true})
+    });
+
+  ipcMain.handle('db:getUnCompletedOrderList',
+    async (e, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {
+      const rows = db.prepare(
+        `SELECT cmp_cd, corner_cd, pos_no, sale_dt, sales_org_cd, '5' as status, stor_cd, trade_no
+      FROM order_hd
+      WHERE 1 = 1
+      AND sale_dt = ?
+      AND cmp_cd = ?
+      AND sales_org_cd = ?
+      AND stor_cd = ?
+      AND corner_cd = ?
+      AND status in ('2','3','4')
+      `
+      ).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd]) as OrderParams[];
       console.log("rows from db:", rows);
       return camelcaseKeys(rows, {deep: true})
     });
@@ -272,5 +301,19 @@ DO UPDATE SET
     stmt.run(...params);
 
     return { success: true };
+  })
+
+  ipcMain.handle('db:completeAllOrderStatus', async (_e,
+                                                com_time, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no) => {
+    db.prepare(`
+      UPDATE order_hd
+      SET status = '5', com_time = ?
+      WHERE sale_dt = ?
+        AND cmp_cd = ?
+        AND sales_org_cd = ?
+        AND stor_cd = ?
+        AND corner_cd = ?
+        AND pos_no = ?
+    `).run(com_time, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no)
   })
 }

@@ -82,6 +82,8 @@ contextBridge.exposeInMainWorld('ipc', {
       ipcRenderer.invoke('db:getOrderList', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd),
     getCompletedList: (sale_dt: string, cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
       ipcRenderer.invoke('db:getCompletedOrderList', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd),
+    getUnCompletedList: (sale_dt: string, cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
+      ipcRenderer.invoke('db:getUnCompletedOrderList', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd),
     getRecentCompletedOrder: (sale_dt: string, cmp_cd: string, sales_org_cd: string, stor_cd: string, corner_cd: string) =>
       ipcRenderer.invoke('db:getRecentCompletedOrder', sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd),
     addOrderHd: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, pos_no:string,

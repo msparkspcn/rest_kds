@@ -472,7 +472,6 @@ function Main(): JSX.Element {
       console.log("status:"+status)
       if (responseCode === '200') {
         if (responseBody != null) {
-          // log(successLog);
 
           try {
             if(status==STRINGS.status_completed) {
@@ -517,8 +516,48 @@ function Main(): JSX.Element {
   };
 
   const handleCompleteOrderAll = () => {
-    openDialog('주문 완료', `모든 주문을\n완료하시겠습니까?`, () => {
-      console.log('전체 주문 완료 실행');
+    openDialog('주문 완료', `모든 주문을\n완료하시겠습니까?`, async () => {
+      try {
+        const unCompletedList = await window.ipc.order.getUnCompletedList(
+          saleDt,
+          user?.cmpCd,
+          user?.salesOrgCd,
+          user?.storCd,
+          user?.cornerCd);
+        console.log("unCompletedList:"+JSON.stringify(unCompletedList))
+        if (!unCompletedList || unCompletedList.length === 0) {
+          console.log("미완료 주문이 없습니다.");
+          return;
+        }
+
+        const result = await api.updateAllOrderStatus(unCompletedList);
+        const {responseCode, responseMessage, responseBody} = result.data;
+        if(responseCode === "200") {
+          if (responseBody != null) {
+            for (const order of unCompletedList) {
+              const currentTime = dayjs().format('HHmmss');
+              await window.ipc.order.updateOrderStatus(
+                STRINGS.status_completed,
+                order.saleDt,
+                order.cmpCd,
+                order.salesOrgCd,
+                order.storCd,
+                order.cornerCd,
+                order.posNo,
+                order.tradeNo,
+                currentTime
+              );
+            }
+            getOrderData(saleDt)
+            console.log("전체 주문 완료 처리 성공");
+          }
+        }
+      } catch (err) {
+        console.error("주문 완료 처리 실패:", err);
+      } finally {
+        setConfirmOpen(false);
+        console.log('전체 주문 완료 실행');
+      }
       // 완료 로직
     });
   }
@@ -526,10 +565,8 @@ function Main(): JSX.Element {
   const handleRestoreRecent = async () => {
     const recentCompletedOrder = await window.ipc.order.getRecentCompletedOrder(
       saleDt, user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
-    ); // ✅ await
-    console.log('주문:', recentCompletedOrder);
-    // setSelectedOrder(recentCompletedOrder)
-    // handleOrder('직전 복원','복원', STRINGS.status_pending)
+    );
+
     await handleOrderStatus(
       recentCompletedOrder.cmpCd,
       recentCompletedOrder.salesOrgCd,

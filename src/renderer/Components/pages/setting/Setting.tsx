@@ -57,7 +57,6 @@ const Setting: React.FC = () => {
         if(user!=null) {
           if ("cmpCd" in user) {
             log("cmpCd:"+user.cmpCd)
-            setSelectedCmpCd(user.cmpCd)
             getCmpList(user.cmpCd)
           }
         }
@@ -375,7 +374,7 @@ const Setting: React.FC = () => {
       <div className="container">
         <div className="button-container">
           <button className="update" onClick={updateVersion}>업데이트</button>
-          <button className="master" onClick={loadCmpList}>마스터수신</button>
+          <button className="master" onClick={() => getCmpList(user.cmpCd)}>마스터수신</button>
         </div>
         <div className="info-section">
           <div className="info-left">
