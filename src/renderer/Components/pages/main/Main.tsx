@@ -600,6 +600,7 @@ function Main(): JSX.Element {
         <Contents
           orderList={filterList}
           onSelectOrderHd={onSelectOrderHd}
+          selectedOrderNo={selectedOrder.orderNoC}
         />
       </div>
       <div className="order-action-bar">

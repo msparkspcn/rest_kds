@@ -68,11 +68,15 @@ function OrderContainer({ item, onSelectOrder }: OrderContainerProps): JSX.Eleme
   },[]);
 
   return (
-    <div className={`order-container ${backColor}`} onClick={() => onSelectOrder(item)}>
+    <div className={`order-container ${backColor} ${selectedOrderNo === item.orderNoC ? 'selected-border' : ''}`} onClick={() => onSelectOrder(item)}>
       <OrderHeader orderNoC={item.orderNoC} instTime={displayInstTime} diff={diff} />
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
-          <RenderItem key={orderItem.seq} item={orderItem} index={index} /> //임시
+          <RenderItem
+            key={orderItem.seq}
+            item={orderItem}
+            index={index}
+          />
         ))}
       </div>
     </div>

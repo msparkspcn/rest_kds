@@ -8,6 +8,12 @@
   border-radius: 0.5rem;
   box-sizing: border-box;
   overflow: hidden;
+
+  &.selected-border {
+    border: 3px solid #9ca3af;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  }
+
   &.bg-green {
     background-color: #bbf7d0;
   }

@@ -6,6 +6,7 @@ interface ContentsProps {
   orderList: string | any[];
   className?: string;
   onSelectOrderHd: (order: OrderData) => void;
+  selectedOrderNo: string | null;
 }
 interface OrderItem {
   itemNm: string;
@@ -24,7 +25,7 @@ interface OrderData {
   orderDtList: OrderItem[];
 }
 
-function Contents({ orderList, onSelectOrderHd }: ContentsProps): JSX.Element {
+function Contents({ orderList, onSelectOrderHd, selectedOrderNo }: ContentsProps): JSX.Element {
   const ITEMS_PER_PAGE = 9;
   const [currentPage, setCurrentPage] = useState(0);
   const orderArray = Array.isArray(orderList) ? orderList : [];
@@ -41,6 +42,7 @@ function Contents({ orderList, onSelectOrderHd }: ContentsProps): JSX.Element {
             key={orderItem.orderNoC}
             item={orderItem}
             onSelectOrder={onSelectOrderHd}
+            selectedOrderNo={selectedOrderNo}
           />
         ))}
       </div>

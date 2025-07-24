@@ -107,6 +107,7 @@ const Setting: React.FC = () => {
         infoNm: cmpNm,
       }))
     );
+    setSelectedCmpCd(user.cmpCd)
     await getSalesOrgList(list[0].cmpCd);
   }
 
