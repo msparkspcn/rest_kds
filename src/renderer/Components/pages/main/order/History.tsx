@@ -194,7 +194,10 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
                     </>
                   )}
                   <td>{dt.seq}</td>
-                  <td>{dt.itemNm}</td>
+                  <td>
+                    {dt.itemDiv !== "0" ? '↳' : ''}
+                    {dt.itemNm}
+                  </td>
                   <td>{dt.saleQty}</td>
                 </tr>
               );
