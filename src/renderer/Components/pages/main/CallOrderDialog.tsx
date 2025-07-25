@@ -6,7 +6,7 @@ interface CallOrderProps {
   title: string;
   errorMsg: string;
   onClose: () => void;
-  onCorrect: () => void;
+  onCorrect: (orderNoC: string) => void;
 }
 
 const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, onCorrect }) => {
@@ -39,12 +39,12 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
   };
 
   const onPasswordCheck = () => {
-    if (getPassword() === inputValue) {
+    if (inputValue!=='') {
       console.log('비밀번호 일치');
       onClose();
-      onCorrect();
+      onCorrect(inputValue);
     } else {
-      console.log('비밀번호 불일치');
+      console.log('입력 필요');
       setIsCorrect(false);
       setInputValue('');
     }

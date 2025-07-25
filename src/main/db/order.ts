@@ -100,6 +100,25 @@ export function registerOrderIpc() {
       return camelcaseKeys(rows, {deep: true})
     });
 
+  ipcMain.handle('db:getOrder',
+    async (e, sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, order_no_c) => {
+      const rows = db.prepare(
+        `SELECT cmp_cd, sales_org_cd, stor_cd, corner_cd, pos_no, sale_dt, trade_no
+      FROM order_hd
+      WHERE 1 = 1
+      AND sale_dt = ?
+      AND cmp_cd = ?
+      AND sales_org_cd = ?
+      AND stor_cd = ?
+      AND corner_cd = ?
+      AND order_no_c = ?
+      AND status in ('2','3','4')
+      `
+      ).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, order_no_c]) as OrderParams[];
+      console.log("rows from db:", rows);
+      return camelcaseKeys(rows, {deep: true})
+    });
+
   ipcMain.handle('db:getOrderList',
     async (e,
            sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd) => {

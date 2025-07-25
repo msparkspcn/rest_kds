@@ -58,11 +58,13 @@ function Main(): JSX.Element {
   });
   const [isSoldOutOpen, setSoldOutOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const { messages } = useWebSocket();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const { messages } = useWebSocket();
   const user = useUserStore((state) => state.user);
   const platform = getPlatform();
+
   useEffect(() => {
     console.log("user:"+JSON.stringify(user));
     //최초 주문 수신 api 필요 getOrderList
@@ -577,6 +579,38 @@ function Main(): JSX.Element {
       setSelectedOrder(order)
     }
   };
+
+  const callEnteredOrder = async (orderNoC: string) => {
+    log("대기번호:"+orderNoC)
+    const enteredOrder = await window.ipc.order.getOrder(
+      saleDt, user!.cmpCd, user!.salesOrgCd, user!.storCd, user!.cornerCd, orderNoC
+    )
+    log("enteredOrder:"+enteredOrder)
+    if (enteredOrder !== null && enteredOrder.length>0) {
+      try {
+        await handleOrderStatus(
+          enteredOrder.cmpCd,
+          enteredOrder.salesOrgCd,
+          enteredOrder.storCd,
+          enteredOrder.cornerCd,
+          enteredOrder.saleDt,
+          enteredOrder.posNo,
+          enteredOrder.tradeNo,
+          STRINGS.status_call
+        );
+      } catch (error) {
+        log("주문 처리 중 오류:" + error);
+      } finally {
+        setCallOrderOpen(false)
+        log("임의호출 완료")
+      }
+    }
+    else {
+      setErrorMessage('호출할 주문이 없습니다.\n다시 시도해주세요.')
+    }
+  }
+
+  // const on
   return (
     <div className="layout-root">
       {loading && <Loading />}
@@ -621,7 +655,7 @@ function Main(): JSX.Element {
           title="주문번호 입력"
           errorMsg="주문번호를 다시 입력해주세요."
           onClose={() => setCallOrderOpen(false)}
-          onCorrect={() => setCallOrderOpen(false)}
+          onCorrect={callEnteredOrder}
         />
       )}
       {confirmOpen && (

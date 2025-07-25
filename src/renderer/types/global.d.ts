@@ -39,6 +39,7 @@ declare global {
         getHd: () => Promise<any>;
         getDt: () => Promise<any>;
         getList: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
+        getOrder: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string, order_no_c:string) => Promise<any>;
         getCompletedList: (sale_dt:string, cmp_cd:string, sales_org_cd:string, stor_cd:string, corner_cd:string) => Promise<any>;
         getUnCompletedList: (
           sale_dt:string,

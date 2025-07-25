@@ -71,7 +71,10 @@ function OrderContainer({ item, onSelectOrder, selectedOrderNo }: OrderContainer
   },[]);
 
   return (
-    <div className={`order-container ${backColor} ${selectedOrderNo === item.orderNoC ? 'selected-border' : ''}`} onClick={() => onSelectOrder(item)}>
+    <div
+      className={`order-container ${backColor} ${selectedOrderNo === item.orderNoC ? 'selected-border' : ''}`}
+      onClick={() => onSelectOrder(item)}
+    >
       <OrderHeader orderNoC={item.orderNoC} instTime={displayInstTime} diff={diff} />
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
