@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import "../../common/InputPassword.scss";
-import { useUserStore } from '@Components/store/user';
 
 interface CallOrderProps {
   title: string;
@@ -12,7 +11,6 @@ interface CallOrderProps {
 const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, onCorrect }) => {
   const [inputValue, setInputValue] = useState('');
   const [isCorrect, setIsCorrect] = useState(true);
-  const getPassword = useUserStore((state) => state.getPassword);
   const keyArray = [
     { value: '1' },
     { value: '2' },
@@ -38,9 +36,8 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
     }
   };
 
-  const onPasswordCheck = () => {
+  const onCallOrder = () => {
     if (inputValue!=='') {
-      console.log('비밀번호 일치');
       onClose();
       onCorrect(inputValue);
     } else {
@@ -48,12 +45,6 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
       setIsCorrect(false);
       setInputValue('');
     }
-  };
-
-  const onCallOrder = (value: string) => {
-    // params:{cmpCd, salesOrgCd, storCd, cornerCd, saleDt, orderNo}
-    // kdsState 대기,호출,완료
-    // onCallOrder -> 호출
   };
 
   return (
@@ -70,7 +61,7 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
           <div className="order-no-box">{inputValue}</div>
 
           <div className="keypad">
-            {keyArray.map((item, idx) => (
+            {keyArray.map((item) => (
               <button
                 key={item.value}
                 className="key"
@@ -83,7 +74,7 @@ const CallOrderDialog: React.FC<CallOrderProps> = ({ title, errorMsg, onClose, o
           </div>
         </div>
         <div className="password-footer">
-          <button className="confirm-button" onClick={onPasswordCheck}>호출</button>
+          <button className="confirm-button" onClick={onCallOrder}>호출</button>
         </div>
       </div>
     </div>

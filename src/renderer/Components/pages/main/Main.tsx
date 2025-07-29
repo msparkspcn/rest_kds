@@ -150,7 +150,7 @@ function Main(): JSX.Element {
                   STRINGS.status_pending);
 
                 const orderHdList = await window.ipc.order.getList(
-                  body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,cornerCd);
+                  saleDt, body.cmpCd, body.salesOrgCd, body.storCd,cornerCd);
 
                 setOrderList(orderHdList);
 
@@ -250,7 +250,7 @@ function Main(): JSX.Element {
       const {responseCode, responseMessage, responseBody} = result.data;
       if (responseCode === "200") {
         if(responseBody!=null) {
-          log("개점일:"+responseBody)
+          log("개점일:"+JSON.stringify(responseBody.openDt))
 
           if(platform==='electron') {
             // console.log("cmpCd:"+cmpCd);
@@ -313,9 +313,6 @@ function Main(): JSX.Element {
 
           log(`상품 수:${responseBody.length}`);
         }
-
-        // setSaleDt(responseBody.saleDt);
-        // getOrderData(responseBody.saleDt);
       }
       else {
         window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
@@ -325,10 +322,7 @@ function Main(): JSX.Element {
       window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
     }
     finally {
-      console.log('상품 insert 완료'+storCd);
-      const productList = await window.ipc.product.getList(
-        cmpCd, salesOrgCd, storCd, 'CIHA')
-      console.log("상품 목록",JSON.stringify(productList))
+      console.log('상품 insert 완료 storCd:'+storCd+", cornerCd:"+user!.cornerCd);
       setLoading(false);
     }
   };
@@ -336,8 +330,8 @@ function Main(): JSX.Element {
   const getOrderData = async(saleDt: string) => {
     //주문정보 내부 쿼리 후 주문건수, 주문 set
     // const {cmpCd, brandCd, storeCd} = store;
-    console.log("getOrderData saleDt:" + saleDt + ", cmpCd:" + user.cmpCd
-      + ", storCd:" + user.storCd + ", cornerCd:" + user.cornerCd)
+    console.log("getOrderData saleDt:" + saleDt + ", cmpCd:" + user!.cmpCd
+      + ", storCd:" + user!.storCd + ", cornerCd:" + user!.cornerCd)
     const orderHdList = await window.ipc.order.getList(
       saleDt,
       user!.cmpCd,
@@ -457,6 +451,7 @@ function Main(): JSX.Element {
           try {
             if(status==STRINGS.status_completed) {
               const currentTime = dayjs().format('HHmmss');
+              console.log("완료 상태 currentTime:"+currentTime)
               await window.ipc.order.updateOrderStatus(
                 status, saleDt, cmpCd, salesOrgCd, storCd, cornerCd, posNo, tradeNo, currentTime
               );

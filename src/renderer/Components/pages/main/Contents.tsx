@@ -38,7 +38,7 @@ function Contents({ orderList, onSelectOrderHd, selectedOrderNo }: ContentsProps
   return (
     <div className="page-container">
       <div className="order-grid">
-        {paginatedOrders?.map((orderItem: any, index: number) => (
+        {paginatedOrders?.map((orderItem: any) => (
           <OrderContainer
             key={orderItem.orderNoC}
             item={orderItem}
