@@ -114,7 +114,7 @@ export function registerOrderIpc() {
       AND order_no_c = ?
       AND status in ('2','3','4')
       `
-      ).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, order_no_c]) as OrderParams[];
+      ).get([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd, order_no_c]) as OrderParams;
       console.log("rows from db:", rows);
       return camelcaseKeys(rows, {deep: true})
     });

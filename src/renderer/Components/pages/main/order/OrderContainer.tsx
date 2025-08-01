@@ -47,18 +47,7 @@ function OrderContainer({ item, onSelectOrder, selectedOrderNo }: OrderContainer
         setBackColor('bg-green');
       } else if (timeDiff <= -5 && timeDiff > -10) {
         setBackColor('bg-yellow');
-      } else if (timeDiff <= -10 && timeDiff > -20) {
-        setBackColor('bg-red');
-        // setBackColor('bg-white');
-        // setBackColor('#fca5a5');
-      }
-      else if(timeDiff <= -28800) {
-        setBackColor('bg-yellow');
-      }
-      else if(timeDiff <= -23300) {
-        setBackColor('bg-green');
-      }
-      else if(timeDiff <= -21000) {
+      } else if (timeDiff <= -10) {
         setBackColor('bg-red');
       }
       setDiff(timeDiff);

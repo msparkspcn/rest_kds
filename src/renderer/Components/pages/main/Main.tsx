@@ -66,7 +66,6 @@ function Main(): JSX.Element {
   const platform = getPlatform();
 
   useEffect(() => {
-    console.log("user:"+JSON.stringify(user));
     //최초 주문 수신 api 필요 getOrderList
     if(user!=null) {
       getOpenDate(user.cmpCd, user.salesOrgCd, user.storCd!!)
