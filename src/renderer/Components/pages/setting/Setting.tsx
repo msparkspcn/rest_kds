@@ -10,6 +10,7 @@ import packageJson from '../../../../../package.json';
 import { log } from '@Components/utils/logUtil';
 import Alert from '@Components/common/Alert';
 import Loading from '@Components/common/Loading';
+import { STRINGS } from '../../../constants/strings';
 
 type Corner = {
   cmpCd: string;
@@ -68,7 +69,7 @@ const Setting: React.FC = () => {
 
     setConfirmProps({
       title: '업데이트',
-      message: '최신 버전을 다운로드하고\n설치하시겠습니까?',
+      message: STRINGS.download_msg,
       onConfirm: async () => {
         try {
           const result = await window.ipc.checkForUpdates();
@@ -77,7 +78,7 @@ const Setting: React.FC = () => {
             if (downloadResult.success) {
               setConfirmProps({
                 title: '다운로드 완료',
-                message: '앱을 종료하고 업데이트를 설치하시겠습니까?',
+                message: STRINGS.install_msg,
                 onConfirm: async () => {
                   await window.ipc.quitAndInstall();
                 },
@@ -287,7 +288,7 @@ const Setting: React.FC = () => {
     log("저장 버튼 클릭 "+selectedCmpCd+","+selectedSalesOrgCd+","+selectedStorCd+","+selectedCornerCd);
     setConfirmProps({
       title:'확인',
-      message:"설정 정보를 저장하시겠습니까?",
+      message:STRINGS.save_setting_msg,
       onConfirm:()=>{
         log("확인 버튼 클릭");
         const user = useUserStore.getState().getUser();

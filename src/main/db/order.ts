@@ -133,6 +133,7 @@ ord_time, status,order_no_c
       AND stor_cd = ?
       AND corner_cd = ?
       AND status not in ('5', '8', '9')
+      ORDER BY ORD_TIME
       `).all([sale_dt, cmp_cd, sales_org_cd, stor_cd, corner_cd]) as OrderHd[];
       console.log("orderHdRows from db:", orderHdRows);
     const orderDtRows = db.prepare(

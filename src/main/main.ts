@@ -50,14 +50,15 @@ function createWindow() {
   console.log("createWindow called");
   mainWindow = new BrowserWindow({
     icon: getAssetsPath('icon.ico'),
-    width: 1280,
-    height: 850,
+    width: 1024,
+    height: 768,
     webPreferences: {
       devTools: true,
       preload: getPreloadPath('preload.js'), // 👈 Don't USE PRELOAD.JS IF YOUR USING NODE IN RENDERER PROCESS
       nodeIntegration: true,
       contextIsolation: true,
     },
+    autoHideMenuBar: true,
   });
 
   mainWindow.loadURL(getHtmlPath('index.html'));

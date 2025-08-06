@@ -24,14 +24,13 @@
   font-size: 1.5rem;
   font-weight: 500;
   padding: 0.625rem 0;
-  width: 15%;
+  width: 14%;
   margin: 0.5rem 0;
   border-radius: 0.5rem;
   border: 0.125rem solid colors.$primary;
   color:colors.$primary;
   outline: none;
   position: relative;
-  z-index: 10;
   box-sizing: border-box;
 
   &.btn-blue {
@@ -58,7 +57,6 @@
   }
 
   .count-btn {
-    min-height: 6rem;
     max-width: 9rem;
     min-height: 3rem;
     flex:0 0 auto;
@@ -78,13 +76,13 @@
     }
   }
   .selected-btn {
-    min-width: 10rem;
+    min-width: 8rem;
     max-width: 11rem;
     min-height: 3rem;
     flex:0 0 auto;
     font-size: 1.75rem;
     font-weight: 500;
-    padding: 0.25rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     margin-right: 1rem;
     margin-left: 0.5rem;
     background-color: #d1d5db; // bg-gray-300
