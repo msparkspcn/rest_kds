@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Contents from '@Components/pages/main/Contents';
 import OrderActionBar from '@Components/pages/main/order/OrderActionBar';
 import Footer from '@Components/pages/main/Footer';
@@ -19,6 +19,7 @@ import { getPlatform } from '@Components/utils/platform';
 import { useUserStore } from '@Components/store/user';
 import dayjs from 'dayjs';
 import { OrderDt } from '../../../../types/types';
+import { Message } from 'postcss/lib/result';
 
 interface OrderItem {
   itemNm: string;
@@ -62,6 +63,11 @@ function Main(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { messages } = useWebSocket();
+  const [messageQueue, setMessageQueue] = useState<Message[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const messageQueueRef = useRef<Message[]>([]);
+  const processingRef = useRef(false);
+
   const user = useUserStore((state) => state.user);
   const platform = getPlatform();
 
@@ -74,103 +80,134 @@ function Main(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    const processMessages = async () => {
-      if (!Array.isArray(messages) || messages.length === 0) {
-        console.log('빈 객체입니다');
-        return;
+    if (messages && messages.length > 0) {
+      console.log('WebSocket 메시지 수신:', JSON.stringify(messages));
+      const wasIdle = messageQueueRef.current.length === 0 && !processingRef.current;
+
+      messageQueueRef.current.push(...messages);
+      if (wasIdle) {
+        runQueue();
       }
-      log('0.message:'+JSON.stringify(messages))
+    }
+  }, [messages]);
 
-      for(const msg of messages) {
-        switch (msg.type) {
-          case 'SOLDOUT':
-            log('1.품절 처리:' + JSON.stringify(msg.body));
-            // console.log('1.품절 처리:' + JSON.stringify(msg.body));
-            try {
-              await Promise.all(
-                msg.body.map((body: { itemCd: string; soldoutYn: string; }) =>
-                  window.ipc.product.updateSoldout(body.itemCd, body.soldoutYn)
-                )
-              )
-              console.log('품절 처리 완료:');
-            } catch(err) {
-              console.error('품절 처리 중 오류 발생:', err);
-              setErrorMessage('품절 처리에 실패했습니다.\n다시 시도해주세요.');
-            }
-            break;
+  const runQueue = async () => {
+    if (processingRef.current) return; // 이미 처리 중이면 return
 
-          case 'order':
-            log('2.주문 처리' + JSON.stringify(msg.body))
-            if(msg.body!=null) {
-              try {
-                const body = msg.body;
-                const cornerCd = body.cornerCd ?? '';
-                const details = body.details || [];
+    processingRef.current = true;
 
-                await window.ipc.order.addOrderHd(
-                  body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
-                  cornerCd,
-                  body.posNo, body.tradeNo,
-                  body.ordTime, body.comTime, body.status,
-                  body.orderNoC ?? '',
-                  body.updUserId ?? 'SYSTEM',
-                  body.updDate ?? ''
-                );
-
-                // 주문 상세 저장
-                await Promise.all(
-                  details.map((dt: OrderDt) =>
-                    window.ipc.order.addOrderDt(
-                      dt.saleDt,
-                      dt.cmpCd,
-                      dt.salesOrgCd,
-                      dt.storCd,
-                      dt.cornerCd,
-                      dt.posNo,
-                      dt.tradeNo,
-                      dt.seq,
-                      dt.itemPluCd,
-                      dt.itemNm,
-                      dt.itemDiv,
-                      '',
-                      dt.saleQty
-                    )
-                  )
-                );
-
-                handleOrderStatus(
-                  body.cmpCd,
-                  body.salesOrgCd,
-                  body.storCd,
-                  cornerCd,
-                  body.saleDt,
-                  body.posNo,
-                  body.tradeNo,
-                  STRINGS.status_pending);
-
-                const orderHdList = await window.ipc.order.getList(
-                  saleDt, body.cmpCd, body.salesOrgCd, body.storCd,cornerCd);
-
-                setOrderList(orderHdList);
-
-                console.log('내부 db insert 완료 orderHd12:', orderHdList);
-                console.log('주문 처리 완료');
-              }
-              catch(err) {
-                console.error('주문 처리 중 오류 발생:', err);
-                setErrorMessage('주문 처리에 실패했습니다.\n다시 시도해주세요.');
-              }
-            }
-            break;
-
-            default:
-              console.warn('지원되지 않는 메시지 타입:', msg.type);
-              break;
+    while (messageQueueRef.current.length > 0) {
+      const current = messageQueueRef.current.shift(); // 큐에서 하나 꺼냄
+      if (current) {
+        try {
+          await processMessages(current); // 메시지 처리
+        } catch (err) {
+          console.error('메시지 처리 오류:', err);
         }
       }
-    };
-    processMessages();
-  }, [messages]);
+    }
+
+    processingRef.current = false;
+  };
+
+  const processMessages = async (current: Message) => {
+    log('0.메시지 처리 시작 isProcessing:'+isProcessing)
+    setIsProcessing(true);
+
+    try {
+      switch (current.type) {
+        case 'SOLDOUT':
+          log('1.품절 처리:' + JSON.stringify(current.body));
+          // console.log('1.품절 처리:' + JSON.stringify(msg.body));
+
+          await Promise.all(
+            current.body.map((body: { itemCd: string; soldoutYn: string; }) =>
+              window.ipc.product.updateSoldout(body.itemCd, body.soldoutYn)
+            )
+          );
+          break;
+
+        case 'order':
+          // log('2.주문 처리' + JSON.stringify(current.body))
+          log('2.주문 처리')
+
+          const body = current.body;
+          const cornerCd = body.cornerCd ?? '';
+          const details = body.details || [];
+
+          await window.ipc.order.addOrderHd(
+            body.saleDt, body.cmpCd, body.salesOrgCd, body.storCd,
+            cornerCd,
+            body.posNo, body.tradeNo,
+            body.ordTime, body.comTime, body.status,
+            body.orderNoC ?? '',
+            body.updUserId ?? 'SYSTEM',
+            body.updDate ?? ''
+          );
+
+          // 주문 상세 저장
+          await Promise.all(
+            details.map((dt: OrderDt) =>
+              window.ipc.order.addOrderDt(
+                dt.saleDt,
+                dt.cmpCd,
+                dt.salesOrgCd,
+                dt.storCd,
+                dt.cornerCd,
+                dt.posNo,
+                dt.tradeNo,
+                dt.seq,
+                dt.itemPluCd,
+                dt.itemNm,
+                dt.itemDiv,
+                '',
+                dt.saleQty
+              )
+            )
+          );
+
+          handleOrderStatus(
+            body.cmpCd,
+            body.salesOrgCd,
+            body.storCd,
+            cornerCd,
+            body.saleDt,
+            body.posNo,
+            body.tradeNo,
+            STRINGS.status_pending);
+
+          const orderHdList = await window.ipc.order.getList(
+            saleDt, body.cmpCd, body.salesOrgCd, body.storCd, cornerCd);
+
+          setOrderList(orderHdList);
+
+          // console.log('내부 db insert 완료 orderHd12:', orderHdList);
+          console.log('주문 처리 완료');
+
+          break;
+
+        case 'saleOpen':
+          log('3.개점 처리' + JSON.stringify(current.body))
+
+          await Promise.all(
+            window.ipc.saleOpen.add(current.body.openDt)
+          )
+          setSaleDt(current.body.openDt)
+          getOrderList(user!.cmpCd, user!.salesOrgCd, user!.storCd, user!.cornerCd!!,
+            current.body.openDt)
+
+          break;
+
+        default:
+          console.warn('지원되지 않는 메시지 타입:', current.type);
+          break;
+      }
+    } catch (err) {
+      console.error('메시지 처리 중 오류:', err);
+      setErrorMessage('처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.');
+    }
+  };
+
 
   useEffect(() => {
     console.log(`페이지 변경:${currentPage}`);
@@ -314,11 +351,13 @@ function Main(): JSX.Element {
         }
       }
       else {
-        window.alert("ErrorCode :: " + responseCode + "\n" + responseMessage);
+        log("상품조회실패ErrorCode :: " + responseCode + "\n" + responseMessage);
+        setErrorMessage('상품 조회 실패했습니다.\n관리자에게 문의해주세요.\n code:'
+          +responseCode+'\n'+responseMessage);
       }
     }
     catch(error) {
-      window.alert("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
+      setErrorMessage("서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n error:"+error);
     }
     finally {
       console.log('상품 insert 완료 storCd:'+storCd+", cornerCd:"+user!.cornerCd);
@@ -391,7 +430,7 @@ function Main(): JSX.Element {
     status: string
   ) => {
     if (!selectedOrder || !selectedOrder.orderNoC) {
-      setErrorMessage('주문 번호를 선택해주세요.');
+      setErrorMessage('주문 번호를 선택해주세요.\n관리자에게 문의해주세요.');
       return;
     }
     openDialog(
@@ -474,7 +513,8 @@ function Main(): JSX.Element {
         log("API 응답 실패: " + responseMessage);
       }
     } catch (ex) {
-      window.alert("ErrorCode :: " + ex + "\n");
+      log("주문 상태 변경 실패\nErrorCode :: " + ex);
+      setErrorMessage("주문 상태 변경에 실패했습니다.\n관리자에게 문의해주세요.");
     } finally {
       setSelectedOrder(null)
     }
@@ -567,7 +607,7 @@ function Main(): JSX.Element {
 
   const onSelectOrderHd = (order: OrderData) => {
     if (selectedOrder && selectedOrder.orderNoC == order.orderNoC) {
-      log("order:"+order)
+      log("order:"+JSON.stringify(order))
       setSelectedOrder(null)
     } else {
       setSelectedOrder(order)
@@ -579,8 +619,8 @@ function Main(): JSX.Element {
     const enteredOrder = await window.ipc.order.getOrder(
       saleDt, user!.cmpCd, user!.salesOrgCd, user!.storCd, user!.cornerCd, orderNoC
     )
-    log("enteredOrder:"+enteredOrder)
-    if (enteredOrder !== null && enteredOrder.length>0) {
+    log("enteredOrder:"+JSON.stringify(enteredOrder))
+    if (enteredOrder) {
       try {
         await handleOrderStatus(
           enteredOrder.cmpCd,

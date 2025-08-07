@@ -54,8 +54,25 @@ export const useWebSocket = () => {
 
     const setMessages = (type:string, body: any) => {
       setMessagesInternal((prev) => {
-        const filtered = prev.filter((msg) => msg.type !== type);
-        return [...filtered, { type, body }];
+        let filtered: { type: string; body: any }[] = [];
+
+        if (type === 'order') {
+          filtered = [
+            {
+              type,
+              body,
+            },
+          ];
+        } else {
+          filtered = [
+            {
+              type,
+              body,
+            },
+          ];
+        }
+
+        return filtered;
       });
     };
 

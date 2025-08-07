@@ -5,6 +5,8 @@ import numeral from 'numeral';
 import { useUserStore } from '@Components/store/user';
 
 import ConfirmDialog from '@Components/common/ConfirmDialog';
+import Alert from '@Components/common/Alert';
+import { STRINGS } from '../../../constants/strings';
 interface SoldOutProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,6 +43,8 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
     message: '',
     onConfirm: () => {},
   });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 
   useEffect(() => {
     if(!isOpen) return;
@@ -150,10 +154,10 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
           .then(() =>{console.log("코너 조회 완료!");});
       }
       else {
-        window.alert(responseMessage);
+        setErrorMessage('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + responseMessage + ')');
       }
     }catch(ex) {
-      window.alert('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex + ')');
+      setErrorMessage('서버에 문제가 있습니다.\n관리자에게 문의해주세요.\n(' + ex + ')');
     } finally {
       console.log("soldout 완료")
       setIsLoading(false);
@@ -259,6 +263,13 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
           confirmOpen={confirmOpen}
           onClose={() => setConfirmOpen(false)}
           {...confirmProps}
+        />
+      )}
+      {errorMessage && (
+        <Alert
+          title={STRINGS.alert}
+          message={errorMessage}
+          onClose={()=>{setErrorMessage(null)}}
         />
       )}
     </div>

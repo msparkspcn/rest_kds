@@ -36,6 +36,8 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
     message: '',
     onConfirm: () => {},
   });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   useEffect(() => {
     if(isOpen) {
       getCompletedOrderList()
@@ -106,7 +108,8 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
             }
           })
             .catch(ex => {
-              window.alert("ErrorCode :: " + ex + "\n")
+              log("ErrorCode :: " + ex + "\n")
+              setErrorMessage("주문 복원에 실패했습니다.\n다시 시도해주세요.")
             })
             .finally(() => {
               log("완료")
@@ -145,9 +148,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
       <div className="modal-content">
         <div className="modal-header">
           <div className="modal-title">조회 복원</div>
-          <button className="close-button" onClick={onClose}>
-            X
-          </button>
+          <button className="close-button" onClick={onClose}>X</button>
         </div>
         <div className="table-wrapper">
           <table className="data-table">
@@ -241,6 +242,13 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
           confirmOpen={confirmOpen}
           onClose={() => setConfirmOpen(false)}
           {...confirmProps}
+        />
+      )}
+      {errorMessage && (
+        <Alert
+          title={STRINGS.alert}
+          message={errorMessage}
+          onClose={()=>{setErrorMessage(null)}}
         />
       )}
     </div>
