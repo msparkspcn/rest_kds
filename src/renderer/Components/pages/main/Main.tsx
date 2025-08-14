@@ -381,8 +381,12 @@ function Main(): JSX.Element {
 
     console.log("주문목록1:"+JSON.stringify(orderHdList));
 
-
-    if (orderHdList.length / ITEMS_PER_PAGE > 0) {
+    if (orderHdList.length == 0) {
+      setSelectedOrder(null)
+      setTotalPages(1)
+      setCurrentPage(0)
+    }
+    else if (orderHdList.length / ITEMS_PER_PAGE > 0) {
       console.log(`1이상 =${Math.ceil(orderHdList.length / ITEMS_PER_PAGE)}`);
       setTotalPages(Math.ceil(orderHdList.length / ITEMS_PER_PAGE));
     }
@@ -721,7 +725,6 @@ function Main(): JSX.Element {
           onClose={()=>{setErrorMessage(null)}}
         />
       )}
-
     </div>
   );
 }

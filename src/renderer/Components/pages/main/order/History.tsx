@@ -5,6 +5,7 @@ import * as api from '@Components/data/api/api';
 import { log } from '@Components/utils/logUtil';
 import { useUserStore } from '@Components/store/user';
 import { STRINGS } from '../../../../constants/strings';
+import Alert from '@Components/common/Alert';
 
 interface HistoryProps {
   saleDt: string;
