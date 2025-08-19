@@ -57,6 +57,10 @@
     &.diff {
       justify-content: flex-end;
     }
+    &.refund {
+      justify-content: flex-end;
+      color: red;
+    }
   }
 }
 

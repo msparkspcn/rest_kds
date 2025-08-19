@@ -2,7 +2,7 @@
   "name": "srkds",
   "private": true,
   "homepage": ".",
-  "version": "1.0.6",
+  "version": "1.0.9",
   "description": "휴게소 kds",
   "license": "MIT",
   "author": "minsupark",
@@ -40,7 +40,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-commonjs": "^28.0.6",
     "@types/better-sqlite3": "^7.6.13",
     "@types/detect-port": "^1.3.2",
     "@types/numeral": "^2.0.5",
@@ -94,13 +94,17 @@
       "url": "http://o2pos.spcnetworks.kr/files/app/o2pos/download/srkds/"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32"]
+        }
+      ]
     },
     "nsis": {
       "include": "configs/installer.nsh",
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
-      "perMachine": true,
       "deleteAppDataOnUninstall": false,
       "runAfterFinish": true,
       "differentialPackage": false

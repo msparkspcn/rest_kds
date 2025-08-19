@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import './OrderContainer.scss';
+import { log } from '@Components/utils/logUtil';
 
 interface OrderItem {
   // itemNm: string;
@@ -64,7 +65,7 @@ function OrderContainer({ item, onSelectOrder, selectedOrderNo }: OrderContainer
       className={`order-container ${backColor} ${selectedOrderNo === item.orderNoC ? 'selected-border' : ''}`}
       onClick={() => onSelectOrder(item)}
     >
-      <OrderHeader orderNoC={item.orderNoC} instTime={displayInstTime} diff={diff} />
+      <OrderHeader orderNoC={item.orderNoC} instTime={displayInstTime} diff={diff} status={item.status}/>
       <div className="order-items">
         {item.orderDtList.map((orderItem, index) => (
           <RenderItem
@@ -82,14 +83,18 @@ interface OrderHeaderProps {
   orderNoC: string;
   instTime: string;
   diff: number;
+  status: string;
 }
 /* hd 가져오고 orderNo, updTime, 경과시간 처리.(경과시간 무엇을 기준으로 하는지 확인 필요) */
-function OrderHeader({ orderNoC, instTime, diff }: OrderHeaderProps): JSX.Element {
+function OrderHeader({ orderNoC, instTime, diff, status }: OrderHeaderProps): JSX.Element {
+  log("status:"+status+", orderNoC:"+orderNoC)
   return (
     <div className="order-header">
       <div className="header-cell order-no">{orderNoC}</div>
       <div className="header-cell inst-time">{instTime}</div>
-      <div className="header-cell diff">{diff * -1}&apos;</div>
+      <div className={`header-cell ${status === "8" ? 'refund' : 'diff'}`}>
+        {status === "8" ? "반품" : `${diff * -1}'`}
+      </div>
     </div>
   );
 }

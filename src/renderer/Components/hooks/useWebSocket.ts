@@ -44,7 +44,7 @@ export const useWebSocket = () => {
           setMessages(data.type, data.body);
         }
         else if('order'.includes(data.type)) {
-          log(`order data:${JSON.stringify(data)}`);
+          log(`ws order data:${JSON.stringify(data)}`);
           setMessages(data.type, data.data);
         }
       } catch (err) {
@@ -53,8 +53,8 @@ export const useWebSocket = () => {
     };
 
     const setMessages = (type:string, body: any) => {
-      setMessagesInternal((prev) => {
-        let filtered: { type: string; body: any }[] = [];
+      setMessagesInternal(() => {
+        let filtered: { type: string; body: any }[];
 
         if (type === 'order') {
           filtered = [

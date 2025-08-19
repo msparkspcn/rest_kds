@@ -37,6 +37,7 @@ interface OrderData {
   ordTime: string;
   saleDt: string;
   orderDtList: OrderItem[];
+  status: string;
 }
 
 function Main(): JSX.Element {
@@ -166,15 +167,17 @@ function Main(): JSX.Element {
             )
           );
 
-          handleOrderStatus(
-            body.cmpCd,
-            body.salesOrgCd,
-            body.storCd,
-            cornerCd,
-            body.saleDt,
-            body.posNo,
-            body.tradeNo,
-            STRINGS.status_pending);
+          if(body.status === "1") {
+            handleOrderStatus(
+              body.cmpCd,
+              body.salesOrgCd,
+              body.storCd,
+              cornerCd,
+              body.saleDt,
+              body.posNo,
+              body.tradeNo,
+              STRINGS.status_pending);
+          }
 
           const orderHdList = await window.ipc.order.getList(
             saleDt, body.cmpCd, body.salesOrgCd, body.storCd, cornerCd);
@@ -190,7 +193,7 @@ function Main(): JSX.Element {
           log('3.개점 처리' + JSON.stringify(current.body))
 
           await Promise.all(
-            window.ipc.saleOpen.add(current.body.openDt)
+            window.ipc.saleOpen.add(user!.cmpCd, user!.salesOrgCd, user!.storCd, current.body.openDt)
           )
           setSaleDt(current.body.openDt)
           getOrderList(user!.cmpCd, user!.salesOrgCd, user!.storCd, user!.cornerCd!!,
@@ -231,8 +234,9 @@ function Main(): JSX.Element {
       searchDt : saleDt,
     }
     try {
+      log("주문조회 api call request:"+JSON.stringify(request))
       const result = await api.getOrderList(request);
-      const {responseCode, responseMessage, responseBody} = result.data;
+      const {responseCode, responseBody} = result.data;
       if(responseCode === "200") {
         if(responseBody!=null) {
           log("주문목록:"+JSON.stringify(responseBody))
@@ -283,7 +287,7 @@ function Main(): JSX.Element {
     }
     try {
       const result = await api.getOpenDate(request);
-      const {responseCode, responseMessage, responseBody} = result.data;
+      const {responseCode, responseBody} = result.data;
       if (responseCode === "200") {
         if(responseBody!=null) {
           log("개점일:"+JSON.stringify(responseBody.openDt))
@@ -368,7 +372,7 @@ function Main(): JSX.Element {
   const getOrderData = async(saleDt: string) => {
     //주문정보 내부 쿼리 후 주문건수, 주문 set
     // const {cmpCd, brandCd, storeCd} = store;
-    console.log("getOrderData saleDt:" + saleDt + ", cmpCd:" + user!.cmpCd
+    console.log("로컬 주문 조회 saleDt:" + saleDt + ", cmpCd:" + user!.cmpCd
       + ", storCd:" + user!.storCd + ", cornerCd:" + user!.cornerCd)
     const orderHdList = await window.ipc.order.getList(
       saleDt,
@@ -378,11 +382,10 @@ function Main(): JSX.Element {
       user!.cornerCd);
     setOrderCount(orderHdList.length)
     setOrderList(orderHdList);
-
-    console.log("주문목록1:"+JSON.stringify(orderHdList));
+    setSelectedOrder(null)
+    // console.log("주문목록1:"+JSON.stringify(orderHdList));
 
     if (orderHdList.length == 0) {
-      setSelectedOrder(null)
       setTotalPages(1)
       setCurrentPage(0)
     }
@@ -433,30 +436,53 @@ function Main(): JSX.Element {
     prefix: string,
     status: string
   ) => {
-    if (!selectedOrder || !selectedOrder.orderNoC) {
-      setErrorMessage('주문 번호를 선택해주세요.\n관리자에게 문의해주세요.');
-      return;
-    }
+
     openDialog(
       title,
       `${selectedOrder.orderNoC}번 주문을\n${prefix}하시겠습니까?`,
       async () => {
         console.log(`주문 ${prefix} 실행`);
-        try {
-          await handleOrderStatus(
-            selectedOrder.cmpCd,
-            selectedOrder.salesOrgCd,
-            selectedOrder.storCd,
-            selectedOrder.cornerCd,
-            selectedOrder.saleDt,
-            selectedOrder.posNo,
-            selectedOrder.tradeNo,
-            status
-          );
-        } catch (error) {
-          log("주문 처리 중 오류:"+error);
-        } finally {
-          setConfirmOpen(false);
+
+        if(status=="C") { //취소 완료 시에 별도 처리(로컬 db만 업데이트)
+          log("취소 완료 처리")
+          try {
+            await window.ipc.order.updateOrderStatus(
+              status,
+              saleDt,
+              selectedOrder.cmpCd,
+              selectedOrder.salesOrgCd,
+              selectedOrder.storCd,
+              selectedOrder.cornerCd,
+              selectedOrder.posNo,
+              selectedOrder.tradeNo
+            );
+            log("주문 취소 업데이트 완료");
+            getOrderData(saleDt)
+          }
+          catch (error) {
+            log("주문 상태 업데이트 실패: " + error);
+          }
+          finally {
+            setConfirmOpen(false)
+          }
+        }
+        else {
+          try {
+            await handleOrderStatus(
+              selectedOrder.cmpCd,
+              selectedOrder.salesOrgCd,
+              selectedOrder.storCd,
+              selectedOrder.cornerCd,
+              selectedOrder.saleDt,
+              selectedOrder.posNo,
+              selectedOrder.tradeNo,
+              status
+            );
+          } catch (error) {
+            log("주문 처리 중 오류:"+error);
+          } finally {
+            setConfirmOpen(false);
+          }
         }
       }
     );
@@ -473,6 +499,7 @@ function Main(): JSX.Element {
     status:string
   ) => {
     try {
+      log("상태 업데이트 요청 tradeNo:"+tradeNo+", status:"+status)
       const request = {
         cmpCd: cmpCd,
         salesOrgCd: salesOrgCd,
@@ -527,11 +554,25 @@ function Main(): JSX.Element {
 
   const handleCallOrder = async () => {
     console.log("selectedOrder:"+JSON.stringify(selectedOrder))
+    if (!selectedOrder || !selectedOrder.orderNoC) {
+      setErrorMessage('주문 번호를 선택해주세요.');
+      return;
+    }
+    else if(selectedOrder.status==STRINGS.status_refund) {
+      setErrorMessage('반품된 주문은 호출할 수 없습니다.');
+      return;
+    }
     handleOrder('주문 호출', '호출', STRINGS.status_call)
   };
 
   const handleCompleteOrder = () => {
-    handleOrder('주문 완료', '완료', STRINGS.status_completed)
+    log("완료 클릭 selectedOrder:"+selectedOrder)
+    if (!selectedOrder || !selectedOrder.orderNoC) {
+      setErrorMessage('주문 번호를 선택해주세요.');
+      return;
+    }
+    const statusValue = selectedOrder.status === "8" ? STRINGS.status_refund_completed : STRINGS.status_completed;
+    handleOrder('주문 완료', '완료', statusValue)
   };
 
   const handleCompleteOrderAll = () => {
@@ -554,7 +595,7 @@ function Main(): JSX.Element {
         }
 
         const result = await api.updateAllOrderStatus(unCompletedList);
-        const {responseCode, responseMessage, responseBody} = result.data;
+        const {responseCode, responseBody} = result.data;
         if(responseCode === "200") {
           if (responseBody != null) {
             for (const order of unCompletedList) {
@@ -589,17 +630,18 @@ function Main(): JSX.Element {
     const recentCompletedOrder = await window.ipc.order.getRecentCompletedOrder(
       saleDt, user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
     );
-
-    await handleOrderStatus(
-      recentCompletedOrder.cmpCd,
-      recentCompletedOrder.salesOrgCd,
-      recentCompletedOrder.storCd,
-      recentCompletedOrder.cornerCd,
-      recentCompletedOrder.saleDt,
-      recentCompletedOrder.posNo,
-      recentCompletedOrder.tradeNo,
-      STRINGS.status_pending
-    )
+    if(recentCompletedOrder) {
+      await handleOrderStatus(
+        recentCompletedOrder.cmpCd,
+        recentCompletedOrder.salesOrgCd,
+        recentCompletedOrder.storCd,
+        recentCompletedOrder.cornerCd,
+        recentCompletedOrder.saleDt,
+        recentCompletedOrder.posNo,
+        recentCompletedOrder.tradeNo,
+        STRINGS.status_pending
+      )
+    }
   };
 
   const onExitApp = () => {
