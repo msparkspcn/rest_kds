@@ -35,7 +35,7 @@ function Contents({ orderList, onSelectOrderHd, selectedOrderNo }: ContentsProps
       <div className="order-grid">
         {orderArray?.map((orderItem: any) => (
           <OrderContainer
-            key={orderItem.orderNoC}
+            key={`${orderItem.orderNoC}_${orderItem.tradeNo}`}
             item={orderItem}
             onSelectOrder={onSelectOrderHd}
             selectedOrderNo={selectedOrderNo}

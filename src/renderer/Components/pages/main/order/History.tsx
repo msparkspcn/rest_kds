@@ -47,7 +47,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
   },[isOpen])
 
   const getCompletedOrderList = async() => {
-    console.log("cmpCd:"+user.cmpCd+", storCd:"+user.storCd+", cornerCd:"+user.cornerCd)
+    console.log("saleDt:"+saleDt+", cmpCd:"+user.cmpCd+", storCd:"+user.storCd+", cornerCd:"+user.cornerCd)
     const orderList = await window.ipc.order.getCompletedList(
       saleDt, user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
     )
@@ -66,6 +66,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
   };
   const onRestore = () => {
     if (selectedOrder && selectedOrder.orderNoC) {
+      console.log('주문 복원 실행 selectedOrder:'+JSON.stringify(selectedOrder));
       openDialog(
         '주문 복원',
         selectedOrder.orderNoC+'번 주문을\n복원하시겠습니까?',
@@ -158,6 +159,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
                 <th>No</th>
                 <th>POS</th>
                 <th>주문번호</th>
+                <th>대기번호</th>
                 <th>주문일시</th>
                 <th>완료일시</th>
                 <th>SEQ</th>
@@ -173,7 +175,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
 
               return (
                 <tr
-                  key={`${hd.orderNoC}-${dt.seq}`}
+                  key={`${dt.tradeNo}_${hd.orderNoC}_${dt.seq}`}
                   className={`${selectedOrder.orderNoC === hd.orderNoC ? 'selected' : ''}
           ${globalIndex % 2 === 0 ? 'even-row' : 'odd-row'}
         `}
@@ -183,12 +185,14 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
                   {isFirst ? (
                     <>
                       <td>{hd.posNo}</td>
+                      <td>{hd.tradeNo}</td>
                       <td>{hd.orderNoC}</td>
                       <td>{formatTime(hd.ordTime)}</td>
                       <td>{formatTime(hd.comTime)}</td>
                     </>
                   ) : (
                     <>
+                      <td />
                       <td />
                       <td />
                       <td />

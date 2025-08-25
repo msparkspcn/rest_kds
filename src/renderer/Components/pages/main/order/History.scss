@@ -113,11 +113,11 @@
 
       th:nth-child(1), td:nth-child(1) {
         text-align: center;
-        width: 7%;
+        width: 6%;
       }
       th:nth-child(2), td:nth-child(2) {
         text-align: center;
-        width: 8%;
+        width: 7%;
       }
       th:nth-child(3), td:nth-child(3) {
         text-align: center;
@@ -125,22 +125,26 @@
       }
       th:nth-child(4), td:nth-child(4) {
         text-align: center;
-        width: 16%;
+        width: 11%;
       }
       th:nth-child(5), td:nth-child(5) {
         text-align: center;
-        width: 16%;
+        width: 13%;
       }
       th:nth-child(6), td:nth-child(6) {
         text-align: center;
-        width: 8%;
+        width: 13%;
       }
       th:nth-child(7), td:nth-child(7) {
-        width: 25%;
+        text-align: center;
+        width: 7%;
       }
       th:nth-child(8), td:nth-child(8) {
+        width: 24%;
+      }
+      th:nth-child(9), td:nth-child(9) {
         text-align: right;
-        width: 7%;
+        width: 6%;
       }
 
       th {
