@@ -176,7 +176,7 @@ const History: React.FC<HistoryProps> = ({ saleDt, isOpen, onClose }) => {
               return (
                 <tr
                   key={`${dt.tradeNo}_${hd.orderNoC}_${dt.seq}`}
-                  className={`${selectedOrder.orderNoC === hd.orderNoC ? 'selected' : ''}
+                  className={`${selectedOrder.tradeNo === hd.tradeNo && selectedOrder.orderNoC === hd.orderNoC ? 'selected' : ''}
           ${globalIndex % 2 === 0 ? 'even-row' : 'odd-row'}
         `}
                   onClick={() => setSelectedOrder(hd)}

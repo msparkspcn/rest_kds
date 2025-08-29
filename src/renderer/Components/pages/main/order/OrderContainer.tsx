@@ -29,9 +29,10 @@ interface OrderContainerProps {
   item: OrderData;
   onSelectOrder: (order: OrderData) => void;
   selectedOrderNo: string | null;
+  selectedTradeNo: string | null;
 }
 
-function OrderContainer({ item, onSelectOrder, selectedOrderNo }: OrderContainerProps): JSX.Element {
+function OrderContainer({ item, onSelectOrder, selectedOrderNo, selectedTradeNo }: OrderContainerProps): JSX.Element {
   const [backColor, setBackColor] = useState('bg-green-600');
   const [diff, setDiff] = useState(0);
 
@@ -62,7 +63,11 @@ function OrderContainer({ item, onSelectOrder, selectedOrderNo }: OrderContainer
 
   return (
     <div
-      className={`order-container ${backColor} ${selectedOrderNo === item.orderNoC ? 'selected-border' : ''}`}
+      className={`order-container ${backColor} ${
+        selectedTradeNo === item.tradeNo && selectedOrderNo === item.orderNoC
+          ? 'selected-border'
+          : ''
+      }`}
       onClick={() => onSelectOrder(item)}
     >
       <OrderHeader orderNoC={item.orderNoC} instTime={displayInstTime} diff={diff} status={item.status}/>

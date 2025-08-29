@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import OrderContainer from './order/OrderContainer';
 import './Contents.scss';
 
@@ -7,6 +6,7 @@ interface ContentsProps {
   className?: string;
   onSelectOrderHd: (order: OrderData) => void;
   selectedOrderNo: string | null;
+  selectedTradeNo: string | null;
 }
 interface OrderItem {
   itemNm: string;
@@ -27,7 +27,7 @@ interface OrderData {
   status: string;
 }
 
-function Contents({ orderList, onSelectOrderHd, selectedOrderNo }: ContentsProps): JSX.Element {
+function Contents({ orderList, onSelectOrderHd, selectedOrderNo, selectedTradeNo }: ContentsProps): JSX.Element {
   const orderArray = Array.isArray(orderList) ? orderList : [];
 
   return (
@@ -39,6 +39,7 @@ function Contents({ orderList, onSelectOrderHd, selectedOrderNo }: ContentsProps
             item={orderItem}
             onSelectOrder={onSelectOrderHd}
             selectedOrderNo={selectedOrderNo}
+            selectedTradeNo={selectedTradeNo}
           />
         ))}
       </div>

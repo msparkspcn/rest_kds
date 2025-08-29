@@ -264,6 +264,19 @@ function Main(): JSX.Element {
                   )
                 )
               )
+
+              if(body.status === "1") {
+                log('신규 주문(1)이므로 2로 상태 업데이트')
+                handleOrderStatus(
+                  body.cmpCd,
+                  body.salesOrgCd,
+                  body.storCd,
+                  cornerCd,
+                  body.saleDt,
+                  body.posNo,
+                  body.tradeNo,
+                  STRINGS.status_pending);
+              }
             } else {
               log("웹 환경입니다.")
             }
@@ -699,6 +712,7 @@ function Main(): JSX.Element {
           orderList={filterList}
           onSelectOrderHd={onSelectOrderHd}
           selectedOrderNo={selectedOrder?.orderNoC || null}
+          selectedTradeNo={selectedOrder?.tradeNo || null}
         />
       </div>
       <div className="order-action-bar">
