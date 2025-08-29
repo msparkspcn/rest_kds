@@ -2,7 +2,7 @@
   "name": "srkds",
   "private": true,
   "homepage": ".",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "휴게소 kds",
   "license": "MIT",
   "author": "minsupark",
@@ -19,6 +19,7 @@
     "make:linux": "npm run clean:build && npm run build && electron-builder build -l",
     "make:mac": "npm run clean:build && npm run build && electron-builder build -m",
     "make:win": "npm run rebuild && npm run clean:build && npm run build && electron-builder build -w",
+    "make:win32": "npm run rebuild && npm run clean:build && npm run build && electron-builder build -w --ia32",
     "prod:debug": "npm run debug && electron .",
     "prod": "npm run build && electron .",
     "start": "ts-node configs/check-port.ts && npm run clean:dist && npm run dev"
