@@ -73,7 +73,7 @@ function Main(): JSX.Element {
   const platform = getPlatform();
 
   useEffect(() => {
-    //최초 주문 수신 api 필요 getOrderList
+    log('111 messageQueue:'+JSON.stringify(messageQueue));
     if(user!=null) {
       getOpenDate(user.cmpCd, user.salesOrgCd, user.storCd!!)
       getProductList(user.cmpCd, user.salesOrgCd, user.storCd!!)
@@ -81,8 +81,8 @@ function Main(): JSX.Element {
   }, []);
 
   useEffect(() => {
+    console.log('WebSocket 메시지 수신:', JSON.stringify(messages));
     if (messages && messages.length > 0) {
-      console.log('WebSocket 메시지 수신:', JSON.stringify(messages));
       const wasIdle = messageQueueRef.current.length === 0 && !processingRef.current;
 
       messageQueueRef.current.push(...messages);
@@ -168,6 +168,7 @@ function Main(): JSX.Element {
           );
 
           if(body.status === "1") {
+            log('신규 주문(1)이므로 2로 상태 업데이트')
             handleOrderStatus(
               body.cmpCd,
               body.salesOrgCd,
@@ -184,20 +185,24 @@ function Main(): JSX.Element {
 
           setOrderList(orderHdList);
 
-          // console.log('내부 db insert 완료 orderHd12:', orderHdList);
           console.log('주문 처리 완료');
 
           break;
 
         case 'saleOpen':
           log('3.개점 처리' + JSON.stringify(current.body))
+          if(current.body.openDt<saleDt) {
+            log('이미 개점됐으므로 개점 필요 X')
+            return;
+          }
 
           await Promise.all(
-            window.ipc.saleOpen.add(user!.cmpCd, user!.salesOrgCd, user!.storCd, current.body.openDt)
+            window.ipc.saleOpen.add(user!.cmpCd, user!.salesOrgCd, user!.storCd, current.body.dt)
           )
-          setSaleDt(current.body.openDt)
+
+          setSaleDt(current.body.dt)
           getOrderList(user!.cmpCd, user!.salesOrgCd, user!.storCd, user!.cornerCd!!,
-            current.body.openDt)
+            current.body.dt)
 
           break;
 
@@ -480,6 +485,7 @@ function Main(): JSX.Element {
           }
         }
         else {
+          log('주문 처리 확인 버튼 클릭')
           try {
             await handleOrderStatus(
               selectedOrder.cmpCd,
@@ -644,6 +650,7 @@ function Main(): JSX.Element {
       saleDt, user?.cmpCd, user?.salesOrgCd, user?.storCd, user?.cornerCd
     );
     if(recentCompletedOrder) {
+      log('직전 복원 클릭')
       await handleOrderStatus(
         recentCompletedOrder.cmpCd,
         recentCompletedOrder.salesOrgCd,
@@ -665,6 +672,7 @@ function Main(): JSX.Element {
   }
 
   const onSelectOrderHd = (order: OrderData) => {
+    log("주문 선택: order:"+JSON.stringify(order))
     if (selectedOrder && selectedOrder.orderNoC == order.orderNoC) {
       log("order:"+JSON.stringify(order))
       setSelectedOrder(null)
@@ -681,6 +689,7 @@ function Main(): JSX.Element {
     log("enteredOrder:"+JSON.stringify(enteredOrder))
     if (enteredOrder) {
       try {
+        log('호출 클릭')
         await handleOrderStatus(
           enteredOrder.cmpCd,
           enteredOrder.salesOrgCd,

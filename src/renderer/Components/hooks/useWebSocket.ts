@@ -25,7 +25,7 @@ export const useWebSocket = () => {
 
       ws.current?.send(JSON.stringify({
         type: 'subscribe',
-        topic: ['item','order'],
+        topic: ['item','order','saleOpen'],
         userId: getUserId,
         salesOrgCd: user?.salesOrgCd,
         storCd: user?.storCd,
@@ -47,6 +47,10 @@ export const useWebSocket = () => {
           log(`ws order data:${JSON.stringify(data)}`);
           setMessages(data.type, data.data);
         }
+        else if('saleOpen'.includes(data.type)) {
+          log(`ws 개점정보:${JSON.stringify(data)}`);
+          setMessages(data.type, data.data);
+        }
       } catch (err) {
         console.warn('[WebSocket] Message parse error:', event.data);
       }
@@ -57,6 +61,7 @@ export const useWebSocket = () => {
         let filtered: { type: string; body: any }[];
 
         if (type === 'order') {
+          log("type:order")
           filtered = [
             {
               type,

@@ -220,6 +220,8 @@ const Setting: React.FC = () => {
     );
     const cornerCd = user?.cornerCd || list[0].cornerCd;
     const storCd = user?.storCd || list[0].storCd;
+    log("user:"+JSON.stringify(user))
+    log("storCd:"+storCd+", cornerCd:"+cornerCd)
     setSelectedCornerCd(cornerCd);
     setSelectedStorCd(storCd);
     setLoading(false);
@@ -252,7 +254,7 @@ const Setting: React.FC = () => {
       else {
         log("코너 api 조회 실패. local db 조회")
         const localCornerList = await window.ipc.corner.getList(cmpCd, salesOrgCd);
-        log("local db 조회 결과1:"+JSON.stringify(localCornerList))
+        // log("local db 조회 결과1:"+JSON.stringify(localCornerList))
         if(localCornerList && localCornerList.length > 0) {
           initCornerNmList(localCornerList);
         }

@@ -36,7 +36,7 @@ function OrderContainer({ item, onSelectOrder, selectedOrderNo, selectedTradeNo 
   const [backColor, setBackColor] = useState('bg-green-600');
   const [diff, setDiff] = useState(0);
 
-  // console.log(`item:${JSON.stringify(item)}`);
+  // console.log(`11item:${JSON.stringify(item)}`);
   const filteredTime = item.ordTime ?? "222222"
 
   const displayInstTime = `${filteredTime.slice(0, 2)}:${filteredTime.slice(2, 4)}:${filteredTime.slice(4, 6)}`;
@@ -92,7 +92,7 @@ interface OrderHeaderProps {
 }
 /* hd 가져오고 orderNo, updTime, 경과시간 처리.(경과시간 무엇을 기준으로 하는지 확인 필요) */
 function OrderHeader({ orderNoC, instTime, diff, status }: OrderHeaderProps): JSX.Element {
-  log("status:"+status+", orderNoC:"+orderNoC)
+  // log("status:"+status+", orderNoC:"+orderNoC)
   return (
     <div className="order-header">
       <div className="header-cell order-no">{orderNoC}</div>
