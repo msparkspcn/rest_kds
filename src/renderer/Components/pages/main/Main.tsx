@@ -191,14 +191,12 @@ function Main(): JSX.Element {
 
         case 'saleOpen':
           log('3.개점 처리' + JSON.stringify(current.body))
-          if(current.body.openDt<saleDt) {
-            log('이미 개점됐으므로 개점 필요 X')
+          if(current.body.dt<=saleDt) {
+            log('가장 최근 일자로 개점됐으므로 개점 필요 X')
             return;
           }
 
-          await Promise.all(
-            window.ipc.saleOpen.add(user!.cmpCd, user!.salesOrgCd, user!.storCd, current.body.dt)
-          )
+          await window.ipc.saleOpen.add(user!.cmpCd, user!.salesOrgCd, user!.storCd, current.body.dt)
 
           setSaleDt(current.body.dt)
           getOrderList(user!.cmpCd, user!.salesOrgCd, user!.storCd, user!.cornerCd!!,
