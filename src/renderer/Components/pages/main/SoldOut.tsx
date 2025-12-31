@@ -125,8 +125,8 @@ const SoldOut: React.FC<SoldOutProps> = ({ isOpen, onClose }) => {
       salesOrgCd: selectedCorner.salesOrgCd,
       storCd: selectedCorner.storCd,
       cornerCd: selectedCorner.cornerCd,
-      itemCd: product.itemCd.slice(0, 7),
-      itemSeq: product.itemCd.slice(7),
+      itemCd: product.itemCd.slice(0, -4),
+      itemSeq: product.itemCd.slice(-4),
       soldoutYn: product.soldoutYn,
     }));
 

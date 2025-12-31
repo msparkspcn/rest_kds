@@ -64,7 +64,6 @@ function Main(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { messages } = useWebSocket();
-  const [messageQueue, setMessageQueue] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const messageQueueRef = useRef<Message[]>([]);
   const processingRef = useRef(false);
