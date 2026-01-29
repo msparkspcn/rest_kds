@@ -106,6 +106,5 @@ function createTables() {
   console.log('Database will be created at:', dbPath);
 }
 
-createTables();
 
 export { db, createTables };

@@ -158,7 +158,6 @@ function isVersionGreater(v1: string, v2: string): boolean {
   return false;
 }
 
-
 ipcMain.handle('download-update', async () => {
   return new Promise((resolve) => {
     if (progressBar) {
@@ -215,7 +214,6 @@ ipcMain.handle('download-update', async () => {
 
 ipcMain.handle('quit-and-install', () => {
   BrowserWindow.getAllWindows().forEach((win) => win.close());
-
   autoUpdater.quitAndInstall();
 });
 
