@@ -111,7 +111,7 @@ function Main(): JSX.Element {
   };
 
   const processMessages = async (current: Message) => {
-    log('0.메시지 처리 시작 isProcessing:'+isProcessing)
+    log('메시지 처리 시작 isProcessing:'+isProcessing)
     setIsProcessing(true);
 
     try {
